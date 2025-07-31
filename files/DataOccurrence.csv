@@ -1,0 +1,5 @@
+﻿hazardnames,hazardtypes,limitexpo,broiler,milk,fish,egg,vege
+lead,K,0.008,positives,positives,positives,positives,positives
+cadmium,K,0.01,positives,positives,positives,positives,positives
+salmonella,M,100,all,positives,positives,positives,positives
+campylobacter,M,100,positives,positives,all,positives,positives
