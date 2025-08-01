@@ -1026,8 +1026,8 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
                 sampleconLB <- sample(concentrationsLB,length(concentrationsLB),replace=TRUE)
                 # create 10000 simulations from each replicated data:
                 sampleOIM <- sample(sampleOIM,10000,replace=TRUE)
-                samplecon <- sample(samplecon,10000,replace=TRUE)
-                samplecon0 <- sample(samplecon0,10000,replace=TRUE)
+                sampleconUB <- sample(sampleconUB,10000,replace=TRUE)
+                sampleconLB <- sample(sampleconLB,10000,replace=TRUE)
                 lines(ecdf(sampleOIM*mean(sampleconUB)*RK[foodindex[i],hazardindexK[h]]),verticals=TRUE,do.points=FALSE,xlim=c(0,maxx),lwd=1,lty=3,col="#D0006F")
                 lines(ecdf(sampleOIM*mean(sampleconLB)*RK[foodindex[i],hazardindexK[h]]),verticals=TRUE,do.points=FALSE,xlim=c(0,maxx),lwd=1,lty=3,col="#004F71")
               }
