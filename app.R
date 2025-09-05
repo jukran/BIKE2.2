@@ -216,7 +216,15 @@ ui <- navbarPage(id ="bike_tabs",
                                                    tags$br(),
                                                    downloadLink("downloadOccData", tags$i("DataOccurrence.csv")), 
                                                    tags$br(),
-                                                   downloadLink("downloadPrevData", tags$i("DataPrevalence.csv")) 
+                                                   downloadLink("downloadPrevData", tags$i("DataPrevalence.csv")),
+                                                   tags$br(),
+                                                   downloadLink("downloadConcenDatafish", tags$i("DataConcentrations_fish.csv")),
+                                                   tags$br(),  
+                                                   downloadLink("downloadConsumDataFFQ", tags$i("DataConsumptions_fish_FFQ.csv")),
+                                                   tags$br(),
+                                                   downloadLink("downloadOccDatafish", tags$i("DataOccurrence_fish.csv")),
+                                                   tags$br(),
+                                                   downloadLink("downloadPrevDatafish", tags$i("DataPrevalence_fish.csv"))
                                          )
                                        ),
                                        mainPanel(
@@ -3686,6 +3694,17 @@ server <- function(input, output, session) {
     contentType = "text/csv"
   )
   
+  output$downloadConcenDatafish <- downloadHandler(
+    filename <- function() {
+      paste("DataConcentrations_fish", ".csv", sep=".")
+    },
+    
+    content <- function(file) {
+      file.copy("files/DataConcentrations_fish.csv", file)
+    },
+    contentType = "text/csv"
+  )
+  
   output$downloadConsumData <- downloadHandler(
     filename <- function() {
       paste("DataConsumptions", ".csv", sep=".")
@@ -3693,6 +3712,17 @@ server <- function(input, output, session) {
     
     content <- function(file) {
       file.copy("files/DataConsumptions.csv", file)
+    },
+    contentType = "text/csv"
+  )
+  
+  output$downloadConsumDataFFQ <- downloadHandler(
+    filename <- function() {
+      paste("DataConsumptions_fish_FFQ", ".csv", sep=".")
+    },
+    
+    content <- function(file) {
+      file.copy("files/DataConsumptions_fish_FFQ.csv", file)
     },
     contentType = "text/csv"
   )
@@ -3708,6 +3738,17 @@ server <- function(input, output, session) {
     contentType = "text/csv"
   )
   
+  output$downloadOccDatafish <- downloadHandler(
+    filename <- function() {
+      paste("DataOccurrence_fish", ".csv", sep=".")
+    },
+    
+    content <- function(file) {
+      file.copy("files/DataOccurrence_fish.csv", file)
+    },
+    contentType = "text/csv"
+  )
+  
   output$downloadPrevData <- downloadHandler(
     
     filename = function() {
@@ -3719,7 +3760,16 @@ server <- function(input, output, session) {
     contentType = "application/zip"
   )
   
-  
+  output$downloadPrevDatafish <- downloadHandler(
+    
+    filename = function() {
+      paste("DataPrevalence_fish", ".csv", sep=".")
+    },
+    content = function(file) {
+      file.copy("files/DataPrevalence_fish.csv", file)
+    },
+    contentType = "application/zip"
+  )
   
 } 
 
