@@ -886,12 +886,12 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
               
               # legend outside the figure, but onto the current plot, so it is part of the png file:
               mtext(paste("Estimated 95% quantile for exposure+: ",qu95_50,  
-                          "(median). 90% uncertainty interval for the 95% quantile:", qu95_05,"-", qu95_95),
+                          "(posterior median). 90% uncertainty interval for the 95% quantile:", qu95_05,"-", qu95_95),
                     side = 1, adj = 0,line=2, cex = 1,
                     outer = TRUE)
               
               mtext(paste("Estimated 95% quantile for exposure: ",round(quantile(qutotal95,0.5,names=FALSE),3),
-                          "(median). 90% uncertainty interval for the 95% quantile: ", round(quantile(qutotal95,0.05,names=FALSE),3),"-",round(quantile(qutotal95,0.95,names=FALSE),3)),
+                          "(posterior median). 90% uncertainty interval for the 95% quantile: ", round(quantile(qutotal95,0.05,names=FALSE),3),"-",round(quantile(qutotal95,0.95,names=FALSE),3)),
                     side = 1, adj = 0,line=3, cex = 1,
                     outer = TRUE)
               
@@ -1026,8 +1026,8 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
                 sampleconLB <- sample(concentrationsLB,length(concentrationsLB),replace=TRUE)
                 # create 10000 simulations from each replicated data:
                 sampleOIM <- sample(sampleOIM,10000,replace=TRUE)
-                sampleconUB <- sample(sampleconUB,10000,replace=TRUE)
-                sampleconLB <- sample(sampleconLB,10000,replace=TRUE)
+                samplecon <- sample(samplecon,10000,replace=TRUE)
+                samplecon0 <- sample(samplecon0,10000,replace=TRUE)
                 lines(ecdf(sampleOIM*mean(sampleconUB)*RK[foodindex[i],hazardindexK[h]]),verticals=TRUE,do.points=FALSE,xlim=c(0,maxx),lwd=1,lty=3,col="#D0006F")
                 lines(ecdf(sampleOIM*mean(sampleconLB)*RK[foodindex[i],hazardindexK[h]]),verticals=TRUE,do.points=FALSE,xlim=c(0,maxx),lwd=1,lty=3,col="#004F71")
               }
@@ -1086,13 +1086,13 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
               
               # legend outside the figure, but onto the current plot, so it is part of the png file:
               mtext(paste("Estimated 95% quantile for exposure+: ",qu95_50,  
-                          "(median). 90% uncertainty interval for the 95% quantile: ", qu95_05,"-", qu95_95),
+                          "(posterior median). 90% uncertainty interval for the 95% quantile: ", qu95_05,"-", qu95_95),
                     side = 1, adj = 0,line=2, cex = 1,
                     outer = TRUE)
               
               
               mtext(paste("Estimated 95% quantile for exposure: ",round(quantile(qutotal95,0.5,names=FALSE),3),
-                          "(median). 90% uncertainty interval for the 95% quantile: ", round(quantile(qutotal95,0.05,names=FALSE),3),"-",round(quantile(qutotal95,0.95,names=FALSE),3)),
+                          "(posterior median). 90% uncertainty interval for the 95% quantile: ", round(quantile(qutotal95,0.05,names=FALSE),3),"-",round(quantile(qutotal95,0.95,names=FALSE),3)),
                     side = 1, adj = 0,line=3, cex = 1,
                     outer = TRUE)
               
@@ -1351,13 +1351,13 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
               
               # legend outside the figure, but onto the current plot, so it is part of the png file:
               mtext(paste("Estimated 95% quantile for exposure+: ",qu95_50,  
-                          "(median). 90% uncertainty interval for the 95% quantile: ", qu95_05,"-", qu95_95),
+                          "(posterior median). 90% uncertainty interval for the 95% quantile: ", qu95_05,"-", qu95_95),
                     side = 1, adj = 0,line=2, cex = 1,
                     outer = TRUE)
               
               
               mtext(paste("Estimated 95% quantile for exposure: ",round(quantile(qutotal95,0.5,names=FALSE),3),
-                          "(median). 90% uncertainty interval for the 95% quantile: ", round(quantile(qutotal95,0.05,names=FALSE),3),"-",round(quantile(qutotal95,0.95,names=FALSE),3)),
+                          "(posterior median). 90% uncertainty interval for the 95% quantile: ", round(quantile(qutotal95,0.05,names=FALSE),3),"-",round(quantile(qutotal95,0.95,names=FALSE),3)),
                     side = 1, adj = 0,line=3, cex = 1,
                     outer = TRUE)
               
@@ -1568,13 +1568,13 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
               
               # legend outside the figure, but onto the current plot, so it is part of the png file:
               mtext(paste("Estimated 95% quantile for exposure+: ",qu95_50,  
-                          "(median). 90% uncertainty interval for the 95% quantile: ", qu95_05,"-", qu95_95),
+                          "(posterior median). 90% uncertainty interval for the 95% quantile: ", qu95_05,"-", qu95_95),
                     side = 1, adj = 0,line=2, cex = 1,
                     outer = TRUE)
               
               
               mtext(paste("Estimated 95% quantile for exposure: ",round(quantile(qutotal95,0.5,names=FALSE),3),
-                          "(median). 90% uncertainty interval for the 95% quantile: ", round(quantile(qutotal95,0.05,names=FALSE),3),"-",round(quantile(qutotal95,0.95,names=FALSE),3)),
+                          "(posterior median). 90% uncertainty interval for the 95% quantile: ", round(quantile(qutotal95,0.05,names=FALSE),3),"-",round(quantile(qutotal95,0.95,names=FALSE),3)),
                     side = 1, adj = 0,line=3, cex = 1,
                     outer = TRUE)
               
@@ -1857,12 +1857,12 @@ distPlot4_1 <- function(unit_concen, hazard_concen, n_sim, input_selectscale, in
             
             # legend outside the figure, but onto the current plot, so it is part of the png file:
             mtext(paste("Estimated",theQ,"% quantile for the positive exposures: ",round(quantile(Qplus[,h],0.5,names=FALSE),2),  
-                        "(median). 90% uncertainty interval for the estimated quantile: ", round(quantile(Qplus[,h],0.05,names=FALSE),2),"-", round(quantile(Qplus[,h],0.95,names=FALSE),2)),
+                        "(posterior median). 90% uncertainty interval for the estimated quantile: ", round(quantile(Qplus[,h],0.05,names=FALSE),2),"-", round(quantile(Qplus[,h],0.95,names=FALSE),2)),
                   side = 1, adj = 0,line=1, cex = 1,
                   outer = TRUE)
             
             mtext(paste("Estimated",theQ,"% quantile for all (total) exposures: ",round(quantile(Q[,h],0.5,names=FALSE),2),  
-                        "(median). 90% uncertainty interval for the estimated quantile: ", round(quantile(Q[,h],0.05,names=FALSE),2),"-", round(quantile(Q[,h],0.95,names=FALSE),2)),
+                        "(posterior median). 90% uncertainty interval for the estimated quantile: ", round(quantile(Q[,h],0.05,names=FALSE),2),"-", round(quantile(Q[,h],0.95,names=FALSE),2)),
                   side = 1, adj = 0,line=2, cex = 1,
                   outer = TRUE)
             
@@ -1892,13 +1892,13 @@ distPlot4_1 <- function(unit_concen, hazard_concen, n_sim, input_selectscale, in
             
             # legend outside the figure, but onto the current plot, so it is part of the png file:
             mtext(paste("Estimated",theQ,"% quantile for the positive exposures: ",round(quantile(log10(Qplus[,h]),0.5,names=FALSE),2),  
-                        "(median). 90% uncertainty interval for the estimated quantile: ", round(quantile(log10(Qplus[,h]),0.05,names=FALSE),2),"-", 
+                        "(posterior median). 90% uncertainty interval for the estimated quantile: ", round(quantile(log10(Qplus[,h]),0.05,names=FALSE),2),"-", 
                         round(quantile(log10(Qplus[,h]),0.95,names=FALSE),2)),
                   side = 1, adj = 0,line=1, cex = 1,
                   outer = TRUE)
             
             mtext(paste("Estimated",theQ,"% quantile for all (total) exposures: ",round(quantile(log10(Q[,h]),0.5,names=FALSE),2),  
-                        "(median). 90% uncertainty interval for the estimated quantile: ", round(quantile(log10(Q[,h]),0.05,names=FALSE),2),"-", 
+                        "(posterior median). 90% uncertainty interval for the estimated quantile: ", round(quantile(log10(Q[,h]),0.05,names=FALSE),2),"-", 
                         round(quantile(log10(Q[,h]),0.95,names=FALSE),2)),
                   side = 1, adj = 0,line=2, cex = 1,
                   outer = TRUE)
@@ -2010,12 +2010,12 @@ distPlot4_1 <- function(unit_concen, hazard_concen, n_sim, input_selectscale, in
             
             # legend outside the figure, but onto the current plot, so it is part of the png file:
             mtext(paste("Estimated",theQ,"% quantile for the positive exposures: ",round(quantile(Qplus[,h],0.5,names=FALSE),2),  
-                        "(median). 90% uncertainty interval for the estimated quantile: ", round(quantile(Qplus[,h],0.05,names=FALSE),2),"-", round(quantile(Qplus[,h],0.95,names=FALSE),2)),
+                        "(posterior median). 90% uncertainty interval for the estimated quantile: ", round(quantile(Qplus[,h],0.05,names=FALSE),2),"-", round(quantile(Qplus[,h],0.95,names=FALSE),2)),
                   side = 1, adj = 0,line=1, cex = 1,
                   outer = TRUE)
             
             mtext(paste("Estimated",theQ,"% quantile for all (total) exposures: ",round(quantile(Q[,h],0.5,names=FALSE),2),  
-                        "(median). 90% uncertainty interval for the estimated quantile: ", round(quantile(Q[,h],0.05,names=FALSE),2),"-", round(quantile(Q[,h],0.95,names=FALSE),2)),
+                        "(posterior median). 90% uncertainty interval for the estimated quantile: ", round(quantile(Q[,h],0.05,names=FALSE),2),"-", round(quantile(Q[,h],0.95,names=FALSE),2)),
                   side = 1, adj = 0,line=2, cex = 1,
                   outer = TRUE)
             
@@ -2046,13 +2046,13 @@ distPlot4_1 <- function(unit_concen, hazard_concen, n_sim, input_selectscale, in
             
             # legend outside the figure, but onto the current plot, so it is part of the png file:
             mtext(paste("Estimated",theQ,"% quantile for the positive exposures: ",round(quantile(log10(Qplus[,h]),0.5,names=FALSE),2),  
-                        "(median). 90% uncertainty interval for the estimated quantile: ", round(quantile(log10(Qplus[,h]),0.05,names=FALSE),2),"-", 
+                        "(posterior median). 90% uncertainty interval for the estimated quantile: ", round(quantile(log10(Qplus[,h]),0.05,names=FALSE),2),"-", 
                         round(quantile(log10(Qplus[,h]),0.95,names=FALSE),2)),
                   side = 1, adj = 0,line=1, cex = 1,
                   outer = TRUE)
             
             mtext(paste("Estimated",theQ,"% quantile for all (total) exposures: ",round(quantile(log10(Q[,h]),0.5,names=FALSE),2),  
-                        "(median). 90% uncertainty interval for the estimated quantile: ", round(quantile(log10(Q[,h]),0.05,names=FALSE),2),"-", 
+                        "(posterior median). 90% uncertainty interval for the estimated quantile: ", round(quantile(log10(Q[,h]),0.05,names=FALSE),2),"-", 
                         round(quantile(log10(Q[,h]),0.95,names=FALSE),2)),
                   side = 1, adj = 0,line=2, cex = 1,
                   outer = TRUE)
@@ -2245,12 +2245,12 @@ distPlot4_1 <- function(unit_concen, hazard_concen, n_sim, input_selectscale, in
             
             # legend outside the figure, but onto the current plot, so it is part of the png file:
             mtext(paste("Estimated",theQ,"% quantile for the positive exposures: ",round(quantile(Qplus[,h],0.5,na.rm=TRUE,names=FALSE),2),  
-                        "(median). 90% uncertainty interval for the estimated quantile is", round(quantile(Qplus[,h],0.05,na.rm=TRUE,names=FALSE),2),"-", round(quantile(Qplus[,h],0.95,na.rm=TRUE,names=FALSE),2)),
+                        "(posterior median). 90% uncertainty interval for the estimated quantile is", round(quantile(Qplus[,h],0.05,na.rm=TRUE,names=FALSE),2),"-", round(quantile(Qplus[,h],0.95,na.rm=TRUE,names=FALSE),2)),
                   side = 1, adj = 0,line=1, cex = 1,
                   outer = TRUE)
             
             mtext(paste("Estimated",theQ,"% quantile for all (total) exposures: ",round(quantile(Q[,h],0.5,names=FALSE),2),  
-                        "(median). 90% uncertainty interval for the estimated quantile: ", round(quantile(Q[,h],0.05,names=FALSE),2),"-", round(quantile(Q[,h],0.95,names=FALSE),2)),
+                        "(posterior median). 90% uncertainty interval for the estimated quantile: ", round(quantile(Q[,h],0.05,names=FALSE),2),"-", round(quantile(Q[,h],0.95,names=FALSE),2)),
                   side = 1, adj = 0,line=2, cex = 1,
                   outer = TRUE)
             
@@ -2286,13 +2286,13 @@ distPlot4_1 <- function(unit_concen, hazard_concen, n_sim, input_selectscale, in
             
             # legend outside the figure, but onto the current plot, so it is part of the png file:
             mtext(paste("Estimated",theQ,"% quantile for the positive exposures: ",round(quantile(log10(Qplus[,h]),0.5,na.rm=TRUE,names=FALSE),2),  
-                        "(median). 90% uncertainty interval for the estimated quantile: ", round(quantile(log10(Qplus[,h]),0.05,na.rm=TRUE,names=FALSE),2),"-", 
+                        "(posterior median). 90% uncertainty interval for the estimated quantile: ", round(quantile(log10(Qplus[,h]),0.05,na.rm=TRUE,names=FALSE),2),"-", 
                         round(quantile(log10(Qplus[,h]),0.95,na.rm=TRUE,names=FALSE),2)),
                   side = 1, adj = 0,line=1, cex = 1,
                   outer = TRUE)
             
             mtext(paste("Estimated",theQ,"% quantile for all (total) exposures: ",round(quantile(log10(Q[,h]),0.5,names=FALSE),2),  
-                        "(median). 90% uncertainty interval for the estimated quantile: ", round(quantile(log10(Q[,h]),0.05,names=FALSE),2),"-", 
+                        "(posterior median). 90% uncertainty interval for the estimated quantile: ", round(quantile(log10(Q[,h]),0.05,names=FALSE),2),"-", 
                         round(quantile(log10(Q[,h]),0.95,names=FALSE),2)),
                   side = 1, adj = 0,line=2, cex = 1,
                   outer = TRUE)
@@ -2431,12 +2431,12 @@ distPlot4_1 <- function(unit_concen, hazard_concen, n_sim, input_selectscale, in
             
             # legend outside the figure, but onto the current plot, so it is part of the png file:
             mtext(paste("Estimated",theQ,"% quantile for the positive exposures: ",round(quantile(Qplus[,h],0.5,na.rm=TRUE,names=FALSE),2),  
-                        "(median). 90% uncertainty interval for the estimated quantile: ", round(quantile(Qplus[,h],0.05,na.rm=TRUE,names=FALSE),2),"-", round(quantile(Qplus[,h],0.95,na.rm=TRUE,names=FALSE),2)),
+                        "(posterior median). 90% uncertainty interval for the estimated quantile: ", round(quantile(Qplus[,h],0.05,na.rm=TRUE,names=FALSE),2),"-", round(quantile(Qplus[,h],0.95,na.rm=TRUE,names=FALSE),2)),
                   side = 1, adj = 0,line=1, cex = 1,
                   outer = TRUE)
             
             mtext(paste("Estimated",theQ,"% quantile for all (total) exposures: ",round(quantile(Q[,h],0.5,names=FALSE),2),  
-                        "(median). 90% uncertainty interval for the estimated quantile: ", round(quantile(Q[,h],0.05,names=FALSE),2),"-", round(quantile(Q[,h],0.95,names=FALSE),2)),
+                        "(posterior median). 90% uncertainty interval for the estimated quantile: ", round(quantile(Q[,h],0.05,names=FALSE),2),"-", round(quantile(Q[,h],0.95,names=FALSE),2)),
                   side = 1, adj = 0,line=2, cex = 1,
                   outer = TRUE)
             
@@ -2471,13 +2471,13 @@ distPlot4_1 <- function(unit_concen, hazard_concen, n_sim, input_selectscale, in
             
             # legend outside the figure, but onto the current plot, so it is part of the png file:
             mtext(paste("Estimated",theQ,"% quantile for the positive exposures: ",round(quantile(log10(Qplus[,h]),0.5,na.rm=TRUE,names=FALSE),2),  
-                        "(median). 90% uncertainty interval for the estimated quantile: ", round(quantile(log10(Qplus[,h]),0.05,na.rm=TRUE,names=FALSE),2),"-", 
+                        "(posterior median). 90% uncertainty interval for the estimated quantile: ", round(quantile(log10(Qplus[,h]),0.05,na.rm=TRUE,names=FALSE),2),"-", 
                         round(quantile(log10(Qplus[,h]),0.95,na.rm=TRUE,names=FALSE),2)),
                   side = 1, adj = 0,line=1, cex = 1,
                   outer = TRUE)
             
             mtext(paste("Estimated",theQ,"% quantile for all (total) exposures: ",round(quantile(log10(Q[,h]),0.5,names=FALSE),2),  
-                        "(median). 90% uncertainty interval for the estimated quantile: ", round(quantile(log10(Q[,h]),0.05,names=FALSE),2),"-", 
+                        "(posterior median). 90% uncertainty interval for the estimated quantile: ", round(quantile(log10(Q[,h]),0.05,names=FALSE),2),"-", 
                         round(quantile(log10(Q[,h]),0.95,names=FALSE),2)),
                   side = 1, adj = 0,line=2, cex = 1,
                   outer = TRUE)
