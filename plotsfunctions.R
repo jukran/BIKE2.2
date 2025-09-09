@@ -927,50 +927,7 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
               
               lines(density(meanexposure,from=0,to=maxx,n=2048),col="#F7CE3C",main=paste(hazardnamesusedK[h],"from",foodnamesused[i],"(chronic)"),xlab="C.exposure/bw+",ylab="",xlim=c(0,maxx),lwd=3)
               lines(density(medianexposure,from=0,to=maxx,n=2048),lwd=3)
-              
-              # numerical results:
-              # chronic exposure (hazard i, food j) over all days, all servings (including zeros):
-              #V <- 1000 # variability simulations
-              #logitpconsume <- matrix(NA,nf,V)
-              #pconsume <- matrix(NA,nf,V)
-              #cmeanpos <- numeric()
-              #qtotal95 <- numeric()
-              #for(u in 1:n_sim){ 
-              #  # simulate variability for V individuals, per each uncertain parameter:
-              #  if(input_modelchoice=="Independent days"){
-              #    if(input_modelchoice2 =="Yes"){
-              #      logitpconsume[foodindex[i],1:V] <- rnorm(V,logitp0[u,foodindex[i]],sqrt(Sp[u,foodindex[i],foodindex[i]])) 
-              #    }
-              #    if(input_modelchoice2 == "No"){
-              #      logitpconsume[foodindex[i],1:V] <- rep(logitp0[u,foodindex[i]],V)   
-              #    }
-              #    pconsume[foodindex[i],1:V] <- exp(logitpconsume[foodindex[i],1:V])/(1+exp(logitpconsume[foodindex[i],1:V]))  
-              #  }
-              #  if(input_modelchoice=="Dependent days"){
-              #    pconsume[foodindex[i],1:V] <- rep(p0[u,foodindex[i]],V)  
-              #  }
-                
-              #  cmeanpos[1:V] <- rlnorm(V,logRK[foodindex[i],hazardindexK[h]]
-              #                          +mus0[u,foodindex[i]]
-              #                          +0.5*Vs[u]
-              #                          +mucK[u,hazardindexK[h],foodindex[i]]
-              #                          +0.5*sigcK[u,hazardindexK[h],foodindex[i]]^2,
-              #                          sqrt(Vs0[u] )) 
-              #  qtotal95[u]<-quantile(
-              #    pconsume[foodindex[i],1:V]*
-              #      pK[u,hazardindexK[h],foodindex[i]]*
-              #      PK[foodindex[i],hazardindexK[h]]*
-              #      cmeanpos[1:V],0.95,names=FALSE)
-              #} # end of for u
-              
-              # positive chronic exposures, 
-              # posterior quantiles of variability 95%quantile:
-              ##q95_50 <- round(quantile(qlnormpos95K,
-              ##                          0.5,names=FALSE),3)
-              ##q95_95 <- round(quantile(qlnormpos95K,
-              ##                          0.95,names=FALSE),3)
-              ##q95_05 <- round(quantile(qlnormpos95K,
-              ##                          0.05,names=FALSE),3)
+            
               
               # legend outside the figure, but onto the current plot, so it is part of the png file:
               mtext(paste("Estimated 95% quantile for exposure+: ",q95_50,  
@@ -1133,60 +1090,6 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
               lines(meanexposure[meanexposure<maxx],cump[meanexposure<maxx],col="#F7CE3C",main=paste(hazardnamesusedK[h],"from",foodnamesused[i],"(chronic)"),xlab="C.exposure/bw+",ylab="",xlim=c(0,maxx),lwd=3) 
               lines(medianexposure[medianexposure<maxx],cump[medianexposure<maxx],xlim=c(0,maxx),lwd=3)
               
-              # numerical results:
-              
-              # chronic exposure (hazard i, food j) over all days, all servings (including zeros):
-              #V <- 1000 # variability simulations
-              #logitpconsume <- matrix(NA,nf,V)
-              #pconsume <- matrix(NA,nf,V)
-              #cmeanpos <- numeric()
-              #qtotal95 <- numeric()
-              #qltotal95 <- numeric()
-              #for(u in 1:n_sim){ 
-              #  # simulate variability for V individuals, 
-              #  # per each uncertain parameter:
-              #  if(input_modelchoice=="Independent days"){
-              #    if(input_modelchoice2 =="Yes"){
-              #      logitpconsume[foodindex[i],1:V] <-  rnorm(V,logitp0[u,foodindex[i]],sqrt(Sp[u,foodindex[i],foodindex[i]]))
-              #    }
-              #    if(input_modelchoice2 == "No"){
-              #      logitpconsume[foodindex[i],1:V] <- rep(logitp0[u,foodindex[i]],V)   
-              #    }
-              #    pconsume[foodindex[i],1:V] <- exp(logitpconsume[foodindex[i],1:V])/(1+exp(logitpconsume[foodindex[i],1:V]))  
-              #  }
-              #  if(input_modelchoice=="Dependent days"){
-              #    pconsume[foodindex[i],1:V] <- rep(p0[u,foodindex[i]],V)
-              #  }
-                
-                # evaluate the 95% quantile of the exposure distribution including all days 
-                # (not only positively contaminated consumptions)
-              #  cmeanpos[1:V] <- rlnorm(V,logRK[foodindex[i],hazardindexK[h]]
-              #                          +mus0[u,foodindex[i]]
-              #                          +0.5*Vs[u]
-              #                          +mucK[u,hazardindexK[h],foodindex[i]]
-              #                          +0.5*sigcK[u,hazardindexK[h],foodindex[i]]^2,
-              #                          sqrt(Vs0[u]))
-              #  qtotal95[u]<-quantile(
-              #    pconsume[foodindex[i],1:V]*
-              #      pK[u,hazardindexK[h],foodindex[i]]*
-              #      PK[foodindex[i],hazardindexK[h]]*
-              #      cmeanpos[1:V],0.95,names=FALSE)
-              #  qltotal95[u]<-quantile(
-              #    log10(pconsume[foodindex[i],1:V]*
-              #      pK[u,hazardindexK[h],foodindex[i]]*
-              #      PK[foodindex[i],hazardindexK[h]]*
-              #      cmeanpos[1:V]),0.95,names=FALSE)
-              ##} # end of for u
-              
-              
-              # positive chronic exposures, 
-              # posterior quantiles of variability 95% quantile (contaminated consumptions only):
-              ##q95_50 <- round(quantile(qlnormpos95K, 
-              ##                          0.5,names=FALSE),3)
-              ##q95_95 <- round(quantile(qlnormpos95K,
-              ##                          0.95,names=FALSE),3)
-              ##q95_05 <- round(quantile(qlnormpos95K,
-              ##                          0.05,names=FALSE),3)
               
               # legend outside the figure, but onto the current plot, so it is part of the png file:
               mtext(paste("Estimated 95% quantile for exposure+: ",q95_50,  
@@ -1297,8 +1200,6 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
           } # end of if cumulative
           
           # legend outside the figure, but onto the current plot, so it is part of the png file:
-          
-          
           mtext(paste("Estimated population frequency of exposure for", hazardnamesusedK[h],"from",foodnamesused[i], ": ",round(quantile(100*PK[foodindex[i],hazardindexK[h]]*pK[,hazardindexK[h],foodindex[i]]*p0[,foodindex[i]],0.5,names=FALSE),2),
                       "% (posterior median)"),
                 side = 1, adj = 0,line=0, cex = 1,
@@ -1344,8 +1245,6 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
             Vs[u] <- Ss[u,foodindex[i],foodindex[i]] 
             Vs0[u] <- Ss0[u,foodindex[i],foodindex[i]] 
           }  
-          
-          # numerical results:
           
           # acute exposure (hazard i, food j) over all days, all servings (including zeros):
           V <- 1000 # variability simulations
@@ -1476,61 +1375,6 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
               polygon(c(xvalues,xvalues[100:1]),c(uppervalues,lowervalues[100:1]),col="#CEB888")
               lines(density(meanexposure,from=0,to=maxx,n=2048),col="#F7CE3C",main=paste(hazardnamesusedM[h],"from",foodnamesused[i],"(acute)"),xlab="A.exposure+",ylab="",xlim=c(0,maxx),lwd=3) 
               lines(density(medianexposure,from=0,to=maxx,n=2048),lwd=3)
-              
-              # numerical results:
-              
-              # acute exposure (hazard i, food j) over all days, all servings (including zeros):
-              #V <- 1000 # variability simulations
-              #logitpconsume <- numeric()
-              #pconsume <- numeric()
-              #qtotal95 <- numeric()
-              #qpos95 <- numeric()
-              #poissonmeans <- numeric()
-              #for(u in 1:n_sim){ 
-              #  # simulate variability for V individuals, per each uncertain parameter:
-              #  if(input_modelchoice == "Independent days"){
-              #    if(input_modelchoice2 =="Yes"){
-              #      logitpconsume[1:V] <- rnorm(V,logitp0[u,foodindex[i]],sqrt(Sp[u,foodindex[i],foodindex[i]]))
-              #    }
-              #    if(input_modelchoice2 == "No"){
-              #      logitpconsume[1:V] <- rep(logitp0[u,foodindex[i]],V)   
-              #    }
-              #    pconsume[1:V] <- exp(logitpconsume[1:V])/(1+exp(logitpconsume[1:V]))  
-              #  }
-              #  if(input_modelchoice == "Dependent days"){
-              #    pconsume[1:V] <- rep(p0[u,foodindex[i]],V) 
-              #  } 
-              #  poissonmeans[1:V] <- rlnorm(V,logRM[foodindex[i],hazardindexM[h]]
-              #                              +mus0[u,foodindex[i]]
-              #                              +mucM[u,hazardindexM[h],foodindex[i]]
-              #                              +muw[u],
-              #                              sqrt(Vs[u]
-              #                                   +Vs0[u]
-              #                                   +sigcM[u,hazardindexM[h],foodindex[i]]^2
-              #                                   +sigw[u]^2))
-                
-              #  qtotal95[u]<-quantile(
-              #    rbinom(V,1,pconsume[1:V]*
-              #             pM[u,hazardindexM[h],foodindex[i]]*
-              #             PM[foodindex[i],hazardindexM[h]])*poissonmeans[1:V]
-              #    ,0.95,names=FALSE)
-                # positive acute (poisson mean) exposure variability quantile:
-              #  qpos95[u] <- qlnorm(0.95,logRM[foodindex[i],hazardindexM[h]]
-              #                       +mus0[u,foodindex[i]]
-              #                       +mucM[u,hazardindexM[h],foodindex[i]]
-              #                       +muw[u],
-              #                       sqrt(Vs[u]
-              #                            +Vs0[u]
-              #                            +sigcM[u,hazardindexM[h],foodindex[i]]^2
-              #                            +sigw[u]^2))
-                
-              #} # end of for u
-              
-              # positive acute (poisson mean) exposures, 
-              # posterior quantiles of 95% variability quantile:
-              #q95_05 <- round(quantile(qpos95,0.05,names=FALSE,na.rm=TRUE))
-              #q95_50 <- round(quantile(qpos95,0.5,names=FALSE,na.rm=TRUE))
-              #q95_95 <- round(quantile(qpos95,0.95,names=FALSE,na.rm=TRUE))
               
               # legend outside the figure, but onto the current plot, so it is part of the png file:
               mtext(paste("Estimated 95% quantile for exposure+: ",q95_50,  
@@ -1701,61 +1545,6 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
               lines(meanexposure[meanexposure<maxx],cump[meanexposure<maxx],col="#F7CE3C",main=paste(hazardnamesusedM[h],"from",foodnamesused[i],"(acute)"),xlab="A.exposure+",ylab="",xlim=c(0,maxx),lwd=3) 
               lines(medianexposure[medianexposure<maxx],cump[medianexposure<maxx],xlim=c(0,maxx),lwd=3)
               
-              # numerical results:
-              
-              # acute exposure (hazard i, food j) over all days, all servings (including zeros):
-              #V <- 1000 # variability simulations
-              #logitpconsume <- numeric()
-              #pconsume <- numeric()
-              #qtotal95 <- numeric()
-              #qpos95 <- numeric()
-              #for(u in 1:n_sim){ 
-              #  # simulate variability for V individuals, per each uncertain parameter:
-              #  if(input_modelchoice == "Independent days"){ 
-              #    if(input_modelchoice2 =="Yes"){
-              #      logitpconsume[1:V] <- rnorm(V,logitp0[u,foodindex[i]],sqrt(Sp[u,foodindex[i],foodindex[i]]))
-              #    }
-              #    if(input_modelchoice2 == "No"){
-              #      logitpconsume[1:V] <- rep(logitp0[u,foodindex[i]],V)   
-              #    }
-              #    pconsume[1:V] <- exp(logitpconsume[1:V])/(1+exp(logitpconsume[1:V]))  
-              #  }
-              #  if(input_modelchoice=="Dependent days"){
-              #    pconsume[1:V] <- rep(p0[u,foodindex[i]],V)
-              #  }  
-              #  poissonmeans <- rlnorm(V,logRM[foodindex[i],hazardindexM[h]]
-              #                         +mus0[u,foodindex[i]]
-              #                         +mucM[u,hazardindexM[h],foodindex[i]]
-              #                         +muw[u],
-              #                         sqrt(Vs[u]
-              #                              +Vs0[u]
-              #                              +sigcM[u,hazardindexM[h],foodindex[i]]^2
-              #                              +sigw[u]^2))
-                # 
-              #  qtotal95[u]<-quantile(
-              #    rbinom(V,1,pconsume[1:V]*
-              #             pM[u,hazardindexM[h],foodindex[i]]*
-              #             PM[foodindex[i],hazardindexM[h]])*poissonmeans[1:V]     
-              #    ,0.95,names=FALSE)
-              #  # positive acute exposure (poisson mean) variability quantile:
-              #  qpos95[u] <- qlnorm(0.95,logRM[foodindex[i],hazardindexM[h]]
-              #                       +mus0[u,foodindex[i]]
-              #                       +mucM[u,hazardindexM[h],foodindex[i]]
-              #                       +muw[u],
-              #                       sqrt(Vs[u]
-              #                            +Vs0[u]
-              #                            +sigcM[u,hazardindexM[h],foodindex[i]]^2
-              #                            +sigw[u]^2))
-              #} # end of for u
-              
-              
-              # positive acute exposures (poisson mean), 
-              # posterior quantiles of 95% variability quantile:
-              #q95_05 <- round(quantile(qpos95,0.05,names=FALSE,na.rm=TRUE))
-              #q95_50 <- round(quantile(qpos95,0.5,names=FALSE,na.rm=TRUE))
-              #q95_95 <- round(quantile(qpos95,0.95,names=FALSE,na.rm=TRUE))
-              
-              
               # legend outside the figure, but onto the current plot, so it is part of the png file:
               mtext(paste("Estimated 95% quantile for exposure+: ",q95_50,  
                           "(posterior median). 90% uncertainty interval for the 95% quantile: ", q95_05,"-", q95_95),
@@ -1867,7 +1656,6 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
           } # end of if cumulative
           
           # legend outside the figure, but onto the current plot, so it is part of the png file:
-          
           mtext(paste("Estimated population frequency of exposure for", hazardnamesusedM[h],"from",foodnamesused[i], ": ",round(quantile(100*PM[foodindex[i],hazardindexM[h]]*pM[,hazardindexM[h],foodindex[i]]*p0[,foodindex[i]],0.5,names=FALSE),2),
                       "% (posterior median)"),
                 side = 1, adj = 0,line=0, cex = 1,

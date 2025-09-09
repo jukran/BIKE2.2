@@ -836,6 +836,7 @@ distPlot3_1FFQ <- function(input_lim, unit_concen, hazard_concen, input_upper, i
                                    0.95,names=FALSE),3)
           ql95_05 <- round(quantile(qlpos95,
                                    0.05,names=FALSE),3)
+          
           # chronic exposure (hazard i, food j) over all days, all servings (including zeros):
           V <- 1000 # variability simulations
           qtotal95 <- numeric()
@@ -902,37 +903,6 @@ distPlot3_1FFQ <- function(input_lim, unit_concen, hazard_concen, input_upper, i
               
               lines(density(meanexposure,from=0,to=maxx,n=2048),col="#F7CE3C",main=paste(hazardnamesusedK[h],"from",foodnamesused[i],"(chronic)"),xlab="C.exposure/bw+",ylab="",xlim=c(0,maxx),lwd=3)
               lines(density(medianexposure,from=0,to=maxx,n=2048),lwd=3)
-              
-              # numerical results:
-              
-              # chronic exposure (hazard i, food j) over all days, all servings (including zeros):
-              #V <- 1000 # variability simulations
-              #qtotal95 <- numeric()
-              #for(u in 1:n_sim){ 
-              
-                # calculate quantile by solving: zero-inflated distribution (due to absolute non-consumers)
-              #  PPOSK <- p0[u,foodindex[i]] # probability to consume at all each food
-              #  if(0.95<=(1-PPOSK)){qutotal95[u]<-0}
-              #  if(0.95>(1-PPOSK)){
-              #    qtotal95[u]<- qlnorm((0.95-1+PPOSK)/PPOSK,
-              #                          log(pK[u,hazardindexK[h],foodindex[i]]*PK[foodindex[i],hazardindexK[h]])+logRK[foodindex[i],hazardindexK[h]]
-              #                          +mus0[u,foodindex[i]]
-              #                          +mucK[u,hazardindexK[h],foodindex[i]]
-              #                          +0.5*sigcK[u,hazardindexK[h],foodindex[i]]^2,
-              #                          sqrt(Vs0[u])) 
-              #  }    
-                
-              #} # end of for u
-              
-              # positive chronic exposures, 
-              # posterior quantiles of variability 95%quantile:
-              #q95_50 <- round(quantile(qpos95,
-              #                          0.5,names=FALSE),3)
-              #q95_95 <- round(quantile(qpos95,
-              #                          0.95,names=FALSE),3)
-              #q95_05 <- round(quantile(qpos95,
-              #                          0.05,names=FALSE),3)
-              
               
               # legend outside the figure, but onto the current plot, so it is part of the png file:
               mtext(paste("Estimated 95% quantile for exposure+ (consumers): ",q95_50,  
@@ -1085,36 +1055,6 @@ distPlot3_1FFQ <- function(input_lim, unit_concen, hazard_concen, input_upper, i
               lines(meanexposure[meanexposure<maxx],cump[meanexposure<maxx],col="#F7CE3C",main=paste(hazardnamesusedK[h],"from",foodnamesused[i],"(chronic)"),xlab="C.exposure/bw+",ylab="",xlim=c(0,maxx),lwd=3) 
               lines(medianexposure[medianexposure<maxx],cump[medianexposure<maxx],xlim=c(0,maxx),lwd=3)
               
-              # numerical results:
-              
-              # chronic exposure (hazard i, food j) over all days, all servings (including zeros):
-              #V <- 1000 # variability simulations
-              #qtotal95 <- numeric()
-              #for(u in 1:n_sim){ 
-
-              #  PPOSK <- p0[u,foodindex[i]] # probability to consume at all each food
-              #  if(0.95<=(1-PPOSK)){qutotal95[u]<-0}
-              #  if(0.95>(1-PPOSK)){
-              #    qtotal95[u]<- qlnorm((0.95-1+PPOSK)/PPOSK,
-              #                          log(pK[u,hazardindexK[h],foodindex[i]]*PK[foodindex[i],hazardindexK[h]])+logRK[foodindex[i],hazardindexK[h]]
-              #                          +mus0[u,foodindex[i]]
-              #                          +mucK[u,hazardindexK[h],foodindex[i]]
-              #                          +0.5*sigcK[u,hazardindexK[h],foodindex[i]]^2,
-              #                          sqrt(Vs0[u]))
-              #  }  
-                
-                
-              #} # end of for u
-              
-              # positive chronic exposures, 
-              # posterior quantiles of variability 95% quantile (contaminated consumptions only):
-              #q95_50 <- round(quantile(qpos95, 
-              #                          0.5,names=FALSE),3)
-              #q95_95 <- round(quantile(qpos95,
-              #                          0.95,names=FALSE),3)
-              #q95_05 <- round(quantile(qpos95,
-              #                          0.05,names=FALSE),3)
-              
               # legend outside the figure, but onto the current plot, so it is part of the png file:
               mtext(paste("Estimated Q95% for exposure+ (consumers): ",q95_50,  
                           "(median). 90% uncertainty interval for the Q95%: ", q95_05,"-", q95_95),
@@ -1253,8 +1193,6 @@ distPlot3_1FFQ <- function(input_lim, unit_concen, hazard_concen, input_upper, i
             Vs0[u] <- Ss0[u,foodindex[i],foodindex[i]] 
           }  
           
-          # numerical results:
-          
           # chronic exposure (hazard i, food j) over all days, all servings (including zeros):
           V <- 1000 # variability simulations
           qtotal95 <- numeric()
@@ -1356,44 +1294,6 @@ distPlot3_1FFQ <- function(input_lim, unit_concen, hazard_concen, input_upper, i
               polygon(c(xvalues,xvalues[100:1]),c(uppervalues,lowervalues[100:1]),col="#CEB888")
               lines(density(meanexposure,from=0,to=maxx,n=2048),col="#F7CE3C",main=paste(hazardnamesusedM[h],"from",foodnamesused[i],"(chronic)"),xlab="C.exposure+",ylab="",xlim=c(0,maxx),lwd=3) 
               lines(density(medianexposure,from=0,to=maxx,n=2048),lwd=3)
-              
-              # numerical results:
-              
-              # chronic exposure (hazard i, food j) over all days, all servings (including zeros):
-              #V <- 1000 # variability simulations
-              #qtotal95 <- numeric()
-              #qpos95 <- numeric()
-    
-              #for(u in 1:n_sim){ 
-              #  PPOSM <- p0[u,foodindex[i]] # probability to consume at all each food
-              #  if(0.95<=(1-PPOSM)){qtotal95[u]<-0}
-              #  if(0.95>(1-PPOSM)){
-              #    qtotal95[u]<- qlnorm((0.95-1+PPOSM)/PPOSM,
-              #                          log(pM[u,hazardindexM[h],foodindex[i]]*PM[foodindex[i],hazardindexM[h]])+logRM[foodindex[i],hazardindexM[h]]
-              #                          +mus0[u,foodindex[i]]
-              #                          +mucM[u,hazardindexM[h],foodindex[i]]
-              #                          +muw[u]
-              #                          +0.5*sigcM[u,hazardindexM[h],foodindex[i]]^2,
-              #                          sqrt(Vs0[u]
-              #                               +sigw[u]^2))
-              #  }
-                
-                
-                # positive chronic (mean) exposure variability quantile:
-              #  qpos95[u] <- qlnorm(0.95,logRM[foodindex[i],hazardindexM[h]]
-              #                    +mus0[u,foodindex[i]]
-              #                    +muw[u]
-              #                    +mucM[u,hazardindexM[h],foodindex[i]]
-              #                    +0.5*sigcM[u,hazardindexM[h],foodindex[i]]^2,
-              #                    sqrt(Vs0[u]+sigw[u]^2) )  
-                
-              #} # end of for u
-              
-              # positive chronic (poisson mean) exposures, 
-              # posterior quantiles of 95% variability quantile:
-              #q95_05 <- round(quantile(qpos95,0.05,names=FALSE,na.rm=TRUE))
-              #q95_50 <- round(quantile(qpos95,0.5,names=FALSE,na.rm=TRUE))
-              #q95_95 <- round(quantile(qpos95,0.95,names=FALSE,na.rm=TRUE))
               
               # legend outside the figure, but onto the current plot, so it is part of the png file:
               mtext(paste("Estimated 95% quantile for exposure+ (consumers): ",q95_50,  
@@ -1554,42 +1454,6 @@ distPlot3_1FFQ <- function(input_lim, unit_concen, hazard_concen, input_upper, i
               
               lines(meanexposure[meanexposure<maxx],cump[meanexposure<maxx],col="#F7CE3C",main=paste(hazardnamesusedM[h],"from",foodnamesused[i],"(chronic)"),xlab="C.exposure+",ylab="",xlim=c(0,maxx),lwd=3) 
               lines(medianexposure[medianexposure<maxx],cump[medianexposure<maxx],xlim=c(0,maxx),lwd=3)
-              
-              # numerical results:
-              
-              # chronic exposure (hazard i, food j) over all days, all servings (including zeros):
-              #V <- 1000 # variability simulations
-              #qtotal95 <- numeric()
-              #qpos95 <- numeric()
-              #for(u in 1:n_sim){ 
-                
-              #  PPOSM <- p0[u,foodindex[i]] # probability to consume at all each food
-              #  if(0.95<=(1-PPOSM)){qtotal95[u]<-0}
-              #  if(0.95>(1-PPOSM)){
-              #    qtotal95[u]<- qlnorm((0.95-1+PPOSM)/PPOSM,
-              #                          log(pM[u,hazardindexM[h],foodindex[i]]*PM[foodindex[i],hazardindexM[h]])+logRM[foodindex[i],hazardindexM[h]]
-              #                          +mus0[u,foodindex[i]]
-              #                          +mucM[u,hazardindexM[h],foodindex[i]]
-              #                          +0.5*sigcM[u,hazardindexM[h],foodindex[i]]^2
-              #                          +muw[u],
-              #                          sqrt(Vs0[u]+sigw[u]^2))
-              #  }
-                
-              #  qpos95[u] <- qlnorm(0.95,logRM[foodindex[i],hazardindexM[h]]
-              #                       +mus0[u,foodindex[i]]
-              #                       +muw[u]
-              #                       +mucM[u,hazardindexM[h],foodindex[i]]
-              #                       +0.5*sigcM[u,hazardindexM[h],foodindex[i]]^2,
-              #                       sqrt(Vs0[u]+sigw[u]^2) )  
-                
-                
-              #} # end of for u
-              
-              # positive acute exposures (poisson mean), 
-              # posterior quantiles of 95% variability quantile:
-              #q95_05 <- round(quantile(qpos95,0.05,names=FALSE,na.rm=TRUE))
-              #q95_50 <- round(quantile(qpos95,0.5,names=FALSE,na.rm=TRUE))
-              #q95_95 <- round(quantile(qpos95,0.95,names=FALSE,na.rm=TRUE))
               
               
               # legend outside the figure, but onto the current plot, so it is part of the png file:
