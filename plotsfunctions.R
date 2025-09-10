@@ -832,7 +832,7 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
                                     0.05,names=FALSE),3)
   
           # chronic exposure (hazard i, food j) over all days, all servings (including zeros):
-          V <- 1000 # variability simulations
+          V <- 2000 # variability simulations
           logitpconsume <- matrix(NA,nf,V)
           pconsume <- matrix(NA,nf,V)
           cmeanpos <- numeric()
@@ -1247,7 +1247,7 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
           }  
           
           # acute exposure (hazard i, food j) over all days, all servings (including zeros):
-          V <- 1000 # variability simulations
+          V <- 2000 # variability simulations
           logitpconsume <- numeric()
           pconsume <- numeric()
           qtotal95 <- numeric()
@@ -1685,7 +1685,6 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
 
 # Plot 4: Quantiles:----
 
-# redundant inputs: input_modelchoice5, input_modelchoice4, input_modelchoice3
 ## ---- distPlot4_1 -------- 
 distPlot4_1 <- function(unit_concen, hazard_concen, n_sim, input_selectscale, input_selectQ, nV,
                         nU, Rall, Pall, input_modelchoice, input_modelchoice2,
@@ -2623,8 +2622,6 @@ distPlot5_2 <- function(n_sim,foodnamesused, nfused, foodindex,
 }
 
 
-
-# redundant inputs: input_modelchoice4, input_modelchoice3
 # Plot 6: Serving correlation----
 ## ---- distPlot6_1 --------
 distPlot6_1 <- function(food_consum, unit_consum, n_sim, foodnamesused,
@@ -2636,7 +2633,6 @@ distPlot6_1 <- function(food_consum, unit_consum, n_sim, foodnamesused,
   # Correlation plots for consumptions
   Unit <- unit_consum[food_consum == foodnamesused] # the measurement unit used for food consumptions
   Unit3 <- sub(".*p.", "", Unit) # Extract characters after pattern
-  
   
   
   if((nfused>1) ){  
@@ -2675,7 +2671,6 @@ distPlot6_1 <- function(food_consum, unit_consum, n_sim, foodnamesused,
   #} # if serving correlations
 }
 
-# redundant inputs: input_modelchoice4
 # Plot 7: Mean serving correlations----
 ## ---- distPlot7_1 --------
 distPlot7_1 <- function(food_consum, unit_consum, n_sim, foodnamesused, nfused, foodindex,
@@ -2688,8 +2683,6 @@ distPlot7_1 <- function(food_consum, unit_consum, n_sim, foodnamesused, nfused, 
   
   Unit <- unit_consum[food_consum == foodnamesused] # the measurement unit used for food consumptions
   Unit3 <- sub(".*p.", "", Unit) # Extract characters after pattern
-  
-  
   
   
   if(nfused>1){  

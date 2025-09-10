@@ -838,7 +838,7 @@ distPlot3_1FFQ <- function(input_lim, unit_concen, hazard_concen, input_upper, i
                                    0.05,names=FALSE),3)
           
           # chronic exposure (hazard i, food j) over all days, all servings (including zeros):
-          V <- 1000 # variability simulations
+          V <- 2000 # variability simulations
           qtotal95 <- numeric()
           qltotal95 <- numeric()
           
@@ -1194,7 +1194,7 @@ distPlot3_1FFQ <- function(input_lim, unit_concen, hazard_concen, input_upper, i
           }  
           
           # chronic exposure (hazard i, food j) over all days, all servings (including zeros):
-          V <- 1000 # variability simulations
+          V <- 2000 # variability simulations
           qtotal95 <- numeric()
           qpos95 <- numeric()
           qltotal95 <- numeric()
@@ -1583,7 +1583,6 @@ distPlot3_1FFQ <- function(input_lim, unit_concen, hazard_concen, input_upper, i
 
 # Plot 4: Quantiles:----
 
-##  redundant inputs: input_modelchoice, input_modelchoice2, input_modelchoice5, input_modelchoice4, input_modelchoice3,
 ## ---- distPlot4_1 -------- 
 distPlot4_1FFQ <- function(unit_concen, hazard_concen, n_sim, input_selectscale, input_selectQ, nV,
                         nU, Rall, Pall,
@@ -2098,7 +2097,6 @@ distPlot5_2FFQ <- function(n_sim,foodnamesused, nfused, foodindex,
   
 }
 
-# redundant inputs: input_modelchoice4
 # Plot 7: Mean serving correlations----
 ## ---- distPlot7_1 --------
 distPlot7_1FFQ <- function(food_consum, unit_consum, n_sim, foodnamesused, nfused, foodindex,
