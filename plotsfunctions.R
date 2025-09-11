@@ -37,7 +37,7 @@ distPlot1_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
               
               maxx <- quantile(
                 qlnorm(input_lim,mucK[,hazardindexK[h],foodindex[i]],sigcK[,hazardindexK[h],foodindex[i]]), 
-                0.5,names=FALSE)
+                0.9,names=FALSE)
               
               plot(density(cmedianK,from=0,to=maxx,n=2048),lwd=3,main=paste(hazardnamesusedK[h],"in",foodnamesused[i]),
                    xlab=paste("Concentration+ (", Unit1, "per", Unit2,")"),ylab="Probability density",xlim=c(0,maxx))
@@ -66,7 +66,7 @@ distPlot1_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
             if(input_selectscale=="Logarithmic"){
               
               maxx <- quantile(qnorm(input_lim,mucK[,hazardindexK[h],foodindex[i]],sigcK[,hazardindexK[h],foodindex[i]]),
-                               0.5,names=FALSE)
+                               0.9,names=FALSE)
               minn <- quantile(qnorm(0.05,mucK[,hazardindexK[h],foodindex[i]],sigcK[,hazardindexK[h],foodindex[i]]),
                                0.5,names=FALSE)
               plot(density(mucK[,hazardindexK[h],foodindex[i]]/log(10),from=minn/log(10),to=maxx/log(10),n=2048),col="#F7CE3C",lwd=3,main=paste(hazardnamesusedK[h],"in",foodnamesused[i]),
@@ -102,7 +102,7 @@ distPlot1_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
             
               maxx <- quantile(
                 qlnorm(input_lim,mucK[,hazardindexK[h],foodindex[i]],sigcK[,hazardindexK[h],foodindex[i]]), 
-                0.5,names=FALSE)
+                0.9,names=FALSE)
               
               cmedianK <- sort(exp(mucK[,hazardindexK[h],foodindex[i]]))
               plot(cmedianK[cmedianK<maxx],cump[cmedianK<maxx],col="#F7CE3C",lwd=3,main=paste(hazardnamesusedK[h],"in",foodnamesused[i]),
@@ -143,7 +143,7 @@ distPlot1_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
             if(input_selectscale=="Logarithmic"){
               
               maxx <- quantile(qnorm(input_lim,mucK[,hazardindexK[h],foodindex[i]],sigcK[,hazardindexK[h],foodindex[i]]),
-                               0.5,names=FALSE)
+                               0.9,names=FALSE)
               minn <- quantile(qnorm(0.05,mucK[,hazardindexK[h],foodindex[i]],sigcK[,hazardindexK[h],foodindex[i]]),
                                0.5,names=FALSE)
               
@@ -184,12 +184,12 @@ distPlot1_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
           } # end of if cumulative
           
           # legend----
-          mtext(paste("Estimated prevalence for", hazardnamesusedK[h],"in",foodnamesused[i], ": ",round(quantile(100*pK[,hazardindexK[h],foodindex[i]],0.5,names=FALSE),2),
+          mtext(paste("Estimated prevalence for", hazardnamesusedK[h],"in",foodnamesused[i], ": ",round(quantile(100*pK[,hazardindexK[h],foodindex[i]],0.5,names=FALSE),1),
                       "% (posterior median)."),
                 side = 1, adj = 0,line=1, cex = 1,
                 outer = TRUE)
           mtext(paste("95% uncertainty interval for the prevalence: ", 
-                      round(quantile(100*pK[,hazardindexK[h],foodindex[i]],0.025,names=FALSE),2),"%-", round(quantile(100*pK[,hazardindexK[h],foodindex[i]],0.975,names=FALSE),2),"%"),
+                      round(quantile(100*pK[,hazardindexK[h],foodindex[i]],0.025,names=FALSE),1),"%-", round(quantile(100*pK[,hazardindexK[h],foodindex[i]],0.975,names=FALSE),1),"%"),
                 side = 1, adj = 0,line=2, cex = 1,
                 outer = TRUE)
           if(input_selectscale=="Absolute"){
@@ -238,7 +238,7 @@ distPlot1_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
               cmedianM <- exp(mucM[,hazardindexM[h],foodindex[i]])
               
               maxx <- quantile(qlnorm(input_lim,mucM[,hazardindexM[h],foodindex[i]],sigcM[,hazardindexM[h],foodindex[i]]),
-                               0.5,names=FALSE)
+                               0.9,names=FALSE)
               
               plot(density(cmedianM,from=0,to=maxx,n=2048),lwd=3,main=paste(hazardnamesusedM[h],"in",foodnamesused[i]),
                    xlab=paste("Concentration+ (", Unit1, "per", Unit2,")"),ylab="Probability density",xlim=c(0,maxx)) 
@@ -268,7 +268,7 @@ distPlot1_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
             if(input_selectscale=="Logarithmic"){
               
               maxx <- quantile(qnorm(input_lim,mucM[,hazardindexM[h],foodindex[i]],sigcM[,hazardindexM[h],foodindex[i]]),
-                               0.5,names=FALSE)
+                               0.9,names=FALSE)
               minn <- quantile(qnorm(0.05,mucM[,hazardindexM[h],foodindex[i]],sigcM[,hazardindexM[h],foodindex[i]]),
                                0.5,names=FALSE)
               
@@ -309,7 +309,7 @@ distPlot1_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
               cmedianM <- sort(exp(mucM[,hazardindexM[h],foodindex[i]]))
               
               maxx <- quantile(qlnorm(input_lim,mucM[,hazardindexM[h],foodindex[i]],sigcM[,hazardindexM[h],foodindex[i]]),
-                               0.5,names=FALSE)
+                               0.9,names=FALSE)
               plot(cmedianM[cmedianM<maxx],cump[cmedianM<maxx],lwd=3,main=paste(hazardnamesusedM[h],"in",foodnamesused[i]),
                    xlab=paste("Concentration+ (", Unit1, "per", Unit2,")"),ylab="Cumulative probability",xlim=c(0,maxx),ylim=c(0,1),type="l") 
               xvalues <- seq(0,maxx*1.1,length=100)
@@ -349,7 +349,7 @@ distPlot1_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
             if(input_selectscale=="Logarithmic"){
               
               maxx <- quantile(qnorm(input_lim,mucM[,hazardindexM[h],foodindex[i]],sigcM[,hazardindexM[h],foodindex[i]]),
-                               0.5,names=FALSE)
+                               0.9,names=FALSE)
               minn <- quantile(qnorm(0.05,mucM[,hazardindexM[h],foodindex[i]],sigcM[,hazardindexM[h],foodindex[i]]),
                                0.5,names=FALSE)
               
@@ -390,12 +390,12 @@ distPlot1_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
           
           # legend ----
           # outside the figure, but onto the current plot, so it is part of the png file:
-          mtext(paste("Estimated prevalence for", hazardnamesusedM[h],"in",foodnamesused[i], ": ",round(quantile(100*pM[,hazardindexM[h],foodindex[i]],0.5,names=FALSE),2),
+          mtext(paste("Estimated prevalence for", hazardnamesusedM[h],"in",foodnamesused[i], ": ",round(quantile(100*pM[,hazardindexM[h],foodindex[i]],0.5,names=FALSE),1),
                       "% (posterior median)"),
                 side = 1, adj = 0,line=1, cex = 1,
                 outer = TRUE)
           mtext(paste("95% uncertainty interval for the prevalence: ", 
-                      round(quantile(100*pM[,hazardindexM[h],foodindex[i]],0.025,names=FALSE),2),"%-", round(quantile(100*pM[,hazardindexM[h],foodindex[i]],0.975,names=FALSE),2),"%"),
+                      round(quantile(100*pM[,hazardindexM[h],foodindex[i]],0.025,names=FALSE),1),"%-", round(quantile(100*pM[,hazardindexM[h],foodindex[i]],0.975,names=FALSE),1),"%"),
                 side = 1, adj = 0,line=2, cex = 1,
                 outer = TRUE)
           if(input_selectscale=="Absolute"){
@@ -459,7 +459,7 @@ distPlot2_1 <- function(input_lim, food_consum, unit_consum, input_upper, input_
         meansmedian <- exp(mus0[,foodindex[i]]+0.5*Vs )
         
         maxx <- quantile(qlnorm(input_lim,mus0[,foodindex[i]]+0.5*Vs,sqrt(Vs0) ),
-                         0.5,names=FALSE)
+                         0.9,names=FALSE)
         
         plot(density(meansmedian,from=0,to=maxx,n=2048),lwd=3,main=paste(foodnamesused[i],"consumption"),
              xlab=paste("C.consumption/bw+ (", Unit3,"per kg)"),ylab="Probability density",xlim=c(0,maxx)) 
@@ -495,7 +495,7 @@ distPlot2_1 <- function(input_lim, food_consum, unit_consum, input_upper, input_
         
         maxx <- quantile(qlnorm(input_lim,mus0[,foodindex[i]]+muw,
                                 sqrt(Vs0+Vs+sigw^2)),
-                         0.5,names=FALSE)
+                         0.9,names=FALSE)
         
         plot(density(smedian,from=0,to=maxx,n=2048),lwd=3,main=paste(foodnamesused[i],"consumption"),
              xlab=paste("A.consumption+ (", Unit3,")"),ylab="",xlim=c(0,maxx)) 
@@ -529,7 +529,7 @@ distPlot2_1 <- function(input_lim, food_consum, unit_consum, input_upper, input_
         musmean <- mus0[,foodindex[i]]+0.5*Vs
         
         maxx <- quantile(qnorm(input_lim,mus0[,foodindex[i]]+0.5*Vs,sqrt(Vs0) ),
-                         0.5,names=FALSE)
+                         0.9,names=FALSE)
         minn <- quantile(qnorm(0.05,mus0[,foodindex[i]]+0.5*Vs,sqrt(Vs0) ),
                          0.5,names=FALSE)
         
@@ -566,7 +566,7 @@ distPlot2_1 <- function(input_lim, food_consum, unit_consum, input_upper, input_
         
         maxx <- quantile(qnorm(input_lim,mus0[,foodindex[i]]+muw,
                                sqrt(Vs0+Vs+sigw^2)),
-                         0.5,names=FALSE)
+                         0.9,names=FALSE)
         minn <- quantile(qnorm(0.05,mus0[,foodindex[i]]+muw,
                                sqrt(Vs0+Vs+sigw^2)),
                          0.5,names=FALSE)
@@ -608,7 +608,7 @@ distPlot2_1 <- function(input_lim, food_consum, unit_consum, input_upper, input_
         meansmedian <- sort(exp(mus0[,foodindex[i]]+0.5*Vs ))
         
         maxx <- quantile(qlnorm(input_lim,mus0[,foodindex[i]]+0.5*Vs,sqrt(Vs0) ),
-                         0.5,names=FALSE)
+                         0.9,names=FALSE)
         
         plot(meansmean,cump,col="#F7CE3C",lwd=3,main=paste(foodnamesused[i],"consumption"),
              xlab=paste("C.consumption/bw+ (", Unit3,"per kg)"),ylab="Cumulative probability",xlim=c(0,maxx),type="l")
@@ -644,7 +644,7 @@ distPlot2_1 <- function(input_lim, food_consum, unit_consum, input_upper, input_
         
         maxx <- quantile(qlnorm(input_lim,mus0[,foodindex[i]]+muw,
                                 sqrt(Vs0+Vs+sigw^2)),
-                         0.5,names=FALSE)
+                         0.9,names=FALSE)
         
         
         plot(smean,cump,col="#F7CE3C",lwd=3,main=paste(foodnamesused[i],"consumption"),
@@ -679,7 +679,7 @@ distPlot2_1 <- function(input_lim, food_consum, unit_consum, input_upper, input_
         musmean <- sort(mus0[,foodindex[i]]+0.5*Vs)
         
         maxx <- quantile(qnorm(input_lim,mus0[,foodindex[i]]+0.5*Vs, sqrt(Vs0) ),
-                         0.5,names=FALSE)
+                         0.9,names=FALSE)
         minn <- quantile(qnorm(0.05,mus0[,foodindex[i]]+0.5*Vs, sqrt(Vs0) ),
                          0.5,names=FALSE)
         
@@ -716,7 +716,7 @@ distPlot2_1 <- function(input_lim, food_consum, unit_consum, input_upper, input_
         logsmean <- sort(mus0[,foodindex[i]]+muw)
         maxx <- quantile(qnorm(input_lim,mus0[,foodindex[i]]+muw,
                                sqrt(Vs0+Vs+sigw^2)),
-                         0.5,names=FALSE)
+                         0.9,names=FALSE)
         minn <- quantile(qnorm(0.05,mus0[,foodindex[i]]+muw,
                                sqrt(Vs0+Vs+sigw^2)),
                          0.5,names=FALSE)
@@ -752,14 +752,23 @@ distPlot2_1 <- function(input_lim, food_consum, unit_consum, input_upper, input_
   
   # legend ----
   # outside the figure, but onto the current plot, so it is part of the png file:
-  mtext(paste("Estimated consumption frequency for", foodnamesused[i], ": ", round(quantile(100*p0[,foodindex[i]],0.5,names=FALSE),2),
+  mtext(paste("Estimated consumption frequency for", foodnamesused[i], ": ", round(quantile(100*p0[,foodindex[i]],0.5,names=FALSE),1),
               "% (posterior median)."),
-        side = 1, adj = 0,line=1, cex = 1,
+        side = 1, adj = 0,line=0, cex = 1,
         outer = TRUE)
   mtext(paste("95% uncertainty interval for the consumption frequency: ", 
-              round(quantile(100*p0[,foodindex[i]],0.025,names=FALSE),2),"%-", round(quantile(100*p0[,foodindex[i]],0.975,names=FALSE),2),"%"),
+              round(quantile(100*p0[,foodindex[i]],0.025,names=FALSE),1),"%-", round(quantile(100*p0[,foodindex[i]],0.975,names=FALSE),1),"%"),
+        side = 1, adj = 0,line=1, cex = 1,
+        outer = TRUE)
+  mtext(paste("Estimated C.consumption/bw+ Q50% for", foodnamesused[i], ": ", round(quantile(exp(mus0[,foodindex[i]]+0.5*Vs ),0.5,names=FALSE),1),
+              "(posterior median)."),
         side = 1, adj = 0,line=2, cex = 1,
         outer = TRUE)
+  mtext(paste("Estimated A.consumption+ Q50% for", foodnamesused[i], ": ", round(quantile(exp(mus0[,foodindex[i]]+muw),0.5,names=FALSE),1),
+              "(posterior median)."),
+        side = 1, adj = 0,line=3, cex = 1,
+        outer = TRUE) 
+  
   
   #} # end of if selectresults == "Consumptions"
 }
@@ -896,7 +905,7 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
                                       +mucK[,hazardindexK[h],foodindex[i]]
                                       +0.5*sigcK[,hazardindexK[h],foodindex[i]]^2,
                                       sqrt(Vs0) ),
-                               0.5,names=FALSE)
+                               0.9,names=FALSE)
               
               medianexposure <- exp(logRK[foodindex[i],hazardindexK[h]]+
                                       mus0[,foodindex[i]]+
@@ -953,7 +962,7 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
                                      +mucK[,hazardindexK[h],foodindex[i]]
                                      +0.5*sigcK[,hazardindexK[h],foodindex[i]]^2,
                                      sqrt(Vs0)),
-                               0.5,names=FALSE)
+                               0.9,names=FALSE)
               minn <- quantile(qnorm(0.05,logRK[foodindex[i],hazardindexK[h]]
                                      +mus0[,foodindex[i]]
                                      +0.5*Vs
@@ -1026,7 +1035,7 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
                                       +mucK[,hazardindexK[h],foodindex[i]]
                                       +0.5*sigcK[,hazardindexK[h],foodindex[i]]^2,
                                       sqrt(Vs0) ),
-                               0.5,names=FALSE)
+                               0.9,names=FALSE)
               
               medianexposure <- sort(
                 exp(logRK[foodindex[i],hazardindexK[h]]+mus0[,foodindex[i]]
@@ -1119,7 +1128,7 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
                                      +mucK[,hazardindexK[h],foodindex[i]]
                                      +0.5*sigcK[,hazardindexK[h],foodindex[i]]^2,
                                      sqrt(Vs0)),
-                               0.5,names=FALSE)
+                               0.9,names=FALSE)
               minn <- quantile(qnorm(0.05,logRK[foodindex[i],hazardindexK[h]]
                                      +mus0[,foodindex[i]]
                                      +0.5*Vs
@@ -1200,13 +1209,13 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
           } # end of if cumulative
           
           # legend outside the figure, but onto the current plot, so it is part of the png file:
-          mtext(paste("Estimated population frequency of exposure for", hazardnamesusedK[h],"from",foodnamesused[i], ": ",round(quantile(100*PK[foodindex[i],hazardindexK[h]]*pK[,hazardindexK[h],foodindex[i]]*p0[,foodindex[i]],0.5,names=FALSE),2),
+          mtext(paste("Estimated population frequency of exposure for", hazardnamesusedK[h],"from",foodnamesused[i], ": ",round(quantile(100*PK[foodindex[i],hazardindexK[h]]*pK[,hazardindexK[h],foodindex[i]]*p0[,foodindex[i]],0.5,names=FALSE),1),
                       "% (posterior median)"),
                 side = 1, adj = 0,line=0, cex = 1,
                 outer = TRUE)
           mtext(paste("95% uncertainty interval for population frequency of exposure: ", 
-                      round(quantile(100*PK[foodindex[i],hazardindexK[h]]*pK[,hazardindexK[h],foodindex[i]]*p0[,foodindex[i]],0.025,names=FALSE),2),"% -", 
-                      round(quantile(100*PK[foodindex[i],hazardindexK[h]]*pK[,hazardindexK[h],foodindex[i]]*p0[,foodindex[i]],0.975,names=FALSE),2),"%"),
+                      round(quantile(100*PK[foodindex[i],hazardindexK[h]]*pK[,hazardindexK[h],foodindex[i]]*p0[,foodindex[i]],0.025,names=FALSE),1),"% -", 
+                      round(quantile(100*PK[foodindex[i],hazardindexK[h]]*pK[,hazardindexK[h],foodindex[i]]*p0[,foodindex[i]],0.975,names=FALSE),1),"%"),
                 side = 1, adj = 0,line=1, cex = 1,
                 outer = TRUE)
           
@@ -1338,7 +1347,7 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
                                               Vs+
                                               sigcM[,hazardindexM[h],foodindex[i]]^2+
                                               sigw^2) ),
-                               0.5,names=FALSE)
+                               0.9,names=FALSE)
               medianexposure <- exp(logRM[foodindex[i],hazardindexM[h]]+
                                       mus0[,foodindex[i]]+
                                       mucM[,hazardindexM[h],foodindex[i]]+muw)
@@ -1400,7 +1409,7 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
                                           +Vs
                                           +sigcM[,hazardindexM[h],foodindex[i]]^2
                                           +sigw^2)),
-                               0.5,names=FALSE)
+                               0.9,names=FALSE)
               minn <- quantile(qnorm(0.05,logRM[foodindex[i],hazardindexM[h]]
                                      +mus0[,foodindex[i]]
                                      +mucM[,hazardindexM[h],foodindex[i]]
@@ -1478,7 +1487,7 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
                                               Vs+
                                               sigcM[,hazardindexM[h],foodindex[i]]^2+
                                               sigw^2) ),
-                               0.5,names=FALSE)
+                               0.9,names=FALSE)
               medianexposure <- sort(exp(logRM[foodindex[i],hazardindexM[h]]+
                                            mus0[,foodindex[i]]+
                                            mucM[,hazardindexM[h],foodindex[i]]+
@@ -1572,7 +1581,7 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
                                           +Vs
                                           +sigcM[,hazardindexM[h],foodindex[i]]^2
                                           +sigw^2)),
-                               0.5,names=FALSE)
+                               0.9,names=FALSE)
               minn <- quantile(qnorm(0.05,logRM[foodindex[i],hazardindexM[h]]
                                      +mus0[,foodindex[i]]
                                      +mucM[,hazardindexM[h],foodindex[i]]
@@ -1656,13 +1665,13 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
           } # end of if cumulative
           
           # legend outside the figure, but onto the current plot, so it is part of the png file:
-          mtext(paste("Estimated population frequency of exposure for", hazardnamesusedM[h],"from",foodnamesused[i], ": ",round(quantile(100*PM[foodindex[i],hazardindexM[h]]*pM[,hazardindexM[h],foodindex[i]]*p0[,foodindex[i]],0.5,names=FALSE),2),
+          mtext(paste("Estimated population frequency of exposure for", hazardnamesusedM[h],"from",foodnamesused[i], ": ",round(quantile(100*PM[foodindex[i],hazardindexM[h]]*pM[,hazardindexM[h],foodindex[i]]*p0[,foodindex[i]],0.5,names=FALSE),1),
                       "% (posterior median)"),
                 side = 1, adj = 0,line=0, cex = 1,
                 outer = TRUE)
           mtext(paste("95% uncertainty interval for population frequency of exposure: ", 
-                      round(quantile(100*PM[foodindex[i],hazardindexM[h]]*pM[,hazardindexM[h],foodindex[i]]*p0[,foodindex[i]],0.025,names=FALSE),2),"%-", 
-                      round(quantile(100*PM[foodindex[i],hazardindexM[h]]*pM[,hazardindexM[h],foodindex[i]]*p0[,foodindex[i]],0.975,names=FALSE),2),"%"),
+                      round(quantile(100*PM[foodindex[i],hazardindexM[h]]*pM[,hazardindexM[h],foodindex[i]]*p0[,foodindex[i]],0.025,names=FALSE),1),"%-", 
+                      round(quantile(100*PM[foodindex[i],hazardindexM[h]]*pM[,hazardindexM[h],foodindex[i]]*p0[,foodindex[i]],0.975,names=FALSE),1),"%"),
                 side = 1, adj = 0,line=1, cex = 1,
                 outer = TRUE) 
           

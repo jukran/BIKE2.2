@@ -962,7 +962,7 @@ ui <- navbarPage(id ="bike_tabs",
                                                          conditionalPanel(
                                                            condition = "input.selectresults == 'Concentrations'",
                                                            
-                                                           sliderInput(inputId="conf_lim1",
+                                                           sliderInput(inputId="xrange",
                                                                        label=h5(strong("Range x-axis (%)"),
                                                                                 style = "color:#004F71"), 
                                                                        min = 0, max = 0.99, value = 0.95, step = 0.05),
@@ -2162,7 +2162,7 @@ server <- function(input, output, session) {
     hazard_concen <- units_hazard$hazard_concen
     
     # range x-axis
-    input_lim <- as.double(input$conf_lim1)
+    input_lim <- as.double(input$xrange)
     
     # transform the credible interval selected by the user to upper and lower limits:
     input_conf_interval <- as.double(input$conf_interval1)
