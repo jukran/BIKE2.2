@@ -760,11 +760,11 @@ distPlot2_1 <- function(input_lim, food_consum, unit_consum, input_upper, input_
               round(quantile(100*p0[,foodindex[i]],0.025,names=FALSE),1),"%-", round(quantile(100*p0[,foodindex[i]],0.975,names=FALSE),1),"%"),
         side = 1, adj = 0,line=1, cex = 1,
         outer = TRUE)
-  mtext(paste("Estimated C.consumption/bw+ Q50% for", foodnamesused[i], ": ", round(quantile(exp(mus0[,foodindex[i]]+0.5*Vs ),0.5,names=FALSE),1),
+  mtext(paste("Estimated Q50% C.consumption/bw+ for", foodnamesused[i], ": ", round(quantile(exp(mus0[,foodindex[i]]+0.5*Vs),0.5,names=FALSE),1),
               "(posterior median)."),
         side = 1, adj = 0,line=2, cex = 1,
         outer = TRUE)
-  mtext(paste("Estimated A.consumption+ Q50% for", foodnamesused[i], ": ", round(quantile(exp(mus0[,foodindex[i]]+muw),0.5,names=FALSE),1),
+  mtext(paste("Estimated Q50% A.consumption+ for", foodnamesused[i], ": ", round(quantile(exp(mus0[,foodindex[i]]+muw),0.5,names=FALSE),1),
               "(posterior median)."),
         side = 1, adj = 0,line=3, cex = 1,
         outer = TRUE) 

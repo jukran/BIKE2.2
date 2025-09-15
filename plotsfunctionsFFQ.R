@@ -516,11 +516,11 @@ distPlot2_1FFQ <- function(input_lim, food_consum, unit_consum, input_upper, inp
           uppervalues[xv] <- quantile(dlnorm(xvalues[xv],
                                              mus0[,foodindex[i]]+muw,
                                              sqrt(Vs0+sigw^2)),
-                                      input_upper,names=FALSE) #0.975,names=FALSE)
+                                      input_upper,names=FALSE) 
           lowervalues[xv] <- quantile(dlnorm(xvalues[xv],
                                              mus0[,foodindex[i]]+muw,
                                              sqrt(Vs0+sigw^2)),
-                                      input_lower,names=FALSE) #0.025,names=FALSE)
+                                      input_lower,names=FALSE)
         }
         polygon(c(xvalues,xvalues[100:1]),c(uppervalues,lowervalues[100:1]),col="#CEB888")
         lines(density(meansmedian,from=0,to=maxx,n=2048),lwd=3,main=paste(foodnamesused[i],"consumption"),xlab="C.consumption+",ylab="",xlim=c(0,maxx),type="l") 
@@ -629,10 +629,10 @@ distPlot2_1FFQ <- function(input_lim, food_consum, unit_consum, input_upper, inp
         for(xv in 1:100){
           uppervalues[xv] <- quantile(plnorm(xvalues[xv],
                                              mus0[,foodindex[i]],sqrt(Vs0) ),
-                                      input_upper,names=FALSE) #0.975,names=FALSE)
+                                      input_upper,names=FALSE) 
           lowervalues[xv] <- quantile(plnorm(xvalues[xv],
                                              mus0[,foodindex[i]],sqrt(Vs0) ),
-                                      input_lower,names=FALSE) #0.025,names=FALSE)
+                                      input_lower,names=FALSE) 
         }
         polygon(c(xvalues,xvalues[100:1]),c(uppervalues,lowervalues[100:1]),col="#CEB888")
         lines(meansmean,cump,col="#F7CE3C",lwd=3,main=paste(foodnamesused[i],"consumption"),xlab="C.consumption/bw+",ylab="",xlim=c(0,maxx),type="l")
@@ -740,11 +740,11 @@ distPlot2_1FFQ <- function(input_lim, food_consum, unit_consum, input_upper, inp
           uppervalues[xv] <- quantile(pnorm(xvalues[xv],
                                             (mus0[,foodindex[i]]+muw)/log(10),
                                             (sqrt(Vs0+sigw^2))/log(10) ),
-                                      input_upper,names=FALSE) #0.975,names=FALSE)
+                                      input_upper,names=FALSE) 
           lowervalues[xv] <- quantile(pnorm(xvalues[xv],
                                             (mus0[,foodindex[i]]+muw)/log(10),
                                             (sqrt(Vs0+sigw^2))/log(10) ),
-                                      input_lower,names=FALSE) #0.025,names=FALSE)
+                                      input_lower,names=FALSE)
         }
         polygon(c(xvalues,xvalues[100:1]),c(uppervalues,lowervalues[100:1]),col="#CEB888")
         lines(logsmean/log(10),cump,lwd=3,main=paste(foodnamesused[i],"consumption"),xlab="log C.consumption+",ylab="",xlim=c(minn/log(10),maxx/log(10)),type="l")
@@ -765,12 +765,21 @@ distPlot2_1FFQ <- function(input_lim, food_consum, unit_consum, input_upper, inp
   # outside the figure, but onto the current plot, so it is part of the png file:
   mtext(paste("Estimated population proportion of consumers of", foodnamesused[i], ": ", round(quantile(100*p0[,foodindex[i]],0.5,names=FALSE),1),
               "% (posterior median)."),
-        side = 1, adj = 0,line=1, cex = 1,
+        side = 1, adj = 0,line=0, cex = 1,
         outer = TRUE)
   mtext(paste("95% uncertainty interval: ", 
               round(quantile(100*p0[,foodindex[i]],0.025,names=FALSE),1),"%-", round(quantile(100*p0[,foodindex[i]],0.975,names=FALSE),1),"%"),
+        side = 1, adj = 0,line=1, cex = 1,
+        outer = TRUE)
+  mtext(paste("Estimated Q50% C.consumption/bw+ for", foodnamesused[i], ": ", round(quantile(exp(mus0[,foodindex[i]]),0.5,names=FALSE),1),
+              "(posterior median)."),
         side = 1, adj = 0,line=2, cex = 1,
         outer = TRUE)
+  mtext(paste("Estimated Q50% C.consumption+ for", foodnamesused[i], ": ", round(quantile(exp(mus0[,foodindex[i]]+muw),0.5,names=FALSE),1),
+              "(posterior median)."),
+        side = 1, adj = 0,line=3, cex = 1,
+        outer = TRUE)
+  
   
   #} # end of if selectresults == "Consumptions"
 }
