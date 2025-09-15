@@ -447,7 +447,7 @@ distPlot2_1FFQ <- function(input_lim, food_consum, unit_consum, input_upper, inp
   
   par(oma = c(4, 1, 0, 1)) # Outer margins for legend
   par(mfrow=c(1,2),cex.lab=1.3,cex.main=1.3,yaxt="n")
-  
+    
   OIM <- numeric() # observed individual mean consumptions
   
   p0 <- exp(logitp0)/(1+exp(logitp0)) # probability to consume at all each food type  
@@ -771,15 +771,26 @@ distPlot2_1FFQ <- function(input_lim, food_consum, unit_consum, input_upper, inp
               round(quantile(100*p0[,foodindex[i]],0.025,names=FALSE),1),"%-", round(quantile(100*p0[,foodindex[i]],0.975,names=FALSE),1),"%"),
         side = 1, adj = 0,line=1, cex = 1,
         outer = TRUE)
-  mtext(paste("Estimated Q50% C.consumption/bw+ for", foodnamesused[i], ": ", round(quantile(exp(mus0[,foodindex[i]]),0.5,names=FALSE),1),
+  if(input_selectscale=="Absolute"){
+  mtext(paste("Estimated Q50% C.consumption/bw+ for", foodnamesused[i], ": ", round(quantile(exp(mus0[,foodindex[i]]),0.5,names=FALSE),2),
               "(posterior median)."),
         side = 1, adj = 0,line=2, cex = 1,
         outer = TRUE)
-  mtext(paste("Estimated Q50% C.consumption+ for", foodnamesused[i], ": ", round(quantile(exp(mus0[,foodindex[i]]+muw),0.5,names=FALSE),1),
+  mtext(paste("Estimated Q50% C.consumption+ for", foodnamesused[i], ": ", round(quantile(exp(mus0[,foodindex[i]]+muw),0.5,names=FALSE),2),
               "(posterior median)."),
         side = 1, adj = 0,line=3, cex = 1,
         outer = TRUE)
-  
+  }
+  if(input_selectscale=="Logarithmic"){
+    mtext(paste("Estimated Q50% log C.consumption/bw+ for", foodnamesused[i], ": ", round(quantile((mus0[,foodindex[i]])/log(10),0.5,names=FALSE),2),
+                "(posterior median)."),
+          side = 1, adj = 0,line=2, cex = 1,
+          outer = TRUE)
+    mtext(paste("Estimated Q50% log C.consumption+ for", foodnamesused[i], ": ", round(quantile((mus0[,foodindex[i]]+muw)/log(10),0.5,names=FALSE),2),
+                "(posterior median)."),
+          side = 1, adj = 0,line=3, cex = 1,
+          outer = TRUE)
+  }
   
   #} # end of if selectresults == "Consumptions"
 }
