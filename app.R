@@ -2253,7 +2253,7 @@ server <- function(input, output, session) {
   output$plot1_cap <- renderText({
     paste(tags$b("Figure 1."), "Variability distribution for positive hazard concentrations in food. 
           The uncertainty of the true variability distribution is expressed by plotting a range 
-          (e.g. pointwise 95%CI) of probable variability distributions (straw color). The uncertainty 
+          (pointwise 95%CI) of probable variability distributions (straw color). The uncertainty 
           distribution for mean concentration (yellow color) and median concentration (black color) are 
           plotted in bold lines. In log-scale, the mean and median are equal. For comparison with data, 
           the raw data are represented as cumulative empirical distribution. For data containing censored 
@@ -2352,7 +2352,7 @@ server <- function(input, output, session) {
       output$plot2_cap <- renderText({
         paste(tags$b("Figure 2a."),"Variability distributions for both mean consumptions per bodyweight 
           ('chronic') and single consumptions ('acute'). The uncertainty of the true variability 
-          distribution of positive consumptions is expressed by plotting a range (e.g. pointwise 95%CI) 
+          distribution of positive consumptions is expressed by plotting a range (pointwise 95%CI) 
           of probable variability distributions (straw color). The uncertainty distributions for mean 
           (yellow color) and median (black color) are plotted in bold lines. Observed data for positive 
           consumptions are shown as raspberry color ticks and the empirical cumulative distribution in 
@@ -2369,7 +2369,7 @@ server <- function(input, output, session) {
       output$plot2_cap <- renderText({
         paste(tags$b("Figure 2a."),"Variability distributions for both mean ('chronic') consumptions per bodyweight 
           and as absolute. The uncertainty of the true variability 
-          distribution of positive mean consumptions is expressed by plotting a range (e.g. pointwise 95%CI) 
+          distribution of positive mean consumptions is expressed by plotting a range (pointwise 95%CI) 
           of probable variability distributions (straw color). The uncertainty distributions for mean 
           (yellow color) and median (black color) are plotted in bold lines. Observed data for positive 
           mean consumptions are shown as raspberry color ticks and the empirical cumulative distribution in 
@@ -2537,7 +2537,7 @@ server <- function(input, output, session) {
       output$plot3_cap <- renderText({
         paste(tags$b("Figure 3."), "Variability distribution for mean positive exposures per bodyweight (chemical) 
           or acute positive exposures (microbial). The uncertainty of the true variability distribution of 
-          positive exposures is expressed by plotting a range (e.g. pointwise 95%CI) of probable variability 
+          positive exposures is expressed by plotting a range (pointwise 95%CI) of probable variability 
           distributions (straw color). The uncertainty distributions for mean (yellow color) and median 
           (black color) are plotted in bold lines. The (pseudo)empirical cumulative distribution simulated 
           from bootstrapped data are shown using LB substitution (blueberry color) and UB substitution 
@@ -2559,7 +2559,7 @@ server <- function(input, output, session) {
       output$plot3_cap <- renderText({
         paste(tags$b("Figure 3."), "Variability distribution for mean exposures per bodyweight (chemical) 
           or mean absolute exposures (microbial). The uncertainty of the true variability distribution of 
-          mean exposures is expressed by plotting a range (e.g. pointwise 95%CI) of probable variability 
+          mean exposures is expressed by plotting a range (pointwise 95%CI) of probable variability 
           distributions (straw color). The uncertainty distributions for mean (yellow color) and median 
           (black color) are plotted in bold lines. The (pseudo)empirical cumulative distribution simulated 
           from bootstrapped data are shown using LB substitution (blueberry color) and UB substitution 
