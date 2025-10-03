@@ -1731,7 +1731,8 @@ distPlot4_1FFQ <- function(unit_concen, hazard_concen, n_sim, input_selectscale,
             # count how many hazard-food combinations actually exist (some had no data, were excluded)
             nftotK <- sum(nexactK[hazardindexK[h],foodindex]>0)
             xmin <- min(exposurevarsample[1:thin,1:nV])
-            xmax <- quantile(exposurevarsample[1:thin,1:nV],0.99,names=FALSE)
+            xmax <- max(quantile(exposurevarsample[1:thin,1:nV],0.99,names=FALSE),
+                        quantile(Qplus[,h],0.95,names=FALSE,na.rm=TRUE) )       
             plot(ecdf(exposurevarsample[1,1:nV]),verticals=TRUE,do.points=FALSE,yaxt="s",
                  xlim=c(xmin,xmax),ylim=c(0,1),
                  lwd=1,lty=3,col=rgb(0.816,0.004,0.435),      
@@ -1766,7 +1767,8 @@ distPlot4_1FFQ <- function(unit_concen, hazard_concen, n_sim, input_selectscale,
             # count how many hazard-food combinations actually exist (some had no data, were excluded)
             nftotK <- sum(nexactK[hazardindexK[h],foodindex]>0) 
             xmin <- log10(min(exposurevarsample[1:thin,1:nV],na.rm=TRUE))
-            xmax <- log10(quantile(exposurevarsample[1:thin,1:nV],0.99,na.rm=TRUE,names=FALSE))
+            xmax <- max(log10(quantile(exposurevarsample[1:thin,1:nV],0.99,na.rm=TRUE,names=FALSE)),
+                        quantile(log10(Qplus[,h]),0.95,names=FALSE,na.rm=TRUE) )     
             plot(ecdf(log(exposurevarsample[1,1:nV])/log(10)),verticals=TRUE,do.points=FALSE,yaxt="s",
                  xlim=c(xmin,xmax),ylim=c(0,1),
                  lwd=1,lty=3,col="#D0006F",ylab="Cumulative probability",
@@ -1896,7 +1898,8 @@ distPlot4_1FFQ <- function(unit_concen, hazard_concen, n_sim, input_selectscale,
             nftotM <- sum(nexactM[hazardindexM[h],foodindex]>0)
               
               xmin <- min(exposurevarsample[1:thin,1:nV],na.rm=TRUE)
-              xmax <- quantile(exposurevarsample[1:thin,1:nV],0.99,na.rm=TRUE,names=FALSE)
+              xmax <- max(quantile(exposurevarsample[1:thin,1:nV],0.99,na.rm=TRUE,names=FALSE),
+                          quantile(Qplus[,h],0.95,names=FALSE,na.rm=TRUE)) 
               plot(ecdf(exposurevarsample[1,1:nV]),verticals=TRUE,
                    do.points=FALSE,yaxt="s",
                    xlim=c(xmin,xmax),ylim=c(0,1),
@@ -1937,7 +1940,8 @@ distPlot4_1FFQ <- function(unit_concen, hazard_concen, n_sim, input_selectscale,
             nftotM <- sum(nexactM[hazardindexM[h],foodindex]>0)
               
               xmin <- log10(min(exposurevarsample[1:thin,1:nV]))
-              xmax <- log10(quantile(exposurevarsample[1:thin,1:nV],0.99,names=FALSE))
+              xmax <- max(log10(quantile(exposurevarsample[1:thin,1:nV],0.99,names=FALSE)),
+                          quantile(log10(Qplus[,h]),0.95,names=FALSE,na.rm=TRUE))     
               plot(ecdf(log10(exposurevarsample[1,1:nV])),
                    verticals=TRUE,do.points=FALSE,yaxt="s",
                    xlim=c(xmin,xmax),ylim=c(0,1),
