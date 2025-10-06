@@ -925,11 +925,11 @@ distPlot3_1FFQ <- function(input_lim, unit_concen, hazard_concen, input_upper, i
               lines(density(medianexposure,from=0,to=maxx,n=2048),lwd=3)
               
               # legend outside the figure, but onto the current plot, so it is part of the png file:
-              mtext(paste("Estimated 95% quantile for exposure+ (consumers): ",q95_50,  
+              mtext(paste("Estimated Q95% for exposure+ (consumers): ",q95_50,  
                           "(posterior median). 90% uncertainty interval for the 95% quantile:", q95_05,"-", q95_95),
                     side = 1, adj = 0,line=2, cex = 1,
                     outer = TRUE)
-              mtext(paste("Estimated 95% quantile for exposure (all): ",round(quantile(qtotal95,0.5,names=FALSE),3),
+              mtext(paste("Estimated Q95% for exposure (all): ",round(quantile(qtotal95,0.5,names=FALSE),3),
                           "(posterior median). 90% uncertainty interval for the 95% quantile: ", round(quantile(qtotal95,0.05,names=FALSE),3),"-",round(quantile(qtotal95,0.95,names=FALSE),3)),
                     side = 1, adj = 0,line=3, cex = 1,
                     outer = TRUE)
@@ -983,11 +983,11 @@ distPlot3_1FFQ <- function(input_lim, unit_concen, hazard_concen, input_upper, i
               lines(density(logmeanexposure/log(10),from=minn/log(10),to=maxx/log(10),n=2048),col="#F7CE3C",main=paste(hazardnamesusedK[h],"from",foodnamesused[i],"(chronic)"),xlab="log (C.exposure/bw+)",ylab="",xlim=c(minn/log(10),maxx/log(10)),lwd=3)
             
               # legend outside the figure, but onto the current plot, so it is part of the png file:
-              mtext(paste("Estimated 95% quantile for exposure+ (consumers): ",ql95_50,  
+              mtext(paste("Estimated Q95% for exposure+ (consumers): ",ql95_50,  
                           "(posterior median). 90% uncertainty interval for the 95% quantile:", ql95_05,"-", ql95_95),
                     side = 1, adj = 0,line=2, cex = 1,
                     outer = TRUE)
-              mtext(paste("Estimated 95% quantile for exposure (all): ",round(quantile(qltotal95,0.5,names=FALSE),3),
+              mtext(paste("Estimated Q95% for exposure (all): ",round(quantile(qltotal95,0.5,names=FALSE),3),
                           "(posterior median). 90% uncertainty interval for the 95% quantile: ", round(quantile(qltotal95,0.05,names=FALSE),3),"-",round(quantile(qltotal95,0.95,names=FALSE),3)),
                     side = 1, adj = 0,line=3, cex = 1,
                     outer = TRUE)
@@ -1164,11 +1164,11 @@ distPlot3_1FFQ <- function(input_lim, unit_concen, hazard_concen, input_upper, i
               lines(logmeanexposure/log(10),cump,main=paste(hazardnamesusedK[h],"from",foodnamesused[i],"(chronic)"),xlab="log (C.exposure/bw+)",ylab="",xlim=c(minn/log(10),maxx/log(10)),lwd=3) 
               
               # legend outside the figure, but onto the current plot, so it is part of the png file:
-              mtext(paste("Estimated 95% quantile for exposure+ (consumers): ",ql95_50,  
+              mtext(paste("Estimated Q95% for exposure+ (consumers): ",ql95_50,  
                           "(posterior median). 90% uncertainty interval for the 95% quantile:", ql95_05,"-", ql95_95),
                     side = 1, adj = 0,line=2, cex = 1,
                     outer = TRUE)
-              mtext(paste("Estimated 95% quantile for exposure (all): ",round(quantile(qltotal95,0.5,names=FALSE),3),
+              mtext(paste("Estimated Q95% for exposure (all): ",round(quantile(qltotal95,0.5,names=FALSE),3),
                           "(posterior median). 90% uncertainty interval for the 95% quantile: ", round(quantile(qltotal95,0.05,names=FALSE),3),"-",round(quantile(qltotal95,0.95,names=FALSE),3)),
                     side = 1, adj = 0,line=3, cex = 1,
                     outer = TRUE)
@@ -1316,11 +1316,11 @@ distPlot3_1FFQ <- function(input_lim, unit_concen, hazard_concen, input_upper, i
               lines(density(medianexposure,from=0,to=maxx,n=2048),lwd=3)
               
               # legend outside the figure, but onto the current plot, so it is part of the png file:
-              mtext(paste("Estimated 95% quantile for exposure+ (consumers): ",q95_50,  
+              mtext(paste("Estimated Q95% for exposure+ (consumers): ",q95_50,  
                           "(posterior median). 90% uncertainty interval for the 95% quantile: ", q95_05,"-", q95_95),
                     side = 1, adj = 0,line=2, cex = 1,
                     outer = TRUE)
-              mtext(paste("Estimated 95% quantile for exposure (all): ",round(quantile(qtotal95,0.5,names=FALSE),3),
+              mtext(paste("Estimated Q95% for exposure (all): ",round(quantile(qtotal95,0.5,names=FALSE),3),
                           "(posterior median). 90% uncertainty interval for the 95% quantile: ", round(quantile(qtotal95,0.05,names=FALSE),3),"-",round(quantile(qtotal95,0.95,names=FALSE),3)),
                     side = 1, adj = 0,line=3, cex = 1,
                     outer = TRUE)
@@ -1373,11 +1373,11 @@ distPlot3_1FFQ <- function(input_lim, unit_concen, hazard_concen, input_upper, i
               lines(density(logmeanexposure/log(10),from=minn/log(10),to=maxx/log(10),n=2048),col="#F7CE3C",main=paste(hazardnamesusedM[h],"from",foodnamesused[i],"(chronic)"),xlab="log (C.exposure+)",ylab="",xlim=c(minn/log(10),maxx/log(10)),lwd=3)
               
               # legend outside the figure, but onto the current plot, so it is part of the png file:
-              mtext(paste("Estimated 95% quantile for exposure+ (consumers): ",ql95_50,  
+              mtext(paste("Estimated Q95% for exposure+ (consumers): ",ql95_50,  
                           "(posterior median). 90% uncertainty interval for the 95% quantile: ", ql95_05,"-", ql95_95),
                     side = 1, adj = 0,line=2, cex = 1,
                     outer = TRUE)
-              mtext(paste("Estimated 95% quantile for exposure (all): ",round(quantile(qltotal95,0.5,names=FALSE),3),
+              mtext(paste("Estimated Q95% for exposure (all): ",round(quantile(qltotal95,0.5,names=FALSE),3),
                           "(posterior median). 90% uncertainty interval for the 95% quantile: ", round(quantile(qltotal95,0.05,names=FALSE),3),"-",round(quantile(qltotal95,0.95,names=FALSE),3)),
                     side = 1, adj = 0,line=3, cex = 1,
                     outer = TRUE)
@@ -1570,11 +1570,11 @@ distPlot3_1FFQ <- function(input_lim, unit_concen, hazard_concen, input_upper, i
               lines(logmeanexposure/log(10),cump,main=paste(hazardnamesusedM[h],"from",foodnamesused[i],"(chronic)"),xlab="log (C.exposure+)",ylab="",xlim=c(minn/log(10),maxx/log(10)),lwd=3) 
               
               # legend outside the figure, but onto the current plot, so it is part of the png file:
-              mtext(paste("Estimated 95% quantile for exposure+ (consumers): ",ql95_50,  
+              mtext(paste("Estimated Q95% for exposure+ (consumers): ",ql95_50,  
                           "(posterior median). 90% uncertainty interval for the 95% quantile: ", ql95_05,"-", ql95_95),
                     side = 1, adj = 0,line=2, cex = 1,
                     outer = TRUE)
-              mtext(paste("Estimated 95% quantile for exposure (all): ",round(quantile(qltotal95,0.5,names=FALSE),3),
+              mtext(paste("Estimated Q95% for exposure (all): ",round(quantile(qltotal95,0.5,names=FALSE),3),
                           "(posterior median). 90% uncertainty interval for the 95% quantile: ", round(quantile(qltotal95,0.05,names=FALSE),3),"-",round(quantile(qltotal95,0.95,names=FALSE),3)),
                     side = 1, adj = 0,line=3, cex = 1,
                     outer = TRUE)
