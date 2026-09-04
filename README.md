@@ -14,7 +14,7 @@ OpenBUGS is no longer on this site:
 https://www.mrc-bsu.cam.ac.uk/software/bugs/openbugs/
 But it could be downloaded from here:
 https://openbugs.software.informer.com/download/?cf25c9ce#downloading
-And the file OpenBUGS323setup.exe is also copied in this BIKE2.1 folder for convenience. 
+And the file OpenBUGS323setup.exe is also copied in this folder for convenience. 
 
 2. Download the BIKE-code files and unzip in local folder.
 3. Open the app.R file in RStudio.
@@ -29,6 +29,10 @@ Ranta J, Mikkelä A, Suomi J, Tuominen P. BIKE: Dietary Exposure Model for Foodb
 Ranta J, Marinova-Todorova M, Mikkelä A, Suomi J, Tuominen P 2023. BIKE foodborne exposure model - A graphical user interface for the Bayesian dietary exposure assessment model for microbiological and chemical hazards (BIKE). Finnish Food Authority, Helsinki, Finland. Available at https://bike-expo-shiny.rahtiapp.fi/
 
 #### Updates:
+
+Estimated distributions are derived for both acute exposures and long term mean exposures for both chemical and microbiological hazards. 
+
+Consumption amounts can be set as constant values. By this we assume the same amount is consumed every day, which, consequently, is also the long term mean consumption. Results from exposure analysis include analyses for chronic exposures and acute exposures, under the constant consumption. Also, maximum consumption is estimated for which the Q95% exposure is at a given safety limit. This can be used for studying consumption scenarios or recommendations.     
 
 Food Frequency Questionnaire data (FFQ) is allowed as another data format (previously only food diary format). In FFQ data, average long term daily consumptions of the foods are given for each individual. This implies that there is no model for day-to-day (or serving-to-serving) variation in FFQ-model. Also, FFQ-model has no model for the error or those average daily consumptions. They are taken as exact values. Individuals who report zero average long term consumption in FFQ data are assumed to be true non-consumers. Hence, the FFQ-data are utilized for estimation of the proportion of true consumers. In diary data, zero consumption(s) on a random day(s) does not imply the person to be truly non-consumer. Hence, the FFQ data and diary data have different level of information.  
 
