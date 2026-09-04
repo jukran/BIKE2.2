@@ -135,7 +135,10 @@ if(nhM>0){
 # CONSUMPTION DATA FORMATTING CODE
 
 
-if(input$datachoice!="FFQ"){   # food diary type of data
+if(input$datachoice=="Food diary"){   # food diary type of data
+  constant.consum <- logical(1)
+  constant.consum <- FALSE
+  
 # Make order matrix that describes the position (column) of studied foods
 order <- matrix(NA,nrow = nf, ncol = nd)
 for(i in 1:nf){   # food
@@ -147,18 +150,63 @@ orderv <- c(t(order)) # make order vector
 consum[orderv] <- suppressWarnings(sapply(consum[orderv],as.numeric)) 
 # Make data array for the consumption estimation (to be used in BUGS)
 
-s <- array(NA,c(nr,nd,nf))
+s <- array(NA,c(nr,nd,nf))     
 sw <- array(NA,c(nr,nd,nf))
+oimlogs <- matrix(NA,nr,nf)
+oimlogsw <- matrix(NA,nr,nf)
+osdlogs <- matrix(NA,nr,nf)
+osdlogsw <- matrix(NA,nr,nf)
+
+osdlogs1 <- numeric()  
+osdlogsw1<- numeric()  
+osdlogs2 <- numeric()  
+osdlogsw2<- numeric()  
+
+if (nf==1){
+  osdlogs1 <- numeric(nf+1)  
+  osdlogsw1<- numeric(nf+1)  # +1 added to keep it as vector for BUGS, when nf=1
+  osdlogs2 <- numeric(nf+1)  
+  osdlogsw2<- numeric(nf+1)  # +1 added to keep it as vector for BUGS, when nf=1
+}
+
 Weight <- sapply(Weight,as.numeric)
-for(r in 1:nr){
-  for(i in 1:nf){
+for(i in 1:nf){
+  for(r in 1:nr){  # collect all consumptions (including zeros), for each food, each consumer, each day:
     s[r,1:nd,i] <- suppressWarnings(as.numeric(consum[r,order[i,]]))  # serving size
     sw[r,1:nd,i] <- suppressWarnings(as.numeric(consum[r,order[i,]]/Weight[r])) # serving size per person weight
-  }}
-s[s == 0] <- NA
-sw[is.na(s)] <- NA
+  }
+}
+s[s == 0] <- NA   # place NA where consumption was zero
+sw[is.na(s)] <- NA # place NA where consumption was zero
+for(i in 1:nf){
+  for(r in 1:nr){
+oimlogs[r,i] <- mean(log(s[r,1:nd,i]),na.rm=TRUE)  # observed individual means, calculated over actual log-consumptions
+oimlogsw[r,i] <- mean(log(sw[r,1:nd,i]),na.rm=TRUE)# observed individual means (per bodyweight), calculated over actual log-consumptions
+# note: there must be at least some individuals with at least one positive consumption day! 
+osdlogs[r,i] <- sd(log(s[r,1:nd,i]),na.rm=TRUE) # observed individual SD:s, over actual log-consumptions
+osdlogsw[r,i] <- sd(log(sw[r,1:nd,i]),na.rm=TRUE) # observed individual SD:s (per bodyweight), over actual log-consumptions
+# note: some SD:s can be zero, if there was only one actual consumption time of the food i for consumer r.
+# there must be at least some individuals with positive consumption on both days! 
+  }
+# Data based simple point estimates for the SD:s between consumer means, and between servings (in log scale), for each food type:  
+osdlogs1[i] <- sd(oimlogs[,i],na.rm=TRUE) # observed standard deviations (between-consumer variability of log-values)
+osdlogsw1[i] <- sd(oimlogsw[,i],na.rm=TRUE) # observed standard deviations (between-consumer variability of log-values)
+osdlogs2[i] <- mean(osdlogs[,i],na.rm=TRUE) # mean of the consumer specific observed SD:s  (of which some can be zero)
+osdlogsw2[i] <- mean(osdlogsw[,i],na.rm=TRUE) # mean of the consumer specific observed SD:s (per bodyweight)  (of which some can be zero)
+}
+
 logs <- log(s)    # natural logarithms of serving size
 logsw <- log(sw)  # natural logarithms of serving size per weight
+
+
+# if(sd(Weight)==0){
+# # if all weights are equal: then use a model assuming constant consumption for each food type
+# for(i in 1:nf){ # set constant value for each food type (=the mean over all reported positive values)
+# s[,,i][!is.na(s[,,i])] <- mean(s[,,i],na.rm=TRUE)
+# sw[,,i][!is.na(s[,,i])] <- mean(s[,,i],na.rm=TRUE)/mean(Weight)
+# }
+# constant.consum <- TRUE
+# }
 
 # Option to be investigated, not used currently: 
 # empirically based wishart prior based on observed data correlations between foods.
@@ -182,7 +230,7 @@ for(r in 1:nr){
   for(i in 1:nf){
     usedays[r,i,1:nd] <- as.numeric(as.numeric(consum[r,order[i,]])>0)
   }}
-} # not FFQ data
+} # Food diary data
 
 
 if(input$datachoice=="FFQ"){ # FFQ type of data
@@ -210,3 +258,30 @@ if(input$datachoice=="FFQ"){ # FFQ type of data
       usedfoods[r,1:nf] <- as.numeric(as.numeric(consum[r,order])>0)
     }}
 } # FFQ data
+
+
+
+if(input$datachoice=="Constant consumption"){ # Constant consumption type of data
+  
+  
+  nr <- 1   # dummy variable for number of individuals (consumption is constant for all individuals)
+  nd <- 1   # dummy variable also for number of days (consumption is constant for all days)
+
+  # Make data array for the consumption estimation (to be used in BUGS)
+  s <- array(NA,c(nr,nd,nf))   # here nr=1,nd=1, i.e. constant value --> all individuals and days are same, no variations
+  sw <- array(NA,c(nr,nd,nf))  # here nr=1,nd=1, i.e. constant value --> all individuals and days are same, no variations
+  
+  constant.consum <- logical(1)  
+  constant.consum <- TRUE
+  
+  for(i in 1:nf){ # set constant value for each food type (=the mean over all reported positive values)
+    s[,,i] <- consum[,i+1]                 
+    sw[,,i] <- consum[,i+1]/consum[,1] 
+  }
+  
+  logs <- log(s)    # natural logarithms of serving size
+  logsw <- log(sw)  # natural logarithms of serving size per bodyweight
+  
+  usedays <- 1
+  
+} # Constant consumption

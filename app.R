@@ -4,7 +4,6 @@
 # the 'Run App' button above.
 #
 
-
 # packages needed:
 library(shiny)
 library(R2OpenBUGS)
@@ -18,8 +17,6 @@ library(shinyjs)
 library(DT)
 library(data.table) # -> for the function fread() to read the uploaded files
 library(rmarkdown)
-
-
 
 
 source("helps.R")
@@ -47,9 +44,9 @@ ui <- navbarPage(id ="bike_tabs",
                       hazards, respectively. Uncertainty and variability in exposures are visualized, 
                       and a few optional model structures are available."), 
                                                tags$p("BIKE app is open source and latest version is available from GitHub",tags$i(tags$a("(https://github.com/jukran)",
-                                                                                                                        href = "https://github.com/jukran",
-                                                                                                                        target =
-                                                                                                                          "_blank")),
+                                                                                                                                          href = "https://github.com/jukran",
+                                                                                                                                          target =
+                                                                                                                                            "_blank")),
                                                       ". Simulated synthetic data resembling real occurrence and consumption data is 
                                        provided with the code as an example."),
                                                
@@ -171,24 +168,6 @@ ui <- navbarPage(id ="bike_tabs",
                                                                 "text/comma-separated-values,text/plain",
                                                                 ".csv")
                                                    ),
-                                                   #Upload file 2:
-                                                   radioButtons(  
-                                                     "datachoice",
-                                                     label = h5(strong("Consumption data type:"), style = "color:#CEB888"),
-                                                     choiceNames = list(tags$span("Food diary", style = "color: black"),
-                                                                        tags$span("FFQ", style = "color: black")),
-                                                     choiceValues = list("Food diary","FFQ"),
-                                                     selected = "Food diary"
-                                                   ),
-                                                   
-                                                   fileInput(
-                                                     "file_consm",
-                                                     strong("Consumptions"),
-                                                     multiple = FALSE,
-                                                     accept = c("text/csv",
-                                                                "text/comma-separated-values,text/plain",
-                                                                ".csv")
-                                                   ),
                                                    #Upload file 3:
                                                    fileInput(
                                                      "file_occ",
@@ -207,24 +186,62 @@ ui <- navbarPage(id ="bike_tabs",
                                                                 "text/comma-separated-values,text/plain",
                                                                 ".csv")
                                                    ),
+                                                   ##Upload file Consumption: ----
+                                                   #Consumption data as csv file for Food diary of FFQ; or manualy in a table for Constant consumption 
+                                                   help_consum_data(),
+                                                   radioButtons(  
+                                                     "datachoice",
+                                                     label = h5(strong("Consumption data type:"), style = "color:#CEB888"),
+                                                     choiceNames = list(tags$span("Food diary", style = "color: black"),
+                                                                        tags$span("FFQ", style = "color: black"),
+                                                                        tags$span("Constant consumption", style = "color: black")),
+                                                     choiceValues = list("Food diary","FFQ","Constant consumption"),
+                                                     selected = "Food diary"
+                                                   ),
+                                                   
+                                                   # CSV (if "Food diary" or "FFQ")
+                                                   conditionalPanel(
+                                                     condition = "input.datachoice == 'Food diary'  || input.datachoice == 'FFQ'",
+                                                     fileInput(
+                                                       "file_consm",
+                                                       strong(""),
+                                                       multiple = FALSE,
+                                                       accept = c("text/csv",
+                                                                  "text/comma-separated-values,text/plain",
+                                                                  ".csv")
+                                                     )
+                                                   ),
+                                                   conditionalPanel(
+                                                     condition = "input.datachoice == 'Constant consumption'",
+                                                     shinyMatrix::matrixInput(
+                                                       "constant_vals",
+                                                       class = "numeric",
+                                                       value = matrix(),
+                                                       rows = list(names = TRUE),
+                                                       cols = list(names = TRUE)
+                                                     )
+                                                   ),
                                                    tags$hr(),
-                                                   strong("Example files:"),
+                                                   h5(strong("Example files"), style = "color:#CEB888"),
+                                                   strong("Food diary"),
                                                    tags$br(),
-                                                   downloadLink("downloadConcenData", tags$i("DataConcentrations.csv")),
-                                                   tags$br(),
-                                                   downloadLink("downloadConsumData", tags$i("DataConsumptions.csv")), 
+                                                   downloadLink("downloadConcenData", tags$i("DataConcentrations.csv")), 
                                                    tags$br(),
                                                    downloadLink("downloadOccData", tags$i("DataOccurrence.csv")), 
                                                    tags$br(),
                                                    downloadLink("downloadPrevData", tags$i("DataPrevalence.csv")),
                                                    tags$br(),
+                                                   downloadLink("downloadConsumData", tags$i("DataConsumptions.csv")),
+                                                   tags$br(),tags$br(),
+                                                   strong("FFQ"),
+                                                   tags$br(),
                                                    downloadLink("downloadConcenDatafish", tags$i("DataConcentrations_fish.csv")),
-                                                   tags$br(),  
-                                                   downloadLink("downloadConsumDataFFQ", tags$i("DataConsumptions_fish_FFQ.csv")),
                                                    tags$br(),
                                                    downloadLink("downloadOccDatafish", tags$i("DataOccurrence_fish.csv")),
                                                    tags$br(),
-                                                   downloadLink("downloadPrevDatafish", tags$i("DataPrevalence_fish.csv"))
+                                                   downloadLink("downloadPrevDatafish", tags$i("DataPrevalence_fish.csv")),
+                                                   tags$br(),  
+                                                   downloadLink("downloadConsumDataFFQ", tags$i("DataConsumptions_fish_FFQ.csv"))
                                          )
                                        ),
                                        mainPanel(
@@ -239,11 +256,6 @@ ui <- navbarPage(id ="bike_tabs",
                                              tableOutput("contents_conct")
                                            ),
                                            tabPanel(
-                                             title = "Consumptions data",
-                                             value = "file_consmTab",
-                                             tableOutput("contents_consm")
-                                           ),
-                                           tabPanel(
                                              title = "Occurrence data",
                                              value = "file_occTab",
                                              tableOutput("contents_occ")
@@ -252,6 +264,11 @@ ui <- navbarPage(id ="bike_tabs",
                                              title = "Prevalence data",
                                              value = "file_prevTab",
                                              tableOutput("contents_prev")
+                                           ),
+                                           tabPanel(
+                                             title = "Consumption data",
+                                             value = "file_consmTab",
+                                             tableOutput("contents_consm")
                                            )
                                          )
                                        )
@@ -279,15 +296,15 @@ ui <- navbarPage(id ="bike_tabs",
                                                tags$br(),
                                                fluidRow(
                                                  column(5,
-                                                 radioButtons(
-                                                   "modelchoice4FFQ",
-                                                   label = h5(("Correlated mean serving sizes"), style ="color:#343841"),
-                                                   choices = c("No", "Yes"),
-                                                   selected = "No"
-                                                   ###choiceNames = list(tags$span("Correlation: no ", style = "color: #000000;"),
-                                                  ###                    tags$span("Correlation: yes", style = "color: #000000;")),
-                                                   ###choiceValues = list("No","Yes"),
-                                                 )
+                                                        radioButtons(
+                                                          "modelchoice4FFQ",
+                                                          label = h5(("Correlated mean serving sizes"), style ="color:#343841"),
+                                                          choices = c("No", "Yes"),
+                                                          selected = "No"
+                                                          ###choiceNames = list(tags$span("Correlation: no ", style = "color: #000000;"),
+                                                          ###                    tags$span("Correlation: yes", style = "color: #000000;")),
+                                                          ###choiceValues = list("No","Yes"),
+                                                        )
                                                  )
                                                )
                                              ),
@@ -297,19 +314,20 @@ ui <- navbarPage(id ="bike_tabs",
                                            
                                            conditionalPanel(   ###
                                              ## Selection based on either food diary data or FFQ data
-                                             condition = "input.datachoice != 'FFQ'",   ###
+                                             condition = "input.datachoice == 'Food diary'",   ###
                                              
                                              radioButtons(
                                                "modelchoice",
                                                label = h5(strong("Consumption model"), style = "color:#CEB888"),
                                                choiceNames = list(tags$span("Dependent days", style = "color: #EEEEEE;"),
-                                                                  tags$span("Independent days", style = "color: #EEEEEE;")),
-                                               choiceValues = list("Dependent days", "Independent days"),
+                                                                  tags$span("Independent days", style = "color: #EEEEEE;"),
+                                                                  tags$span("Independent days, fixed variance", style = "color: #EEEEEE;")),
+                                               choiceValues = list("Dependent days", "Independent days", "Fixed variance"),
                                                selected = "Independent days"
                                              ),
                                              conditionalPanel(
-                                               # Selection that is related only to Consumption model "Independent days":
-                                               condition = "input.modelchoice == 'Independent days'",
+                                               # Selection that is related only to Consumption model "Independent days", or that with "Fixed variance":
+                                               condition = "input.modelchoice == 'Independent days' | input.modelchoice == 'Fixed variance'",
                                                wellPanel(
                                                  style = "border-color: #CEB888",
                                                  help_params_indep(),
@@ -330,33 +348,36 @@ ui <- navbarPage(id ="bike_tabs",
                                                  ),   ##
                                                )
                                              ),
-                                             h5(strong("Correlation models"), style ="color:#CEB888"),
                                              
-                                             wellPanel( 
-                                               help_params_serving(),
-                                               tags$br(),
-                                               fluidRow(
-                                                 column(
-                                                   5, 
-                                                   radioButtons(
-                                                     "modelchoice3",
-                                                     label = h5(("Correlated serving sizes"), style = "color:#343841"),
-                                                     choices = c("No", "Yes")
-                                                   )
-                                                 ),
-                                                 column(
-                                                   7, radioButtons(
-                                                     "modelchoice4",
-                                                     label = h5(("Correlated mean serving sizes"), style ="color:#343841"),
-                                                     choices = c("No", "Yes")
-                                                   )
-                                                 ))
-                                             ),
+                                             conditionalPanel(   # added conditional panel
+                                               condition = "input.modelchoice == 'Independent days' | input.modelchoice == 'Dependent days'",   
+                                               h5(strong("Correlation models"), style ="color:#CEB888"),
+                                               wellPanel( 
+                                                 help_params_serving(),
+                                                 tags$br(),
+                                                 fluidRow(
+                                                   column(
+                                                     5, 
+                                                     radioButtons(
+                                                       "modelchoice3",
+                                                       label = h5(("Correlated serving sizes"), style = "color:#343841"),
+                                                       choices = c("No", "Yes")
+                                                     )
+                                                   ),
+                                                   column(
+                                                     7, radioButtons(
+                                                       "modelchoice4",
+                                                       label = h5(("Correlated mean serving sizes"), style ="color:#343841"),
+                                                       choices = c("No", "Yes")
+                                                     )
+                                                   ))
+                                               )    # well panel, this was:  ),
+                                             ),  # added conditional panel
                                              
                                            ),  ### not FFQ
                                            
-                                            
-                                          
+                                           
+                                           
                                            radioButtons(
                                              "priorchoice",
                                              label = h5(strong("Priors for variances"), style ="color:#CEB888"),
@@ -473,7 +494,7 @@ ui <- navbarPage(id ="bike_tabs",
                                                                       "Exposures",
                                                                       tags$br(),
                                                                       hidden(htmlOutput("plot3text")),
-                                                                      plotOutput("distPlot3", width = "100%", height = "650px"),
+                                                                      plotOutput("distPlot3", width = "100%", height = "850px"),
                                                                       
                                                                       tags$br(),
                                                                       htmlOutput("plot3_cap")
@@ -702,18 +723,18 @@ ui <- navbarPage(id ="bike_tabs",
                                                                                     "nV_dl",
                                                                                     tags$span("Variability sample size for Q%", style = "color: #004F71;"),
                                                                                     min = 100,
-                                                                                    max = 1000,
+                                                                                    max = 2000,
                                                                                     value = 100,
-                                                                                    step = 10,
+                                                                                    step = 100,
                                                                                     width = '200px'
                                                                                   ),
                                                                                   numericInput(
                                                                                     "nU_dl",
                                                                                     tags$span("Uncertainty sample size for Q%", style = "color: #004F71;"),
                                                                                     min = 100,
-                                                                                    max = 2000,
+                                                                                    max = 8000,
                                                                                     value = 200,
-                                                                                    step = 10,
+                                                                                    step = 100,
                                                                                     width = '200px'
                                                                                   )
                                                                                 )
@@ -739,7 +760,7 @@ ui <- navbarPage(id ="bike_tabs",
                                                      2,
                                                      # Quantiles options----
                                                      conditionalPanel(
-                                                       condition = "input.selectresults == 'exposureTab'&& input.exposures == 'Quantiles'",
+                                                       condition = "input.selectresults == 'exposureTab'&& input.exposures == 'Quantiles'&& input.datachoice != 'Constant consumption'",
                                                        style = "color: #F4F3F2;",
                                                        wellPanel(
                                                          help_quantiles(),
@@ -765,17 +786,17 @@ ui <- navbarPage(id ="bike_tabs",
                                                              "nV",
                                                              tags$span("Variability sample size for Q%", style = "color: #004F71;"),
                                                              min = 100,
-                                                             max = 1000,
+                                                             max = 2000,
                                                              value = 100,
-                                                             step = 10
+                                                             step = 100
                                                            ),
                                                            numericInput(
                                                              "nU",
                                                              tags$span("Uncertainty sample size for Q%", style = "color: #004F71;"),
                                                              min = 100,
-                                                             max = 2000,
+                                                             max = 8000,
                                                              value = 200,
-                                                             step = 10
+                                                             step = 100
                                                            )
                                                            
                                                          )
@@ -792,11 +813,12 @@ ui <- navbarPage(id ="bike_tabs",
                                                        input.selectresults == 'MCMC samples'",
                                                        wellPanel(
                                                          help_view1(),
-                                                         h4(strong("To plot"), style = "color:#CEB888"),
+                                                         #h4(strong("Select"), style = "color:#CEB888"),
                                                          
                                                          #### _concentrations----
                                                          conditionalPanel(
                                                            condition = "input.selectresults == 'Concentrations'",
+                                                           h4(strong("Select"), style = "color:#CEB888"),
                                                            selectInput(
                                                              inputId = "thefoodnames1",
                                                              label = strong(("Food types"), style = "color:#004F71"),
@@ -811,7 +833,8 @@ ui <- navbarPage(id ="bike_tabs",
                                                          
                                                          #### _consumptions----
                                                          conditionalPanel(
-                                                           condition = "input.selectresults == 'Consumptions' && input.consumptions == 'Consumptions'",
+                                                           condition = "input.selectresults == 'Consumptions' && input.consumptions == 'Consumptions' && input.datachoice != 'Constant consumption'",
+                                                           h4(strong("Select"), style = "color:#CEB888"),
                                                            selectInput(
                                                              inputId = "thefoodnames2",
                                                              label = strong(("Food types"), style = "color:#004F71"),
@@ -822,6 +845,7 @@ ui <- navbarPage(id ="bike_tabs",
                                                          #### _serving correlation----
                                                          conditionalPanel(
                                                            condition = "input.selectresults == 'Consumptions'&& input.consumptions == 'serveCor'",
+                                                           h4(strong("Select"), style = "color:#CEB888"),
                                                            checkboxGroupInput(
                                                              inputId = "thefoodnames21",
                                                              label = strong(("Food types"), style = "color:#004F71"),
@@ -832,6 +856,7 @@ ui <- navbarPage(id ="bike_tabs",
                                                          #### _mean serving correlation----
                                                          conditionalPanel(
                                                            condition = "input.selectresults == 'Consumptions'&& input.consumptions == 'mserveCor'",
+                                                           h4(strong("Select"), style = "color:#CEB888"),
                                                            checkboxGroupInput(
                                                              inputId = "thefoodnames22",
                                                              label = strong(("Food types"), style = "color:#004F71"),
@@ -842,6 +867,7 @@ ui <- navbarPage(id ="bike_tabs",
                                                          #### _exposures----
                                                          conditionalPanel(
                                                            condition = "input.selectresults == 'exposureTab'&& input.exposures == 'Exposures'",
+                                                           h4(strong("Select"), style = "color:#CEB888"),
                                                            selectInput(
                                                              inputId = "thefoodnames3",
                                                              label = strong(("Food types"), style = "color:#004F71"),
@@ -856,7 +882,8 @@ ui <- navbarPage(id ="bike_tabs",
                                                          
                                                          #### _quantiles----
                                                          conditionalPanel(
-                                                           condition = "input.selectresults == 'exposureTab'&& input.exposures == 'Quantiles'&& input.selectQ != 'None'",
+                                                           condition = "input.selectresults == 'exposureTab'&& input.exposures == 'Quantiles'&& input.selectQ != 'None'&& input.datachoice != 'Constant consumption'",
+                                                           h4(strong("Select"), style = "color:#CEB888"),
                                                            checkboxGroupInput(
                                                              inputId = "thefoodnames4",
                                                              label = strong(("Food types"), style = "color:#004F71"),
@@ -871,6 +898,7 @@ ui <- navbarPage(id ="bike_tabs",
                                                          #### _MCMC----
                                                          conditionalPanel(
                                                            condition = "input.selectresults == 'MCMC samples' && input.diagchoice == 'Concentration parameters'",
+                                                           h4(strong("Select"), style = "color:#CEB888"),
                                                            selectInput(
                                                              inputId = "thefoodnames5",
                                                              label = strong(("Food types"), style = "color:#004F71"),
@@ -879,6 +907,7 @@ ui <- navbarPage(id ="bike_tabs",
                                                          ),
                                                          conditionalPanel(
                                                            condition = "input.selectresults == 'MCMC samples' && input.diagchoice == 'Consumption parameters'",
+                                                           h4(strong("Select"), style = "color:#CEB888"),
                                                            selectInput(
                                                              inputId = "thefoodnames52",
                                                              label = strong(("Food types"), style = "color:#004F71"),
@@ -890,8 +919,8 @@ ui <- navbarPage(id ="bike_tabs",
                                                            selectInput(
                                                              inputId = "thehazardnames5",
                                                              label = strong(("Hazards"), style = "color:#004F71"),
-                                                           choices = c()
-                                                          )
+                                                             choices = c()
+                                                           )
                                                          )
                                                        )
                                                      ),
@@ -955,13 +984,12 @@ ui <- navbarPage(id ="bike_tabs",
                                                        input.selectresults == 'exposureTab'&& input.exposures == 'Quantiles'",
                                                        wellPanel(
                                                          help_view2(),
-                                                         h4(strong("Plot options"), style = "color:#CEB888"),
                                                          
                                                          ### _concentrations----
                                                          ### Credible interval----
                                                          conditionalPanel(
                                                            condition = "input.selectresults == 'Concentrations'",
-                                                           
+                                                           h4(strong("Plot options"), style = "color:#CEB888"),
                                                            sliderInput(inputId="xrange",
                                                                        label=h5(strong("Range x-axis (%)"),
                                                                                 style = "color:#004F71"), 
@@ -1000,8 +1028,8 @@ ui <- navbarPage(id ="bike_tabs",
                                                          ### _consumptions----
                                                          ### Credible interval----
                                                          conditionalPanel(
-                                                           condition = "input.selectresults == 'Consumptions'",
-                                                           
+                                                           condition = "input.selectresults == 'Consumptions' && input.datachoice != 'Constant consumption'",
+                                                           h4(strong("Plot options"), style = "color:#CEB888"),
                                                            sliderInput(inputId="conf_lim2",
                                                                        label=h5(strong("Range x-axis (%)"),
                                                                                 style = "color:#004F71"), 
@@ -1016,7 +1044,7 @@ ui <- navbarPage(id ="bike_tabs",
                                                          ),
                                                          ### Scale----
                                                          conditionalPanel(
-                                                           condition = "input.selectresults == 'Consumptions'",
+                                                           condition = "input.selectresults == 'Consumptions' && input.datachoice != 'Constant consumption'",
                                                            radioButtons(
                                                              "selectscale2",
                                                              label = h5(strong("Scale"), style = "color:#004F71"),
@@ -1027,7 +1055,7 @@ ui <- navbarPage(id ="bike_tabs",
                                                          ),
                                                          ### Distributions----
                                                          conditionalPanel(
-                                                           condition = "input.selectresults == 'Consumptions'",
+                                                           condition = "input.selectresults == 'Consumptions' && input.datachoice != 'Constant consumption'",
                                                            radioButtons(
                                                              "selectdist2",
                                                              label = h5(strong("Distributions"), style = "color:#004F71"),
@@ -1037,11 +1065,12 @@ ui <- navbarPage(id ="bike_tabs",
                                                            )
                                                          ),
                                                          
+                                                         
                                                          ### _exposures----
                                                          ### Credible interval----
                                                          conditionalPanel(
                                                            condition = "input.selectresults == 'exposureTab'&& input.exposures == 'Exposures'",
-                                                           
+                                                           h4(strong("Plot options"), style = "color:#CEB888"),
                                                            sliderInput(inputId="conf_lim3",
                                                                        label=h5(strong("Range x-axis (%)"),
                                                                                 style = "color:#004F71"), 
@@ -1057,6 +1086,7 @@ ui <- navbarPage(id ="bike_tabs",
                                                          ### Scale----
                                                          conditionalPanel(
                                                            condition = "input.selectresults == 'exposureTab'&& input.exposures == 'Exposures'",
+                                                           help_log_results(),
                                                            radioButtons(
                                                              "selectscale3",
                                                              label = h5(strong("Scale"), style = "color:#004F71"),
@@ -1081,7 +1111,8 @@ ui <- navbarPage(id ="bike_tabs",
                                                          
                                                          ### Scale----
                                                          conditionalPanel(
-                                                           condition = "input.selectresults == 'exposureTab'&& input.exposures == 'Quantiles'&& input.selectQ != 'None'",
+                                                           condition = "input.selectresults == 'exposureTab'&& input.exposures == 'Quantiles'&& input.selectQ != 'None'&& input.datachoice != 'Constant consumption'",
+                                                           h4(strong("Plot options"), style = "color:#CEB888"),
                                                            radioButtons(
                                                              "selectscale4",
                                                              label = h5(strong("Scale"), style = "color:#004F71"),
@@ -1191,8 +1222,10 @@ does not lead to extremely small or large numerical values since this could affe
                                                               tabPanel(
                                                                 tags$b("Consumption data"),
                                                                 tags$br(),
-                                                                tags$p("The data file with food consumption can take two formats: either food diary or food frequency questionnaire (FFQ). 
-                                                                A food diary data has to contain at least the columns with the following names: ", tags$b("IDnum, Weight, foodA1, foodA2, foodB1, foodB2, etc.")),
+                                                                tags$p("The data file with food consumption can take two formats: either food diary or food frequency questionnaire (FFQ). Alternatively, constant values can be set for consumptions.  
+                                                                "), 
+                                                                tags$p("A food diary data has to contain at least the columns with the following names: ", 
+                                                                       tags$b("IDnum, Weight, foodA1, foodA2, foodB1, foodB2, etc.")),
                                                                 tags$ul(
                                                                   tags$li(tags$b("IDnum"), ": The respondent's number."),
                                                                   tags$li(tags$b("Weight"), ": Body weight of each respondent. Must be given for all individuals. Missing values
@@ -1201,7 +1234,7 @@ not allowed."),
 number of the reporting day. E.g Orange1 for the consumption of orange on day 1, and
 Orange2 for day 2, etc. There should be at least two reporting days for all respondents.
 These columns should contain consumptions of the food items for each respondent, e.g.
-grams per day. With FFQ data the columns are given only for long term mean daily consumptions of each food type (possibly zero). 
+grams per day.  
 Note that the chosen weight units should match the units used for hazard
 concentrations. If food consumption is given as grams per day, the hazard concentrations
 in the food should be given as something per grams. BIKE does not convert measurement
@@ -1212,11 +1245,12 @@ units.")),
                                                                 for 'missing days'. Consumption data file may also contain other columns although 
                                                                 these are not currently used in the model. For example, age of respondents."
                                                                 ),
+                                                                tags$p("Food frequency data (FFQ) specifies the columns only for long term mean daily consumptions of each food type. A zero value indicates a true non-consumer of the food type. This data type does not contain information about variability of daily consumptions, only about the variability of the long-term mean consumptions."),
                                                                 
                                                                 tags$br(),
                                                                 wellPanel(style = "background-color: #EEEEEE;",
                                                                           tags$p(
-                                                                            "Food consumption data can correspond to", tags$b("food diary data format"), 
+                                                                            "Food consumption data file can correspond to", tags$b("food diary data format"), 
                                                                             "where daily food consumption amounts
 per each individual are tabulated per food item, row-by-row.
 The column named ",
@@ -1238,16 +1272,17 @@ number of days for all (missing days marked 'NA'). Each row represents the repor
 types can represent composite foods or raw ingredients as needed, but the names of the food types
 (apart from the day number as the last character) have to be the same as those used in the hazard
 concentration data. Each row gives either the consumed food amounts, or zeros, for the reported
-days. The measurement units also need to be compatible with those in the concentration data, e.g.
+days for each individual. A zero only indicates the person did not happen to consume the food on this day. The measurement units also need to be compatible with those in the concentration data, e.g.
 consumptions in grams if concentrations are given per grams. Consumption data may originally come
 in a hierarchical form that has several levels of food types with increasing details, e.g. seafood, fish,
 smoked fish, smoked salmon. However, only one of those labels (character string
 without spaces) has to be selected and used throughout in consumption data as well as in concentration data. This
-labeling of food items can only be as detailed as both data sets permit. Food consumption data may also correspond to", tags$b("food frequency questionnaire (FFQ) data format"), 
-"where each individual gives his/her long term average daily consumption of each food type. This can also be zero, 
+labeling of food items can only be as detailed as both data sets permit."),
+                                                                          tags$p("Food consumption data file may also correspond to", tags$b("food frequency questionnaire (FFQ) data format"), 
+                                                                            "where each individual gives his/her long term average daily consumption of each food type. This can also be zero, 
 if the individual is truly non-consumer of the food. The columns are then simply e.g.", tags$b("IDnum, Weight, broiler, fish."),
                                                                           )
-                                                                )
+                                                                ), tags$p(tags$b("Constant consumption:"), " when consumption data does not exist, or if a specific fixed consumption amount is of interest as a scenario or consumer recommendation, constant values for daily consumption can be set in a pop-up table instead of a data file. It is then assumed that everyone consumes the given constant amount every day."),
                                                               ),
                                                               tabPanel(
                                                                 tags$b("Occurrence data"),
@@ -1449,7 +1484,7 @@ server <- function(input, output, session) {
   # 1. Source files----
   
   # file with the functions used for generating the plots:
-  source("plotsfunctions.R",local=TRUE)     # when food diary data
+  source("plotsfunctions.R",local=TRUE)     # when food diary data, includes plots for 'constant consumpion' model 
   source("plotsfunctionsFFQ.R",local=TRUE)  # when FFQ data
   
   # file with the functions used for generating the tables:
@@ -1463,9 +1498,12 @@ server <- function(input, output, session) {
   # 2. Upload data files and print them:----
   ## Check if all files are uploaded:----
   output$uploadFiles <- renderUI({
-    if (is.null(input$file_conct) | is.null(input$file_consm) |
+    if ((is.null(input$file_conct) | 
         is.null(input$file_occ) |
-        is.null(input$file_prev) == TRUE) {
+        is.null(input$file_prev) == TRUE) |
+        (is.null(input$file_consm)  == TRUE  && (input$datachoice == 'Food diary'  | input$datachoice == 'FFQ'))
+        
+        ) {
       validate("Input data is missing. Upload all the required files."
       )
     }
@@ -1503,40 +1541,6 @@ server <- function(input, output, session) {
     
     file_contents
   })
-  
-  
-  ## Consumption----
-  consum <- reactive({
-    req(input$file_consm)
-    A <- fread(input$file_consm$datapath,
-               header = TRUE,
-               sep = ",",
-               quote = "")
-    A
-  })
-  
-  
-  output$contents_consm <- renderTable({
-    req(input$file_consm)
-    
-    inFile <- input$file_consm
-    
-    if (is.null(inFile))
-      return(NULL)
-    
-    file_contents <- read.csv(inFile$datapath, sep = ",", dec = ".")
-    
-    required_columns <- c('IDnum', 'Weight')
-    column_names <- colnames(file_contents)
-    
-    validate(
-      need(all(required_columns %in% column_names), 
-           "This file does not meet the requirements. \nCheck the file format (the decimal and field separator!) and the column names.")
-    )
-    
-    file_contents
-  })
-  
   
   ## Occurrence----
   
@@ -1607,6 +1611,201 @@ server <- function(input, output, session) {
     file_contents
   })
   
+  ## Consumption----
+  ### ~Constant consumption----
+  #values provided manually by the user
+  
+  observeEvent(ocdata(), {
+    df <- ocdata()
+    req(is.data.frame(df))
+    req("limitexpo" %in% names(df))
+    
+    # Find columns after 'limitexpo'
+    limit_idx <- match("limitexpo", names(df))
+    extracted_names <- names(df)[(limit_idx + 1):ncol(df)]
+    
+    # Add "Weight" as the first row name
+    row_names <- c("Weight", extracted_names)
+    
+    # Create numeric matrix with ONE column
+    mat <- matrix(
+      NA_real_,
+      nrow = length(row_names),
+      ncol = 1,
+      dimnames = list(row_names, "Value")
+    )
+    
+    # Update matrixInput
+    shinyMatrix::updateMatrixInput(
+      session = session,
+      inputId = "constant_vals",
+      value = mat
+    )
+  })
+  
+  constant_values <- reactive({
+    req(input$constant_vals)
+    B <- data.frame(
+      name  = rownames(input$constant_vals),
+      value = as.numeric(input$constant_vals[, 1]),
+      row.names = NULL
+    )
+    B
+  })
+  
+  ### ~consum----
+  current_file <- reactiveVal(NULL)
+  
+  observeEvent(input$file_consm, {
+    current_file(input$file_consm)
+  })
+  
+  observeEvent(input$datachoice, {
+    # Clear stored file when switching modes
+    current_file(NULL)
+  })
+  
+  
+  consum <- reactive({
+    req(input$datachoice)
+    
+    # --- CSV case ---
+    if (input$datachoice %in% c("Food diary", "FFQ")) {
+      
+      req(current_file())   # use stored file instead of input directly
+      
+      A <- data.table::fread(
+        current_file()$datapath,
+        header = TRUE,
+        sep = ",",
+        quote = ""
+      )
+      
+      # Add IDnum as first column
+      #A <- cbind(IDnum = 1, A)
+      
+      return(A)
+    }
+    
+    # --- Constant consumption case ---
+    if (input$datachoice == "Constant consumption") {
+      
+      req(constant_values())
+      
+      df <- constant_values()
+      
+      # Transpose: names -> columns, values -> one row
+      B <- as.data.frame(t(df$value))
+      colnames(B) <- df$name
+      
+      # Add IDnum as first column
+      #B <- cbind(IDnum = 1, B)
+      
+      return(B)
+    }
+    
+    return(NULL)
+  })
+  
+  
+  
+  
+  output$contents_consm <- renderTable({
+    
+    req(input$datachoice)
+    
+    # --- CSV case ---
+    if (input$datachoice %in% c("Food diary", "FFQ")) {
+      
+      req(current_file())   # use the cleaned file source
+      
+      file_contents <- read.csv(current_file()$datapath, sep = ",", dec = ".")
+      
+      required_columns <- c("IDnum", "Weight")
+      
+      validate(
+        need(all(required_columns %in% colnames(file_contents)),
+             "This file does not meet the requirements.\nCheck separators and column names.")
+      )
+      
+      
+      # 1. Check food columns
+      food_cols <- setdiff(names(file_contents), required_columns)
+      
+      df <- ocdata()
+      req(is.data.frame(df))
+      req("limitexpo" %in% names(df))
+      
+      # Find columns after 'limitexpo'
+      limit_idx <- match("limitexpo", names(df))
+      extracted_names <- names(df)[(limit_idx + 1):ncol(df)]
+      
+      
+      if (input$datachoice == "Food diary") {
+        
+        # extracted_names contains all names of foods.  Check if all foods from the occurrence data are present in the consumption data. 
+        # Check if the food names in the occurrence list have day indexes (e.g., fish1, fish2, egg1, egg2) in the consumption data. If they don't have, it's not Food diary format. 
+        # Do not count the names from consumption data that are not in occurrence data (extracted_names.
+        
+        if (!all(extracted_names %in% gsub("\\d+$", "", food_cols))) {
+          return("Some food names from occurrence data are missing in consumption data. Please check the file format.")
+        }
+        
+        # check if the food names have day indexes (e.g., fish1, fish2, egg1, egg2). If they don't have, it's not Food diary format. 
+        if (!any(grepl("\\d+$", food_cols))) {
+          return("Food columns do not have day indexes. Please check the file format.")
+        }
+        
+        # Make a list of the food name in consumption data that exist in the extracted_names list from the occurrence data.
+        food_cols <- food_cols[grepl(paste0("^(", paste(extracted_names, collapse = "|"), ")\\d+$"), food_cols)]
+        food_indices <- gsub(".*?(\\d+)$", "\\1", food_cols)
+        
+        # check if the indexes for all food names are the same (e.g., fish1, egg1, fish2, egg2). If they are not the same, it's not Food diary format. 
+        
+        if (length(unique(food_indices)) != length(food_indices) / length(unique(gsub("\\d+$", "", food_cols)))) {
+          return("Food columns do not have consistent day indexes. Please check the file format.")
+        }
+        
+      }
+      
+      if (input$datachoice=="FFQ") {
+        # Remove trailing numbers (car1 -> car, doll2 -> doll)
+        food_names <- gsub("\\d+$", "", food_cols)
+        
+        duplicated_foods <- unique(food_names[duplicated(food_names)])
+        
+        if (length(duplicated_foods) > 0) {
+          return(
+            message = paste(
+              "Duplicate food names detected:",
+              paste(duplicated_foods, collapse = ", ")
+            )
+          )
+        }
+        
+        if (!all(extracted_names %in% gsub("\\d+$", "", food_cols))) {
+          return("Some food names from occurrence data are missing in consumption data. Please check the file format.")
+        }
+        
+      }
+      
+      return(file_contents)
+    }
+    
+    # --- Constant consumption case ---
+    # Case 2: Constant consumption (matrix)
+    if (input$datachoice == "Constant consumption") {
+      
+      # replace this with your actual matrix source
+      req(constant_values())   # example reactive storing matrix
+      
+      return(as.data.frame(constant_values()))
+    }
+    
+    return(NULL)
+  })
+  
+  
   
   ## Formatted input data----
   ### extract units for the figures:
@@ -1640,6 +1839,7 @@ server <- function(input, output, session) {
   
   # saving the uploaded formatted data in data1() so it can be used further in the code
   data1 <- reactive({
+    
     req(ocdata(), consum(), concen())
     ocdata <- as.data.frame(ocdata())
     consum <- as.data.frame(consum())
@@ -1680,234 +1880,125 @@ server <- function(input, output, session) {
     prevdata <- as.data.frame(prevdata())
     
     
+    
     source("format_ocdata_prevdata.R", local = TRUE)
     source("format_consum_concen.R", local = TRUE)
     
-    iter_n <- input$Iterations # number of the iterations selected by the user
     burnin <- 1000  # number of burnin iterations for MCMC runs
+    iter_n <- input$Iterations+burnin # number of the iterations selected by the user
     
-    if (input$datachoice!="FFQ"){
-    ### model assumes independent daily consumptions----
-    if (input$modelchoice == "Independent days") {
+    if (input$datachoice == "Food diary"){  # ~Food diary----
+      ### model assumes independent daily consumptions
       
-      withProgress(message = 'Computing in progress...',
-                   value = 0.1, {
-                     
-                     # model without user variability in consumption frequency
-                     if (input$modelchoice2 == "No") {
-                       between.user.pvar <- 0
-                     }
-                     # model with user variability in consumption frequency
-                     if (input$modelchoice2 == "Yes") {
-                       between.user.pvar <- 1
-                     }
-                     
-                     
-                     source("makebugscodeA.R", local = TRUE)     # write code for OpenBUGS
-                     source("RunBUGSfunctionA.R", local = TRUE)  # run BUGS
-                     
-                     
-                     if((nhK > 0)&
-                        (nhM > 0)) {
+      if(input$modelchoice=="Fixed variance"){   # consumption model with fixed variances from data sample variances (between consumers, between daily servings)
+        withProgress(message = 'Computing in progress...', ## ~Fixed variance----
+                     value = 0.1, {
                        
-                       logcK 
-                       logLODK
-                       logLODLimK
-                       logLOQK
-                       logLOQLimK
-                       nbelowLODK
-                       nbelowLOQK
-                       nexactK
-                       nhK
-                       sdpriorlimK
-                       
-                       logcM 
-                       logLODM
-                       logLODLimM
-                       logLOQM
-                       logLOQLimM
-                       nbelowLODM
-                       nbelowLOQM
-                       nexactM
-                       nhM
-                       sdpriorlimM
-                     } else
-                       if ((nhK > 0) & (nhM == 0)) {
-                         
-                         logcK 
-                         logLODK
-                         logLODLimK
-                         logLOQK
-                         logLOQLimK
-                         nbelowLODK
-                         nbelowLOQK
-                         nexactK
-                         nhK
-                         sdpriorlimK
-                       } else
-                         if ((nhK == 0) & (nhM > 0)) {
-                           
-                           logcM 
-                           logLODM
-                           logLODLimM
-                           logLOQM
-                           logLOQLimM
-                           nbelowLODM
-                           nbelowLOQM
-                           nexactM
-                           nhM
-                           sdpriorlimM
-                         }
-                     
-                     bugs(data,inits,model.file="bikemodel.txt",debug=FALSE,parameters,n.chains=1,n.burnin=burnin,n.iter=iter_n,DIC=FALSE,codaPkg=FALSE)%>%
-                       attachbugs()
-                     
-                     
-                   })
-      
-    } else         # if independent days 
-      
-      ## model assumes that consuming next day depends on consuming previous day----
-    if (input$modelchoice == "Dependent days") {
-      
-      withProgress(message = 'Computing in progress',
-                   value = 0.1, {
-                     
-                     source("makebugscodeB.R", local = TRUE)     # write code for OpenBUGS
-                     source("RunBUGSfunctionB.R", local = TRUE)  # run BUGS
-                     
-                     
-                     if((nhK > 0)&
-                        (nhM > 0)) {
-                       
-                       logcK 
-                       logLODK
-                       logLODLimK
-                       logLOQK
-                       logLOQLimK
-                       nbelowLODK
-                       nbelowLOQK
-                       nexactK
-                       nhK
-                       sdpriorlimK
-                       
-                       logcM 
-                       logLODM
-                       logLODLimM
-                       logLOQM
-                       logLOQLimM
-                       nbelowLODM
-                       nbelowLOQM
-                       nexactM
-                       nhM
-                       sdpriorlimM
-                     } else
-                       if ((nhK > 0) & (nhM == 0)) {
-                         
-                         logcK 
-                         logLODK
-                         logLODLimK
-                         logLOQK
-                         logLOQLimK
-                         nbelowLODK
-                         nbelowLOQK
-                         nexactK
-                         nhK
-                         sdpriorlimK
-                       } else
-                         if ((nhK == 0) & (nhM > 0)) {
-                           
-                           logcM 
-                           logLODM
-                           logLODLimM
-                           logLOQM
-                           logLOQLimM
-                           nbelowLODM
-                           nbelowLOQM
-                           nexactM
-                           nhM
-                           sdpriorlimM
-                         }
-                     
-                     bugs(data,inits,model.file="bikemodel.txt",debug=FALSE,parameters,n.chains=1,n.burnin=burnin,n.iter=iter_n,DIC=FALSE,codaPkg=FALSE)%>%
-                       attachbugs()
-                     
-                   })
-      
-    } # if dependent days
-  } else # if not FFQ data
-    
-  if( input$datachoice=="FFQ"){
-    withProgress(message = 'Computing in progress...',
-                 value = 0.1, {
-                   source("makebugscodeC.R", local = TRUE)     # write code for OpenBUGS
-                   source("RunBUGSfunctionC.R", local = TRUE)  # run BUGS
-                   
-                   
-                   if((nhK > 0)&
-                      (nhM > 0)) {
-                     
-                     logcK 
-                     logLODK
-                     logLODLimK
-                     logLOQK
-                     logLOQLimK
-                     nbelowLODK
-                     nbelowLOQK
-                     nexactK
-                     nhK
-                     sdpriorlimK
-                     
-                     logcM 
-                     logLODM
-                     logLODLimM
-                     logLOQM
-                     logLOQLimM
-                     nbelowLODM
-                     nbelowLOQM
-                     nexactM
-                     nhM
-                     sdpriorlimM
-                   } else
-                     if ((nhK > 0) & (nhM == 0)) {
-                       
-                       logcK 
-                       logLODK
-                       logLODLimK
-                       logLOQK
-                       logLOQLimK
-                       nbelowLODK
-                       nbelowLOQK
-                       nexactK
-                       nhK
-                       sdpriorlimK
-                     } else
-                       if ((nhK == 0) & (nhM > 0)) {
-                         
-                         logcM 
-                         logLODM
-                         logLODLimM
-                         logLOQM
-                         logLOQLimM
-                         nbelowLODM
-                         nbelowLOQM
-                         nexactM
-                         nhM
-                         sdpriorlimM
+                       # model without user variability in consumption frequency
+                       if (input$modelchoice2 == "No") {
+                         between.user.pvar <- 0
                        }
-                   bugs(data,inits,model.file="bikemodel.txt",debug=FALSE,parameters,n.chains=1,n.burnin=burnin,n.iter=iter_n,DIC=FALSE,codaPkg=FALSE)%>%
-                     attachbugs()
-                   
-                   
-                 })
-    
-  }  # if FFQ data 
+                       # model with user variability in consumption frequency
+                       if (input$modelchoice2 == "Yes") {
+                         between.user.pvar <- 1  
+                       }
+                       
+                       # check if osdlogsw2 and osdlogsw1 have no NA's or NaN's. And if they have NA / NaN, 
+                       # then print a message just saying "data not sufficient for calculating sample variances". 
+                       # Use other than showNotification() for the message, because it is not a notification but an error message.
+                       
+                       
+                       if (any(is.na(osdlogsw2)) | any(is.nan(osdlogsw2)) | any(is.na(osdlogsw1)) | any(is.nan(osdlogsw1)) | 
+                           any(osdlogsw2[1:nf]==0) | any(osdlogsw1[1:nf] == 0)) {
+                         validate(
+                           need(FALSE,
+                                "Data not sufficient for calculating sample variances. Please check the input data.")
+                         )
+                       }
+                       
+
+                       source("makebugscodeA2.R", local = TRUE)     # write code for OpenBUGS
+                       source("RunBUGSfunctionA2.R", local = TRUE)  # prepare to run BUGS
+                       
+                       
+                       bugs(data=data,inits,model.file="bikemodel.txt",debug=FALSE,parameters,n.chains=1,n.burnin=burnin,n.iter=iter_n,DIC=FALSE,codaPkg=FALSE)%>%
+                         attachbugs()
+                       
+                     })
+      } else # end of if fixed variance
+      if (input$modelchoice == "Independent days") {  # consumption model with variance parameters sampled (between consumers, between servings)
+        
+        withProgress(message = 'Computing in progress...', ## ~Independent days----
+                     value = 0.1, {
+                       
+                       # model without user variability in consumption frequency
+                       if (input$modelchoice2 == "No") {
+                         between.user.pvar <- 0
+                       }
+                       # model with user variability in consumption frequency
+                       if (input$modelchoice2 == "Yes") {
+                         between.user.pvar <- 1
+                       }
+                       
+                       
+                       source("makebugscodeA.R", local = TRUE)     # write code for OpenBUGS
+                       source("RunBUGSfunctionA.R", local = TRUE)  # run BUGS
+                       
+                       
+                       bugs(data,inits,model.file="bikemodel.txt",debug=FALSE,parameters,n.chains=1,n.burnin=burnin,n.iter=iter_n,DIC=FALSE,codaPkg=FALSE)%>%
+                         attachbugs()
+                       
+                       
+                     })
+        
+      } else   # end of if independent days 
+       if(input$modelchoice == "Dependent days"){ #, model assumes that consuming a food next day depends on consuming it previous day
+        
+        withProgress(message = 'Computing in progress', ## ~Dependent days----
+                     value = 0.1, {
+                       
+                       source("makebugscodeB.R", local = TRUE)     # write code for OpenBUGS
+                       source("RunBUGSfunctionB.R", local = TRUE)  # run BUGS
+                       
+                       
+                       bugs(data,inits,model.file="bikemodel.txt",debug=FALSE,parameters,n.chains=1,n.burnin=burnin,n.iter=iter_n,DIC=FALSE,codaPkg=FALSE)%>%
+                         attachbugs()
+                       
+                     })
+        
+      } #  end of if dependent days
+      
+    } else # end of if Food diary data
+      
+      if( input$datachoice=="FFQ"){   # data is based on FFQ 
+        withProgress(message = 'Computing in progress...', # ~FFQ----
+                     value = 0.1, {
+                       source("makebugscodeC.R", local = TRUE)     # write code for OpenBUGS
+                       source("RunBUGSfunctionC.R", local = TRUE)  # run BUGS
+                       
+                       bugs(data,inits,model.file="bikemodel.txt",debug=FALSE,parameters,n.chains=1,n.burnin=burnin,n.iter=iter_n,DIC=FALSE,codaPkg=FALSE)%>%
+                         attachbugs()
+                       
+                     })
+        
+      }  # enf if FFQ data
+    else   # Consumptions are given as constant values per day, hence, no consumption distribution model is created
+      if(input$datachoice=="Constant consumption"){
+      withProgress(message = 'Computing in progress...', # ~Constant consumption----
+                   value = 0.1, {
+                     
+                     source("makebugscode_constant_consum.R", local = TRUE)     # write code for OpenBUGS
+                     source("RunBUGSfunction_constant_consum.R", local = TRUE)  # run BUGS
+                     
+                     bugs(data,inits,model.file="bikemodel.txt",debug=FALSE,parameters,n.chains=1,n.burnin=burnin,n.iter=iter_n,DIC=FALSE,codaPkg=FALSE)%>%
+                       attachbugs()
+                   })
+    } # end of constant consumption
     
   })
   
-  
-  
-  ## Format some of the bugs results for dimension correction---- 
+  ## Format some of the bugs results for dimension correction----
+  ## (bugs will return a lower dimensional parameter object from mcmc output if some of the parameters were constant, i.e. not sampled)
   solvedBugs <- eventReactive(input$run, {
     req(currentresults())
     results <- currentresults()
@@ -1915,6 +2006,9 @@ server <- function(input, output, session) {
     # extract the required data from the input files:
     ocdata <- as.data.frame(ocdata())
     data1 <- data1()
+    constant.consum<-FALSE  # default option
+    if(input$datachoice=="Constant consumption"){constant.consum<-TRUE}  # the option for assuming constant consumption
+    
     foodnames<-names(ocdata[4:dim(ocdata)[2]])
     nf <- length(foodnames)   
     hazardtypes <- ocdata$hazardtypes
@@ -1926,10 +2020,10 @@ server <- function(input, output, session) {
     input_modelchoice2 <- input$modelchoice2
     input_modelchoice3 <- input$modelchoice3
     if(input_datachoice != "FFQ"){
-    input_modelchoice4 <- input$modelchoice4
+      input_modelchoice4 <- input$modelchoice4
     }
     if(input_datachoice == "FFQ"){
-    input_modelchoice4 <- input$modelchoice4FFQ  
+      input_modelchoice4 <- input$modelchoice4FFQ  
     }  
     input_modelchoice5 <- input$modelchoice5
     
@@ -1940,17 +2034,34 @@ server <- function(input, output, session) {
     pM <- results$pM
     sigcK <- results$sigcK
     sigcM <- results$sigcM
-    mus0 <- results$mus0
-    Ts0 <- results$Ts0
-    logitp0 <- results$logitp0
+    
+    if(constant.consum==FALSE){
+      logitp0 <- results$logitp0
+      mus0 <- results$mus0
+      if(input_modelchoice!="Fixed variance"){
+        Ts0 <- results$Ts0
+      } else { Ts0 <- NULL }
+      
+    } else{
+      mus0 <- NULL
+      Ts0 <- NULL
+      logitp0 <- NULL
+    }
+    
     
     if(input_datachoice!="FFQ"){
-    Ts <- results$Ts
-    if(input_modelchoice=="Independent days"){
-      if(input_modelchoice2=="Yes"){
-        Tp <- results$Tp
+      if(constant.consum==FALSE){
+        if(input_modelchoice!="Fixed variance"){
+          Ts <- results$Ts
+        } else { Ts <- NULL }
+      } else{
+        Ts <- NULL
       }
-    }
+      if((input_modelchoice=="Independent days")|(input_modelchoice=="Fixed variance") ){
+        if(input_modelchoice2=="Yes"){
+          Tp <- results$Tp
+        }
+      }
     }
     
     # redefine dimensions if BUGS returns a lower dimensional object than intended, 
@@ -1975,11 +2086,11 @@ server <- function(input, output, session) {
           sigcK_s = array(sigcK,dim=c(n_sim,1,nf))
           pK_s = array(pK,dim=c(n_sim,1,nf))
         } else
-        if(nhK==0){  # if no chemical hazards:
-          mucK_s = NULL
-          sigcK_s = NULL
-          pK_s = NULL 
-        }
+          if(nhK==0){  # if no chemical hazards:
+            mucK_s = NULL
+            sigcK_s = NULL
+            pK_s = NULL 
+          }
     
     # for microbiological, if there is only one hazard, one food:
     if((nhM==1)&(nf==1)) {
@@ -1997,148 +2108,196 @@ server <- function(input, output, session) {
           sigcM_s = array(sigcM,dim=c(n_sim,1,nf))
           pM_s = array(pM,dim=c(n_sim,1,nf))
         } else
-        if(nhM==0){ # if no microbiol hazards
-          mucM_s = NULL
-          sigcM_s = NULL
-          pM_s = NULL
-        }
-      
-    
-    if (nf==1) {
-      mus0_s <- matrix(mus0,n_sim,1)
-      logitp0_s <- matrix(logitp0,n_sim,1)
-      
-      if(input_datachoice!="FFQ"){
-      Ts_s <- array(Ts,dim=c(n_sim,1,1))
-      Ss_s <- array(0,dim=c(n_sim,nf,nf))
-      for(u in 1:n_sim){  
-        Ss_s[u,1:nf,1:nf] <- solve(Ts_s[u,1:nf,1:nf])  # Ss (solved Ts)
-      }
-      }
-      
-      Ts0_s <- array(Ts0,dim=c(n_sim,1,1))
-      Ss0_s <- array(0,dim=c(n_sim,nf,nf))
-      for(u in 1:n_sim){  
-        Ss0_s[u,1:nf,1:nf] <- solve(Ts0_s[u,1:nf,1:nf])  # Ss0 (solved Ts0)
-      }
-      
-      if(input_datachoice!="FFQ"){
-      if(input_modelchoice=="Independent days"){
-        
-        if(input_modelchoice2=="Yes"){
-          Tp_s <- array(Tp,dim=c(n_sim,1,1))
-          Sp_s <- array(0,dim=c(n_sim,nf,nf))
-          for(u in 1:n_sim){  
-            Sp_s[u,1:nf,1:nf] <- solve(Tp_s[u,1:nf,1:nf])  # Sp (solved Tp) for Independent days and between user variability
+          if(nhM==0){ # if no microbiol hazards
+            mucM_s = NULL
+            sigcM_s = NULL
+            pM_s = NULL
           }
-        } else {
+    
+    # redefine dimensions if there is only one food in the input data  
+    if (nf==1) {
+      if(constant.consum==FALSE){ # only then these parameters exist
+        logitp0_s <- matrix(logitp0,n_sim,1)  
+        mus0_s <- matrix(mus0,n_sim,1)
+        
+        if(input_datachoice!="FFQ"){
+          if(input_modelchoice!="Fixed variance"){
+            Ts_s <- array(Ts,dim=c(n_sim,1,1))
+            Ss_s <- array(0,dim=c(n_sim,1,1))
+            for(u in 1:n_sim){  
+              Ss_s[u,1,1] <- solve(Ts_s[u,1,1]) 
+            }
+            Ts0_s <- array(Ts0,dim=c(n_sim,1,1))
+            Ss0_s <- array(0,dim=c(n_sim,1,1))
+            for(u in 1:n_sim){  
+              Ss0_s[u,1,1] <- solve(Ts0_s[u,1,1])  
+            }
+          } else { 
+            Ts_s <- NULL
+            Ss_s <- NULL
+            Ts0_s <- NULL
+            Ss0_s <- NULL }
+          
+        } else{  # FFQ data
+          ##mus0_s <- NULL  
+          ##logitp0_s <- NULL 
+          Ts_s <- NULL
+          Ss_s <- NULL
+          Ts0_s <- array(Ts0,dim=c(n_sim,1,1))
+          Ss0_s <- array(NA,dim=c(n_sim,1,1)) 
+          for(u in 1:n_sim){  
+            Ss0_s[u,1,1] <- solve(Ts0_s[u,1,1])  
+          }
+        }
+      } else{ # constant consumption = TRUE
+        logitp0_s <- NULL 
+        mus0_s <- NULL
+        Ts_s <- NULL
+        Ss_s <- NULL
+        Ts0_s <- NULL
+        Ss0_s <- NULL
+      }
+      
+      
+      if(input_datachoice!="FFQ"){
+        if((input_modelchoice=="Independent days")|(input_modelchoice=="Fixed variance") ){
+          
+          if(input_modelchoice2=="Yes"){
+            Tp_s <- array(Tp,dim=c(n_sim,1,1))
+            Sp_s <- array(0,dim=c(n_sim,nf,nf))
+            for(u in 1:n_sim){  
+              Sp_s[u,1:nf,1:nf] <- solve(Tp_s[u,1:nf,1:nf])  # Sp (solved Tp) for 'Independent days' or 'Fixed variance' model, between user variability of frequencies
+            }
+          } else {
+            Tp_s = NULL
+            Sp_s = NULL
+          }
+        } else {   
           Tp_s = NULL
           Sp_s = NULL
         }
-      } else {   
-        # logitp0_s = NULL # NULL-definition not needed because logitp0 well defined in all options
-        Tp_s = NULL
-        Sp_s = NULL
-      }
       }
       
       # formatted results when one food one hazard in the input data
-      if(input_datachoice!="FFQ"){
-      fresults <- list(mucK_s=mucK_s,sigcK_s=sigcK_s,pK_s=pK_s,
-                        mucM_s=mucM_s,sigcM_s=sigcM_s,pM_s=pM_s,
-                        mus0_s=mus0_s,Ts_s=Ts_s,Ts0_s=Ts0_s,Tp_s=Tp_s,
-                        logitp0_s=logitp0_s,Ss_s=Ss_s,Ss0_s=Ss0_s,Sp_s=Sp_s
-      )
-      }
-      if(input_datachoice=="FFQ"){
-      fresults <- list(mucK_s=mucK_s,sigcK_s=sigcK_s,pK_s=pK_s,
-                        mucM_s=mucM_s,sigcM_s=sigcM_s,pM_s=pM_s,
-                        mus0_s=mus0_s,Ts0_s=Ts0_s,
-                        logitp0_s=logitp0_s,Ss0_s=Ss0_s
-      )}
+      if((input_datachoice!="FFQ")&(input_modelchoice=="Independent days") ){
+        fresults <- list(mucK_s=mucK_s,sigcK_s=sigcK_s,pK_s=pK_s,
+                         mucM_s=mucM_s,sigcM_s=sigcM_s,pM_s=pM_s,
+                         mus0_s=mus0_s,Ts_s=Ts_s,Ts0_s=Ts0_s,Tp_s=Tp_s,
+                         logitp0_s=logitp0_s,Ss_s=Ss_s,Ss0_s=Ss0_s,Sp_s=Sp_s
+        )
+      } else if((input_datachoice!="FFQ")&(input_modelchoice=="Dependent days") ){
+        fresults <- list(mucK_s=mucK_s,sigcK_s=sigcK_s,pK_s=pK_s,
+                         mucM_s=mucM_s,sigcM_s=sigcM_s,pM_s=pM_s,
+                         mus0_s=mus0_s,Ts_s=Ts_s,Ts0_s=Ts0_s,
+                         logitp0_s=logitp0_s,Ss_s=Ss_s,Ss0_s=Ss0_s
+        )
+      } else if((input_datachoice!="FFQ")&(input_modelchoice=="Fixed variance") ){
+        fresults <- list(mucK_s=mucK_s,sigcK_s=sigcK_s,pK_s=pK_s,
+                         mucM_s=mucM_s,sigcM_s=sigcM_s,pM_s=pM_s,
+                         mus0_s=mus0_s,Tp_s=Tp_s,
+                         logitp0_s=logitp0_s,Sp_s=Sp_s
+        )
+      } else {   # input_datachoice == FFQ
+        fresults <- list(mucK_s=mucK_s,sigcK_s=sigcK_s,pK_s=pK_s,
+                         mucM_s=mucM_s,sigcM_s=sigcM_s,pM_s=pM_s,
+                         mus0_s=mus0_s,Ts0_s=Ts0_s,
+                         logitp0_s=logitp0_s,Ss0_s=Ss0_s
+        )}
     }
     
     
-    # redefine dimensions if diagonal matrix with wrong off-diagonals, not zero off-diagonals, was returned from BUGS:
+    # redefine dimensions if diagonal matrix with wrong off-diagonals, (not zero off-diagonals), was returned from BUGS:
     # if there are more than one food in the input data  
     if(nf>1){
       
-      
-      if(input_datachoice!="FFQ"){
-      if(input_modelchoice3=="No"){  # no correlations for log-amounts, reconstruct bugs matrix: 
-        Ts_m <- array(0,dim=c(n_sim,nf,nf))
-        for(j in 1:n_sim){
-          diag(Ts_m[j,1:nf,1:nf]) <- diag(Ts[j,1:nf,1:nf]) 
-        }
-      } else {
-        Ts_m = Ts
-      }
-      Ss_m <- array(0,dim=c(n_sim,nf,nf))
-      for(u in 1:n_sim){  
-        Ss_m[u,1:nf,1:nf] <- solve(Ts_m[u,1:nf,1:nf])  
-      }
-      }
-      
-      if(input_modelchoice4=="No"){  # no correlations for mean log-amounts, reconstruct bugs matrix: 
-        Ts0_m <- array(0,dim=c(n_sim,nf,nf))
-        for(j in 1:(n_sim)){
-          diag(Ts0_m[j,1:nf,1:nf]) <- diag(Ts0[j,1:nf,1:nf])   
-        }
-      } else {
-        Ts0_m = Ts0
-      }
-      Ss0_m <- array(0,dim=c(n_sim,nf,nf))
-      for(u in 1:n_sim){  
-        Ss0_m[u,1:nf,1:nf] <- solve(Ts0_m[u,1:nf,1:nf])  
-      }
-      
-      if(input_datachoice!="FFQ"){
-      if(input_modelchoice=="Independent days"){
-        if(input_modelchoice2=="Yes"){ # variability of individual consumption frequencies (between user variability)
-          if(input_modelchoice5=="No"){  
-            # no correlations for logit-consumption frequencies, reconstruct bugs matrix: 
-            Tp_m <- array(0,dim=c(n_sim,nf,nf))
-            for(j in 1:(n_sim)){
-              diag(Tp_m[j,1:nf,1:nf]) <- diag(Tp[j,1:nf,1:nf])   
+      if(constant.consum==FALSE){
+        if(input_modelchoice!="Fixed variance"){
+          if(input_datachoice!="FFQ"){ 
+            if(input_modelchoice3=="No"){  # no correlations for log-amounts, reconstruct bugs matrix:
+              Ts_m <- array(0,dim=c(n_sim,nf,nf))
+              for(j in 1:n_sim){
+                diag(Ts_m[j,1:nf,1:nf]) <- diag(Ts[j,1:nf,1:nf]) 
+              }
+            } else {
+              Ts_m = Ts
             }
-            Sp_m <- array(0,dim=c(n_sim,nf,nf))
+            Ss_m <- array(0,dim=c(n_sim,nf,nf))
             for(u in 1:n_sim){  
-              Sp_m[u,1:nf,1:nf] <- solve(Tp_m[u,1:nf,1:nf])  
-            }
-          } 
-          
-          if(input_modelchoice5=="Yes"){  # if correlation "Yes"
-            Tp_m <- Tp # full matrix directly from BUGS
-            Sp_m <- array(0,dim=c(n_sim,nf,nf))
-            for(u in 1:n_sim){  
-              Sp_m[u,1:nf,1:nf] <- solve(Tp_m[u,1:nf,1:nf])  
+              Ss_m[u,1:nf,1:nf] <- solve(Ts_m[u,1:nf,1:nf])  
             }
           }
           
+          if(input_modelchoice4=="No"){  # no correlations for mean log-amounts, reconstruct bugs matrix: 
+            Ts0_m <- array(0,dim=c(n_sim,nf,nf))
+            for(j in 1:(n_sim)){
+              diag(Ts0_m[j,1:nf,1:nf]) <- diag(Ts0[j,1:nf,1:nf])   
+            }
+          } else {
+            Ts0_m = Ts0
+          }
+          Ss0_m <- array(0,dim=c(n_sim,nf,nf))
+          for(u in 1:n_sim){  
+            Ss0_m[u,1:nf,1:nf] <- solve(Ts0_m[u,1:nf,1:nf])  
+          }
+        } else {   # fixed variance
+          Ts_m <- NULL
+          Ss_m <- NULL
+          Ts0_m <- NULL
+          Ss0_m <- NULL
+        } 
+      } # not constant consum
+      
+      if(input_datachoice!="FFQ"){
+        if((input_modelchoice=="Independent days")|(input_modelchoice=="Fixed variance") ){
+          if(input_modelchoice2=="Yes"){ # variability of individual consumption frequencies (between user variability)
+            if(input_modelchoice5=="No"){  
+              # no correlations for logit-consumption frequencies, reconstruct bugs matrix: 
+              Tp_m <- array(0,dim=c(n_sim,nf,nf))
+              for(j in 1:(n_sim)){
+                diag(Tp_m[j,1:nf,1:nf]) <- diag(Tp[j,1:nf,1:nf])   
+              }
+              Sp_m <- array(0,dim=c(n_sim,nf,nf))
+              for(u in 1:n_sim){  
+                Sp_m[u,1:nf,1:nf] <- solve(Tp_m[u,1:nf,1:nf])  
+              }
+            } 
+            
+            if(input_modelchoice5=="Yes"){  # if correlation "Yes"
+              Tp_m <- Tp # full matrix directly from BUGS
+              Sp_m <- array(0,dim=c(n_sim,nf,nf))
+              for(u in 1:n_sim){  
+                Sp_m[u,1:nf,1:nf] <- solve(Tp_m[u,1:nf,1:nf])  
+              }
+            }
+            
+          } else {
+            Tp_m = NULL
+            Sp_m = NULL
+            
+          } 
         } else {
           Tp_m = NULL
           Sp_m = NULL
           
         } 
-      } else {
-        Tp_m = NULL
-        Sp_m = NULL
+      }
+      
+      if(constant.consum==FALSE){
+        if(input_datachoice!="FFQ"){
+          fresults <- list(Ts_m=Ts_m,Ts0_m=Ts0_m,Tp_m=Tp_m,
+                           Ss_m=Ss_m,Ss0_m=Ss0_m,Sp_m=Sp_m)
+        } else{
+          fresults <- list(Ts0_m=Ts0_m,
+                           Ss0_m=Ss0_m)
+        }
+      } else{
+        fresults <- NULL
         
-      } 
       }
-      
-      if(input_datachoice!="FFQ"){
-        fresults <- list(Ts_m=Ts_m,Ts0_m=Ts0_m,Tp_m=Tp_m,
-                        Ss_m=Ss_m,Ss0_m=Ss0_m,Sp_m=Sp_m)
-      }
-      if(input_datachoice=="FFQ"){
-        fresults <- list(Ts0_m=Ts0_m,
-                          Ss0_m=Ss0_m)
-      }
-      
     }
     
     fresults
+    
     
   })
   
@@ -2208,7 +2367,6 @@ server <- function(input, output, session) {
     nexactK <- data1$nexactK
     nexactM <- data1$nexactM
     
-    
     n_sim <- results$n.sims
     
     # redefine dimensions if scalars were returned from BUGS:
@@ -2248,7 +2406,7 @@ server <- function(input, output, session) {
     
   })
   
-
+  
   
   output$plot1_cap <- renderText({
     paste(tags$b("Figure 1."), "Variability distribution for positive hazard concentrations in food. 
@@ -2296,7 +2454,7 @@ server <- function(input, output, session) {
     input_modelchoice2 <- input$modelchoice2
     input_modelchoice3 <- input$modelchoice3
     if(input_datachoice != "FFQ"){
-    input_modelchoice4 <- input$modelchoice4
+      input_modelchoice4 <- input$modelchoice4
     }
     if(input_datachoice == "FFQ"){
       input_modelchoice4 <- input$modelchoice4FFQ
@@ -2309,13 +2467,19 @@ server <- function(input, output, session) {
     nf <- length(foodnames)   # Calculate the number of foods
     
     IDnum <- data1$IDnum
+    Weight <- data1$Weight
+    constant.consum <- FALSE  # default option
+    if(input$datachoice=="Constant consumption"){ constant.consum <-TRUE }  # the option for constant consumption
     
     if(input_datachoice != "FFQ"){
-    nd <- data1$nd     # number of days reported
+      nd <- data1$nd     # number of days reported
     }
     nr <- data1$nr  	 # number of respondents
-    logs <- data1$logs
-    logsw <- data1$logsw
+    logs <- data1$logs # log(positive serving sizes)
+    logsw <- data1$logsw # log(positive serving sizes per bodyweight)
+    
+    osdlogsw1 <- data1$osdlogsw1  # between consumer variability (simple point estimate from data)
+    osdlogsw2 <- data1$osdlogsw2  # between day (serving) variability (simple point estimate from data)
     
     n_sim <- results$n.sims
     muw <- results$muw
@@ -2325,32 +2489,57 @@ server <- function(input, output, session) {
     
     # redefine dimensions if scalars were returned from BUGS:
     if(nf==1){
-      mus0<- solvedBugs$mus0_s
-      logitp0 <- solvedBugs$logitp0_s 
-      Ss0 <- solvedBugs$Ss0_s
-      if(input_datachoice != "FFQ"){
-      Ss<- solvedBugs$Ss_s
+      if(constant.consum==FALSE){ # only then these parameters exist
+        logitp0 <- solvedBugs$logitp0_s   
+        mus0<- solvedBugs$mus0_s
+        Ss0 <- solvedBugs$Ss0_s
+        if(input_datachoice != "FFQ"){
+          Ss<- solvedBugs$Ss_s
+        }
+      }
+      if(constant.consum==TRUE){
+        logitp0 <- NULL  
+        mus0 <- NULL
+        Ss0 <- NULL
+        Ss <- NULL
+        muw <- NULL
+        sigw <- NULL
       }
       
     }
-    if(nf>1){ 
-      mus0 <- results$mus0
-      logitp0 <- results$logitp0
-      Ss0 <- solvedBugs$Ss0_m
-      if(input_datachoice != "FFQ"){
-      Ss <- solvedBugs$Ss_m
+    if(nf>1){
+      if(constant.consum==FALSE){ # only then these parameters exist
+        logitp0 <- results$logitp0
+        mus0 <- results$mus0
+        Ss0 <- solvedBugs$Ss0_m
+        if(input_datachoice != "FFQ"){
+          Ss <- solvedBugs$Ss_m
+        }
+      }
+      if(constant.consum==TRUE){
+        logitp0 <- NULL  
+        mus0 <- NULL
+        Ss0 <- NULL
+        Ss <- NULL
+        muw <- NULL
+        sigw <- NULL
       }
     }  
     
-    # redundant inputs: input_modelchoice,input_modelchoice2,input_modelchoice3,input_modelchoice4,input_modelchoice5,
     # call plot function:
     if(input_datachoice!="FFQ"){
-    distPlot2_1(input_lim, food_consum, unit_consum, input_upper, input_lower, n_sim, input_selectdist, input_selectscale, foodnamesused, nfused, foodindex,
-                nf, nr, nd,logs, logsw,
-                mus0,muw,logitp0,sigw,Ss,Ss0
-    )
-      output$plot2_cap <- renderText({
-        paste(tags$b("Figure 2a."),"Variability distributions for both mean consumptions per bodyweight 
+      distPlot2_1(input_lim, food_consum, unit_consum, input_upper, input_lower, n_sim, input_selectdist, input_selectscale, foodnames , foodnamesused, nfused, foodindex,
+                  nf, nr, nd,logs, logsw,
+                  mus0,muw,logitp0,sigw,Ss,Ss0,constant.consum,Weight,osdlogsw1,osdlogsw2,input_modelchoice
+      )
+      if(constant.consum==TRUE){
+        output$plot2_cap <- renderText({
+          paste(tags$b("Figure 2a."),"Constant consumption amounts shown as pie charts (per bodyweight and absolute)")
+        }) 
+      }
+      else {
+        output$plot2_cap <- renderText({
+          paste(tags$b("Figure 2a."),"Variability distributions for both mean consumptions per bodyweight 
           ('chronic') and single consumptions ('acute'). The uncertainty of the true variability 
           distribution of positive consumptions is expressed by plotting a range (pointwise 95%CI) 
           of probable variability distributions (straw color). The uncertainty distributions for mean 
@@ -2358,13 +2547,15 @@ server <- function(input, output, session) {
           consumptions are shown as raspberry color ticks and the empirical cumulative distribution in 
           raspberry color line. Note that the distributions in the figures represent truly positive 
           consumptions, excluding zeros.")
-      })  
+        })
+      }
+      
     }
-      #### redundant inputs: input_modelchoice,input_modelchoice2,input_modelchoice3,input_modelchoice4,input_modelchoice5
+    
     if(input_datachoice=="FFQ"){
       distPlot2_1FFQ(input_lim, food_consum, unit_consum, input_upper, input_lower, n_sim, input_selectdist, input_selectscale, foodnamesused, nfused, foodindex,
-                  nf, nr,logs, logsw,
-                  mus0,muw,logitp0,sigw,Ss0
+                     nf, nr,logs, logsw,
+                     mus0,muw,logitp0,sigw,Ss0
       )
       output$plot2_cap <- renderText({
         paste(tags$b("Figure 2a."),"Variability distributions for both mean ('chronic') consumptions per bodyweight 
@@ -2416,10 +2607,10 @@ server <- function(input, output, session) {
     input_modelchoice2 <- input$modelchoice2
     input_modelchoice3 <- input$modelchoice3
     if(input_datachoice != "FFQ"){
-    input_modelchoice4 <- input$modelchoice4
+      input_modelchoice4 <- input$modelchoice4
     }
     if(input_datachoice == "FFQ"){
-    input_modelchoice4 <- input$modelchoice4FFQ
+      input_modelchoice4 <- input$modelchoice4FFQ
     }  
     input_modelchoice5 <- input$modelchoice5
     
@@ -2450,7 +2641,7 @@ server <- function(input, output, session) {
     nhM <- sum(hazardtypes=="M") # number of microbiological hazards
     
     if(input_datachoice != "FFQ"){
-    nd <- data1$nd # number of days reported
+      nd <- data1$nd # number of days reported
     }
     nr <- data1$nr  	   # number of respondents
     logs <- data1$logs
@@ -2467,13 +2658,23 @@ server <- function(input, output, session) {
     logLODLimM <- data1$logLODLimM
     nexactK <- data1$nexactK
     nexactM <- data1$nexactM
+    Weight <- data1$Weight
+    constant.consum <- FALSE  # default option
+    if(input$datachoice=="Constant consumption"){ constant.consum <-TRUE }  # the option for constant consumption
     
+    osdlogsw1 <- data1$osdlogsw1  # between consumer variability (simple point estimate from data)
+    osdlogsw2 <- data1$osdlogsw2  # between day (serving) variability (simple point estimate from data)
     
     n_sim <- results$n.sims
     mus0 <- results$mus0
     muw <- results$muw
     sigw <- results$sigw
     
+    limitexpo <- ocdata$limitexpo
+    limitexpoK <- numeric()
+    limitexpoM <- numeric()
+    limitexpoK <- as.numeric(limitexpo[hazardtypes=="K"])
+    limitexpoM <- as.numeric(limitexpo[hazardtypes=="M"])
     
     # redefine dimensions if scalars were returned from BUGS:
     if(nf==1){
@@ -2483,20 +2684,29 @@ server <- function(input, output, session) {
       mucM <- solvedBugs$mucM_s
       sigcM <- solvedBugs$sigcM_s
       pM <- solvedBugs$pM_s
-      mus0<- solvedBugs$mus0_s
-      logitp0 <- solvedBugs$logitp0_s
-      Ss0 <- solvedBugs$Ss0_s
-      
-      if(input_datachoice != "FFQ"){
-      Ss <- solvedBugs$Ss_s 
-      if(input_modelchoice=="Independent days"){
-        if(input_modelchoice2=="Yes"){
-          Sp <- solvedBugs$Sp_s
+      if(constant.consum==FALSE){ # only then these parameters exist
+        mus0<- solvedBugs$mus0_s
+        logitp0 <- solvedBugs$logitp0_s
+        Ss0 <- solvedBugs$Ss0_s
+        if(input_datachoice != "FFQ"){
+          Ss <- solvedBugs$Ss_s 
+          if((input_modelchoice=="Independent days")|(input_modelchoice=="Fixed variance") ){
+            if(input_modelchoice2=="Yes"){
+              Sp <- solvedBugs$Sp_s
+            }
+          }
         }
+      } else {
+        mus0<- NULL
+        logitp0 <- NULL
+        Ss0 <- NULL
+        Ss <- NULL
+        Sp<- NULL
       }
-      }  
       
-    }
+      
+      
+    } # nf==1
     
     # redefine dimensions if diagonal matrix with wrong off-diagonals, not zero off-diagonals, was returned from BUGS:
     if(nf>1){
@@ -2506,55 +2716,72 @@ server <- function(input, output, session) {
       mucM <- results$mucM
       sigcM <- results$sigcM
       pM <- results$pM
-      mus0 <- results$mus0
-      logitp0 <- results$logitp0
-      Ss0 <- solvedBugs$Ss0_m
-      
-      if(input_datachoice != "FFQ"){
-      Ss <- solvedBugs$Ss_m
-      if(input_modelchoice=="Independent days"){
-        if(input_modelchoice2=="Yes"){
-          Sp <- solvedBugs$Sp_m
+      if(constant.consum==FALSE){ # only then these parameters exist
+        mus0 <- results$mus0
+        logitp0 <- results$logitp0
+        Ss0 <- solvedBugs$Ss0_m
+        if(input_datachoice != "FFQ"){
+          Ss <- solvedBugs$Ss_m
+          if((input_modelchoice=="Independent days")|(input_modelchoice=="Fixed variance") ){
+            if(input_modelchoice2=="Yes"){
+              Sp <- solvedBugs$Sp_m
+            }
+          }
         }
+      } else{  # consumption is constant
+        mus0 <- NULL
+        logitp0 <- NULL
+        Ss0 <- NULL
+        Ss <- NULL
+        Sp <- NULL
       }
-      }
+      
+      
       
     }
     
-    # redundant inputs: input_modelchoice3, input_modelchoice4,
-    # call plot function: 
+    # call plot function:
+    
     if(input_datachoice!="FFQ"){
-    distPlot3_1(input_lim, unit_concen, hazard_concen, input_upper, input_lower, n_sim, 
-                input_selectdist, input_selectscale, input_modelchoice, input_modelchoice2, 
-                foodnamesused, nfused, foodindex, hazardnames,
-                nhused,  hazardnamesusedK, hazardnamesusedM,
-                nhusedK, nhusedM, hazardindexK, hazardindexM, Rall, Pall,nhK,nhM,nf,nr,nd,
-                nexactK, nexactM, 
-                logs,logsw,logcK,logLOQK,logLODK,logLOQLimK,logLODLimK, logcM,logLOQM,logLODM,logLOQLimM,logLODLimM,
-                logitp0,mucK,mucM,mus0,muw,pK,pM,sigcK,sigcM,sigw,
-                Ss,Ss0,Sp
-    )
+      distPlot3_1(input_lim, unit_concen, hazard_concen, input_upper, input_lower, n_sim, 
+                  input_selectdist, input_selectscale, input_modelchoice, input_modelchoice2, 
+                  foodnamesused, nfused, foodindex, hazardnames,
+                  nhused,  hazardnamesusedK, hazardnamesusedM,
+                  nhusedK, nhusedM, hazardindexK, hazardindexM, Rall, Pall,nhK,nhM,nf,nr,nd,
+                  nexactK, nexactM, 
+                  logs,logsw,logcK,logLOQK,logLODK,logLOQLimK,logLODLimK, logcM,logLOQM,logLODM,logLOQLimM,logLODLimM,
+                  logitp0,mucK,mucM,mus0,muw,pK,pM,sigcK,sigcM,sigw,
+                  Ss,Ss0,Sp,Weight,constant.consum,limitexpoK,limitexpoM,osdlogsw1,osdlogsw2
+      )
       output$plot3_cap <- renderText({
-        paste(tags$b("Figure 3."), "Variability distribution for mean positive exposures per bodyweight (chemical) 
+        if(constant.consum==FALSE){
+          paste(tags$b("Figure 3."), "Variability distribution for mean positive exposures per bodyweight (chemical) 
           or acute positive exposures (microbial). The uncertainty of the true variability distribution of 
           positive exposures is expressed by plotting a range (pointwise 95%CI) of probable variability 
           distributions (straw color). The uncertainty distributions for mean (yellow color) and median 
           (black color) are plotted in bold lines. The (pseudo)empirical cumulative distribution simulated 
           from bootstrapped data are shown using LB substitution (blueberry color) and UB substitution 
           (raspberry color) method. Note that the distributions in the figures represent truly positive 
-          exposures, excluding zeros.")
+          exposures, excluding zeros.")}
+        if(constant.consum==TRUE){
+          paste(tags$b("Figure 3."), "Uncertainty distribution for mean exposures of contaminated food under constant daily consumptions (upper frames). 
+                Uncertainty of variability distributions for acute exposures of contaminated food under constant daily consumptions (lower frames). 
+                For microbial exposures the the final (Poisson) variation of discrete bacteria counts in daily servings is not included, 
+                i.e. showing only variation of (Poisson) mean counts. 
+                Numerical results below without/with accounting for contamination prevalence.")  
+        }
       })  
     }
-    # redundant inputs: input_modelchoice, input_modelchoice2, input_modelchoice3,input_modelchoice4,
+    
     if(input_datachoice=="FFQ"){
       distPlot3_1FFQ(input_lim, unit_concen, hazard_concen, input_upper, input_lower, n_sim, input_selectdist, input_selectscale,
-                  foodnamesused, nfused, foodindex, hazardnames,
-                  nhused,  hazardnamesusedK, hazardnamesusedM,
-                  nhusedK, nhusedM, hazardindexK, hazardindexM, Rall, Pall,nhK,nhM,nf,nr,
-                  nexactK, nexactM, 
-                  logs,logsw,logcK,logLOQK,logLODK,logLOQLimK,logLODLimK, logcM,logLOQM,logLODM,logLOQLimM,logLODLimM,
-                  logitp0,mucK,mucM,mus0,muw,pK,pM,sigcK,sigcM,sigw,
-                  Ss0
+                     foodnamesused, nfused, foodindex, hazardnames,
+                     nhused,  hazardnamesusedK, hazardnamesusedM,
+                     nhusedK, nhusedM, hazardindexK, hazardindexM, Rall, Pall,nhK,nhM,nf,nr,
+                     nexactK, nexactM, 
+                     logs,logsw,logcK,logLOQK,logLODK,logLOQLimK,logLODLimK, logcM,logLOQM,logLODM,logLOQLimM,logLODLimM,
+                     logitp0,mucK,mucM,mus0,muw,pK,pM,sigcK,sigcM,sigw,
+                     Ss0
       )
       output$plot3_cap <- renderText({
         paste(tags$b("Figure 3."), "Variability distribution for mean exposures per bodyweight (chemical) 
@@ -2577,7 +2804,7 @@ server <- function(input, output, session) {
     distPlot3_1_1()
   }) 
   
-
+  
   ## Plot 4, quantiles----
   
   distPlot4_1_1 <- eventReactive(input$generateP4, { 
@@ -2602,43 +2829,50 @@ server <- function(input, output, session) {
     input_modelchoice2 <- input$modelchoice2
     input_modelchoice3 <- input$modelchoice3
     if(input_datachoice != "FFQ"){
-    input_modelchoice4 <- input$modelchoice4
+      input_modelchoice4 <- input$modelchoice4
     }
     if(input_datachoice == "FFQ"){
-    input_modelchoice4 <- input$modelchoice4FFQ
+      input_modelchoice4 <- input$modelchoice4FFQ
     }
     input_modelchoice5 <- input$modelchoice5
     foodnamesused = input$thefoodnames4 # selected foods
-    hazardnamesused = input$thehazardnames4 # selected hazard
+    hazardnamesused = input$thehazardnames4 # selected hazard (one allowed in selection panel)
     
     foodnames<-names(ocdata[4:dim(ocdata)[2]])
     foodindex = match(foodnamesused,foodnames) # indexing of selected foods in all foods
     nfused = length(foodnamesused)     # number of selected foods
-    nhused = length(hazardnamesused) # number of selected hazards
+    nhused = length(hazardnamesused)   # number of selected hazards (one for this quantile analysis)
     hazardtypes <- ocdata$hazardtypes
     hazardnames <- ocdata$hazardnames
-    hazardtypesused = hazardtypes[is.element(hazardnames,hazardnamesused)] # types of selected hazards (chemical/microbiological)
+    hazardtypesused = hazardtypes[is.element(hazardnames,hazardnamesused)] # type(s) of selected hazard(s) (chemical/microbiological)
     nf <- length(foodnames)   # Calculate the number of foods
     nh <- length(hazardnames) # Calculate the number of hazards
     nhK <- sum(hazardtypes=="K") # number of chemical hazards
     nhM <- sum(hazardtypes=="M") # number of microbiological hazards
     hazardnamesK = hazardnames[hazardtypes=="K"] # chemical hazard names
     hazardnamesM = hazardnames[hazardtypes=="M"] # microbiological hazard names
-    hazardnamesusedK = hazardnamesused[hazardtypesused=="K"] # selected che hazard names
-    hazardnamesusedM = hazardnamesused[hazardtypesused=="M"] # selected mic hazard names
-    nhusedK = length(hazardnamesusedK) # number of che hazards selected
-    nhusedM = length(hazardnamesusedM) # number of mic hazards selected
+    hazardnamesusedK = hazardnamesused[hazardtypesused=="K"] # selected che hazard name (one or zero allowed in selection panel) 
+    hazardnamesusedM = hazardnamesused[hazardtypesused=="M"] # selected mic hazard name (one or zero allowed in selection panel) 
+    nhusedK = length(hazardnamesusedK) # number of che hazards selected (one or zero allowed)
+    nhusedM = length(hazardnamesusedM) # number of mic hazards selected (one or zero allowed)
     hazardindex = match(hazardnamesused,hazardnames) # 
-    hazardindexK = match(hazardnamesusedK,hazardnamesK) # indexing of selected hazards in all che hazards
-    hazardindexM = match(hazardnamesusedM,hazardnamesM) # indexing of selected hazards in all mic hazards
+    hazardindexK = match(hazardnamesusedK,hazardnamesK) # indexing of selected hazard in all che hazards
+    hazardindexM = match(hazardnamesusedM,hazardnamesM) # indexing of selected hazard in all mic hazards
     
     nexactK <- data1$nexactK
     nexactM <- data1$nexactM
     
-    
     n_sim <- results$n.sims
     muw <- results$muw
     sigw <- results$sigw
+    
+    constant.consum <- FALSE
+    if(input$datachoice=="Constant consumption"){
+      constant.consum <- TRUE
+    }
+    
+    osdlogsw1 <- data1$osdlogsw1  # between consumer variability (simple point estimate from data)
+    osdlogsw2 <- data1$osdlogsw2  # between day (serving) variability (simple point estimate from data)
     
     # redefine dimensions if scalars were returned from BUGS:
     if(nf==1){
@@ -2654,11 +2888,11 @@ server <- function(input, output, session) {
       
       if(input_datachoice != "FFQ"){
         Ss<- solvedBugs$Ss_s  
-      if(input_modelchoice=="Independent days"){
-        if(input_modelchoice2=="Yes"){
-          Sp<- solvedBugs$Sp_s
+        if((input_modelchoice=="Independent days")|(input_modelchoice=="Fixed variance") ){
+          if(input_modelchoice2=="Yes"){
+            Sp<- solvedBugs$Sp_s
+          }
         }
-      }
       }  
       
     }
@@ -2674,31 +2908,31 @@ server <- function(input, output, session) {
       mus0 <- results$mus0
       logitp0 <- results$logitp0
       Ss0 <- solvedBugs$Ss0_m
-      
+          
       if(input_datachoice!="FFQ"){
-      Ss <- solvedBugs$Ss_m
-      if(input_modelchoice=="Independent days"){
-        if(input_modelchoice2=="Yes"){
-          Sp <- solvedBugs$Sp_m
+        Ss <- solvedBugs$Ss_m
+        if((input_modelchoice=="Independent days")|(input_modelchoice=="Fixed variance")){
+          if(input_modelchoice2=="Yes"){
+            Sp <- solvedBugs$Sp_m
+          }
         }
-      }
       }
       
     }
     
-    # redundant inputs: input_modelchoice5, input_modelchoice4, input_modelchoice3,
+    
     # call plot function:
     if(input_datachoice!="FFQ"){
-    distPlot4_1(unit_concen, hazard_concen, n_sim, input_selectscale, input_selectQ, nV,
-                nU, Rall, Pall, input_modelchoice, input_modelchoice2,
-                nfused, foodindex, 
-                nexactK, nexactM, 
-                nhused, hazardnames, hazardnamesusedK, hazardnamesusedM,
-                nhusedK, nhusedM, hazardindexK, hazardindexM, nhK,nhM,nf,
-                mucK,mucM,mus0,muw,pK,pM,sigcK,sigcM,sigw,
-                Ss,Ss0,Sp,
-                logitp0
-    )
+      distPlot4_1(unit_concen, hazard_concen, n_sim, input_selectscale, input_selectQ, nV,
+                  nU, Rall, Pall, input_modelchoice, input_modelchoice2,
+                  nfused, foodindex, 
+                  nexactK, nexactM, 
+                  nhused, hazardnames, hazardnamesusedK, hazardnamesusedM,
+                  nhusedK, nhusedM, hazardindexK, hazardindexM, nhK,nhM,nf,
+                  mucK,mucM,mus0,muw,pK,pM,sigcK,sigcM,sigw,
+                  Ss,Ss0,Sp,
+                  logitp0,constant.consum,osdlogsw1,osdlogsw2
+      )
       output$plot4_cap <- renderText({
         paste(tags$b("Figure 4."), "Cumulative distributions for separation of uncertainty and variability for 
           mean exposures per bodyweight (chemical) or acute exposures (microbial). The uncertainty of 
@@ -2708,17 +2942,17 @@ server <- function(input, output, session) {
           to Monte Carlo error of 2D simulations).")
       })  
     }
-    # redundant inputs: input_modelchoice5, input_modelchoice4, input_modelchoice3,input_modelchoice2, input_modelchoice,
+    
     if(input_datachoice=="FFQ"){
       distPlot4_1FFQ(unit_concen, hazard_concen, n_sim, input_selectscale, input_selectQ, nV,
-                  nU, Rall, Pall, 
-                  nfused, foodindex, 
-                  nexactK, nexactM, 
-                  nhused, hazardnames, hazardnamesusedK, hazardnamesusedM,
-                  nhusedK, nhusedM, hazardindexK, hazardindexM, nhK,nhM,nf,
-                  mucK,mucM,mus0,muw,pK,pM,sigcK,sigcM,sigw,
-                  Ss0,
-                  logitp0
+                     nU, Rall, Pall, 
+                     nfused, foodindex, 
+                     nexactK, nexactM, 
+                     nhused, hazardnames, hazardnamesusedK, hazardnamesusedM,
+                     nhusedK, nhusedM, hazardindexK, hazardindexM, nhK,nhM,nf,
+                     mucK,mucM,mus0,muw,pK,pM,sigcK,sigcM,sigw,
+                     Ss0,
+                     logitp0
       )
       output$plot4_cap <- renderText({
         paste(tags$b("Figure 4."), "Cumulative distributions for separation of uncertainty and variability for 
@@ -2742,6 +2976,8 @@ server <- function(input, output, session) {
     withProgress(message = '2D simulation in progress...',
                  value = 0.1, {
                    distPlot4_1_1()
+                    
+                   
                  })
   })
   
@@ -2754,7 +2990,7 @@ server <- function(input, output, session) {
     data1 <- data1()
     results <- currentresults()
     solvedBugs <- solvedBugs()
-  
+    
     foodnamesused <- input$thefoodnames5 # selected foods
     hazardnamesused <- input$thehazardnames5 # selected hazard
     
@@ -2834,7 +3070,9 @@ server <- function(input, output, session) {
     ocdata <- as.data.frame(ocdata())
     results <- currentresults()
     solvedBugs <- solvedBugs()
+    data1 <- data1()
     
+    input_modelchoice <- input$modelchoice
     input_datachoice <- input$datachoice  # Food diary or FFQ data  
     foodnamesused <- input$thefoodnames52 # selected foods
     input_modelchoice3 <- input$modelchoice3 # serving correlations
@@ -2847,54 +3085,66 @@ server <- function(input, output, session) {
     
     n_sim <- results$n.sims
     
+    Weight <- data1$Weight
+    constant.consum <- FALSE  # default option
+    if(input$datachoice=="Constant consumption"){ constant.consum <-TRUE }  # the option for constant consumption
+    
     # redefine dimensions if scalars were returned from BUGS:
     if(nf==1){
       mus0<- solvedBugs$mus0_s
       logitp0 <- solvedBugs$logitp0_s
       if(input_datachoice!="FFQ"){
-      Ss <- solvedBugs$Ss_s
+        if(input_modelchoice!="Fixed variance"){
+          Ss <- solvedBugs$Ss_s
+        }else{ Ss <- NULL }
       }
       if(input_datachoice=="FFQ"){
-        Ss0 <- solvedBugs$Ss0_s
+        if(input_modelchoice!="Fixed variance"){
+          Ss0 <- solvedBugs$Ss0_s
+        }else{ Ss0 <- NULL }
       }
     }
     if(nf>1){ 
       mus0 <- results$mus0
       logitp0 <- results$logitp0
       if(input_datachoice!="FFQ"){
-      Ss <- solvedBugs$Ss_m
+        if(input_modelchoice!="Fixed variance"){
+          Ss <- solvedBugs$Ss_m
+        }else{ Ss <- NULL }
       }
       if(input_datachoice=="FFQ"){
-      Ss0 <- solvedBugs$Ss0_m  
+        if(input_modelchoice!="Fixed variance"){
+          Ss0 <- solvedBugs$Ss0_m  
+        }else{ Ss0 <- NULL }
       }
       
     }
     
     # call plot function:
     if(input_datachoice!="FFQ"){
-    distPlot5_2(n_sim,foodnamesused, nfused, foodindex,
-                nf,
-                mus0,logitp0,
-                Ss
-    )
+      distPlot5_2(n_sim,foodnamesused, nfused, foodindex,
+                  nf,
+                  mus0,logitp0,
+                  Ss,constant.consum,input_modelchoice
+      )
       output$plot52_cap <- renderText({
         paste(tags$b("Figure 5b."), "Permuted MCMC samples of model parameters mu and sigma of the log-normal 
           (", tags$i('mu, sigma'),")-distribution for single servings, and consumption frequency", tags$b(tags$i('p')), "of the", tags$b('food'),". 
           For each parameter, also the approximated marginal probability density is shown.")
       })  
     } else
-    if(input_datachoice=="FFQ"){
-      distPlot5_2FFQ(n_sim,foodnamesused, nfused, foodindex,
-                  nf,
-                  mus0,logitp0,
-                  Ss0
-      )
-      output$plot52_cap <- renderText({
-        paste(tags$b("Figure 5b."), "Permuted MCMC samples of model parameters mu and sigma of the log-normal 
+      if(input_datachoice=="FFQ"){
+        distPlot5_2FFQ(n_sim,foodnamesused, nfused, foodindex,
+                       nf,
+                       mus0,logitp0,
+                       Ss0
+        )
+        output$plot52_cap <- renderText({
+          paste(tags$b("Figure 5b."), "Permuted MCMC samples of model parameters mu and sigma of the log-normal 
           (", tags$i('mu, sigma'),")-distribution for mean servings (FFQ data), and population proportion of consumers", tags$b(tags$i('p')), "of the", tags$b('food'),". 
           For each parameter, also the approximated marginal probability density is shown.")
-      })
-    }
+        })
+      }
     
     recordPlot()
     
@@ -2914,6 +3164,12 @@ server <- function(input, output, session) {
     data1 <- data1()
     results <- currentresults()
     solvedBugs <- solvedBugs()
+    Weight <- data1$Weight
+    constant.consum <- FALSE  # default option
+    if(input$datachoice=="Constant consumption"){ constant.consum <-TRUE }  # the option for constant consumption
+    
+    osdlogsw1 <- data1$osdlogsw1  # between consumer variability (simple point estimate from data)
+    osdlogsw2 <- data1$osdlogsw2  # between day (serving) variability (simple point estimate from data)
     
     # units for the plot
     units_food <- units_food()
@@ -2922,19 +3178,20 @@ server <- function(input, output, session) {
     
     foodnamesused <- input$thefoodnames21 # selected foods
     
+    input_modelchoice <- input$modelchoice
     input_datachoice <- input$datachoice
     if(input_datachoice != "FFQ"){
-    input_modelchoice4 <- input$modelchoice4
-    input_modelchoice3 <- input$modelchoice3 
+      input_modelchoice4 <- input$modelchoice4
+      input_modelchoice3 <- input$modelchoice3 
     }
-
+    
     foodnames<-names(ocdata[4:dim(ocdata)[2]])
     nfused <- length(foodnamesused)
     foodindex <- match(foodnamesused, foodnames)
     nf <- length(foodnames)   # Calculate the number of foods
     
     if(input_datachoice != "FFQ"){
-    nd <- data1$nd # number of days reported
+      nd <- data1$nd # number of days reported
     }
     nr <- data1$nr  	   # number of respondents
     logsw <- data1$logsw
@@ -2944,27 +3201,40 @@ server <- function(input, output, session) {
     
     # redefine dimensions if diagonal matrix with wrong off-diagonals, not zero off-diagonals, was returned from BUGS:
     if(input_datachoice != "FFQ"){
-    Ss <- solvedBugs$Ss_m
+      if(input_modelchoice!="Fixed variance"){
+        Ss <- solvedBugs$Ss_m
+      }else{ Ss <- NULL }
     }
-    Ss0 <- solvedBugs$Ss0_m
+    if(input_modelchoice!="Fixed variance"){
+      Ss0 <- solvedBugs$Ss0_m
+    }else{ Ss0 <- NULL }
     
     
-    # redundant inputs: input_modelchoice4, input_modelchoice3
     # call plot function:
     if(input_datachoice != "FFQ"){  # this is only for Food diary data
-    distPlot6_1(food_consum, unit_consum, n_sim, foodnamesused,
-                nfused, foodindex,nr,nd,nf,logsw,
-                mus0,
-                Ss,Ss0
-    )
+      distPlot6_1(food_consum, unit_consum, n_sim, foodnamesused,
+                  nfused, foodindex,nr,nd,nf,logsw,
+                  mus0,
+                  Ss,Ss0,constant.consum,input_modelchoice,
+                  osdlogsw1,osdlogsw2
+      )
       output$plot6_cap <- renderText({
         paste(tags$b("Figure 2b."), "Pairwise scatter plots of logarithms of actual positive consumptions per 
          bodyweights. Data points (blueberry color) and model based simulations (raspberry color).")
       })    
     }
-    if(input_datachoice == "FFQ"){  # this could be done only with Food diary data
+    if(input_datachoice == "FFQ"){  # this plot of actual single consumptions could be done only with Food diary data
+      {
+        par(mar = c(0,0,0,0))
+        plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
+        text(x = 0.5, y = 0.8, paste("FFQ data were used. \n",
+                                     "Consumption model applied to distribution of mean consumptions. \n",
+                                     "Therefore, correlation model results not available for single day consumptions"), 
+             cex = 1.6, col = "#D0006F")
+        par(mar = c(5, 4, 4, 2) + 0.1)
+      } 
       output$plot6_cap <- renderText({
-        paste(tags$b("Figure 2b."), "FFQ data has no observed individual (acute) consumptions. Plot not possible.")
+        paste(tags$b("Figure 2b."), "FFQ data have no observed individual (acute) consumptions. Plot not possible.")
       })    
     }
     
@@ -2986,6 +3256,12 @@ server <- function(input, output, session) {
     data1 <- data1()
     results <- currentresults()
     solvedBugs <- solvedBugs()
+    Weight <- data1$Weight
+    constant.consum <- FALSE  # default option
+    if(input$datachoice=="Constant consumption"){ constant.consum <-TRUE }  # the option for constant consumption
+    
+    osdlogsw1 <- data1$osdlogsw1  # between consumer variability (simple point estimate from data)
+    osdlogsw2 <- data1$osdlogsw2  # between day (serving) variability (simple point estimate from data)
     
     # units for the plot
     units_food <- units_food()
@@ -2995,12 +3271,13 @@ server <- function(input, output, session) {
     foodnamesused <- input$thefoodnames22 # selected foods
     
     input_datachoice <- input$datachoice
+    input_modelchoice <- input$modelchoice
     input_modelchoice3 <- input$modelchoice3
     if(input_datachoice != "FFQ"){
-    input_modelchoice4 <- input$modelchoice4  
+      input_modelchoice4 <- input$modelchoice4  
     }
     if(input_datachoice == "FFQ"){
-    input_modelchoice4 <- input$modelchoice4FFQ  
+      input_modelchoice4 <- input$modelchoice4FFQ  
     }
     
     foodnames<-names(ocdata[4:dim(ocdata)[2]])
@@ -3009,7 +3286,7 @@ server <- function(input, output, session) {
     nf <- length(foodnames)   # Calculate the number of foods
     
     if(input_datachoice != "FFQ"){
-    nd <- data1$nd # number of days reported
+      nd <- data1$nd # number of days reported
     }
     nr <- data1$nr  	   # number of respondents
     logsw <- data1$logsw
@@ -3020,24 +3297,28 @@ server <- function(input, output, session) {
     
     # redefine dimensions if diagonal matrix with wrong off-diagonals, not zero off-diagonals, was returned from BUGS:
     if(input_datachoice !="FFQ"){
-    Ss <- solvedBugs$Ss_m  
+      if(input_modelchoice!="Fixed variance"){
+        Ss <- solvedBugs$Ss_m  
+      }else{ Ss <- NULL }
     }
-    Ss0 <- solvedBugs$Ss0_m
+    if(input_modelchoice!="Fixed variance"){
+      Ss0 <- solvedBugs$Ss0_m
+    }else{ Ss0 <- NULL }
     
     # call plot function:
-    # redundant inputs: input_modelchoice4
     if(input_datachoice != "FFQ"){
-    distPlot7_1(food_consum, unit_consum, n_sim, foodnamesused, nfused, foodindex,
-                nf,nr,nd,logsw,
-                mus0,
-                Ss,Ss0
-    )
+      distPlot7_1(food_consum, unit_consum, n_sim, foodnamesused, nfused, foodindex,
+                  nf,nr,nd,logsw,
+                  mus0,
+                  Ss,Ss0,constant.consum,input_modelchoice,
+                  osdlogsw1,osdlogsw2
+      )
     }
     if(input_datachoice == "FFQ"){
       distPlot7_1FFQ(food_consum, unit_consum, n_sim, foodnamesused, nfused, foodindex,
-                  nf,nr,logsw,
-                  mus0,
-                  Ss0
+                     nf,nr,logsw,
+                     mus0,
+                     Ss0
       )
     }  
     
@@ -3073,10 +3354,10 @@ server <- function(input, output, session) {
     input_modelchoice2 <- input$modelchoice2
     input_modelchoice3 <- input$modelchoice3
     if(input_datachoice != "FFQ"){
-    input_modelchoice4 <- input$modelchoice4
+      input_modelchoice4 <- input$modelchoice4
     }
     if(input_datachoice == "FFQ"){
-    input_modelchoice4 <- input$modelchoice4FFQ
+      input_modelchoice4 <- input$modelchoice4FFQ
     }
     input_modelchoice5 <- input$modelchoice5
     foodnamesused <- input$thefoodnames_t # selected foods
@@ -3111,7 +3392,14 @@ server <- function(input, output, session) {
     n_sim <- results$n.sims
     muw <- results$muw
     sigw <- results$sigw
-    
+    constant.consum <- FALSE
+    if(input$datachoice=="Constant consumption"){
+      constant.consum <- TRUE
+    }
+    logsw <- data1$logsw
+    logs <- data1$logs
+    osdlogsw1 <- data1$osdlogsw1  # between consumer variability (simple point estimate from data)
+    osdlogsw2 <- data1$osdlogsw2  # between day (serving) variability (simple point estimate from data)
     
     
     # redefine dimensions if scalars were returned from BUGS:
@@ -3122,22 +3410,29 @@ server <- function(input, output, session) {
       mucM <- solvedBugs$mucM_s
       sigcM <- solvedBugs$sigcM_s
       pM <- solvedBugs$pM_s
+      
+      if(constant.consum==FALSE){  # only then these parameters exist
       mus0<- solvedBugs$mus0_s
-      if(input_datachoice!="FFQ"){
-      Ss<- solvedBugs$Ss_s
-      }
+      logitp0 <- solvedBugs$logitp0_s
       Ss0 <- solvedBugs$Ss0_s
-      logitp0 <- solvedBugs$logitp0_s  
       
       if(input_datachoice != "FFQ"){ 
-      if(input_modelchoice=="Independent days"){
-        if(input_modelchoice2=="Yes"){
-          Sp <- solvedBugs$Sp_s
+        Ss<- solvedBugs$Ss_s
+        if((input_modelchoice=="Independent days")|(input_modelchoice=="Fixed variance")){
+          if(input_modelchoice2=="Yes"){
+            Sp <- solvedBugs$Sp_s
+          }
         }
-      }
       }  
-      
-    }
+    }else {
+        mus0<- NULL
+        logitp0 <- NULL
+        Ss0 <- NULL
+        Ss <- NULL
+        Sp<- NULL
+    } 
+    } # nf=1
+    
     if(nf>1){
       mucK <- results$mucK
       sigcK <- results$sigcK
@@ -3145,47 +3440,56 @@ server <- function(input, output, session) {
       mucM <- results$mucM
       sigcM <- results$sigcM
       pM <- results$pM
+      
+      if(constant.consum==FALSE){ # only then these parameters exist
       mus0 <- results$mus0
       logitp0 <- results$logitp0
-      
       Ss0 <- solvedBugs$Ss0_m
-      if(input_datachoice != "FFQ"){
-      Ss <- solvedBugs$Ss_m
-      Sp <- solvedBugs$Sp_m
-      }
       
-    }
-    
-    
+      if(input_datachoice != "FFQ"){
+        Ss <- solvedBugs$Ss_m
+        if((input_modelchoice=="Independent days")|(input_modelchoice=="Fixed variance") ){
+          if(input_modelchoice2=="Yes"){
+            Sp <- solvedBugs$Sp_m
+          }
+        }
+      }
+      } else{  # consumption is constant
+        mus0 <- NULL
+        logitp0 <- NULL
+        Ss0 <- NULL
+        Ss <- NULL
+        Sp <- NULL
+      }
+    } # nf>1
+      
     # call table function: 
     if(input_datachoice != "FFQ"){
-    table1(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice3,input_modelchoice4,input_modelchoice5,
-           theresults, foodnamesused, nfused, foodindex, hazardnames, 
-           hazardnamesusedK,hazardnamesusedM, nhusedK, nhusedM, hazardindexK, hazardindexM,
-           Rall, Pall,nhK,nhM,nf,nexactK,nexactM,
-           mucK,mucM,mus0,muw,pK,pM,sigcK,sigcM,sigw,
-           logitp0,
-           Ss,Ss0,Sp
-    )
-    } else
-    if(input_datachoice == "FFQ"){
-      table1FFQ(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice3,input_modelchoice4,input_modelchoice5,
+      table1(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice3,input_modelchoice4,input_modelchoice5,
              theresults, foodnamesused, nfused, foodindex, hazardnames, 
              hazardnamesusedK,hazardnamesusedM, nhusedK, nhusedM, hazardindexK, hazardindexM,
              Rall, Pall,nhK,nhM,nf,nexactK,nexactM,
              mucK,mucM,mus0,muw,pK,pM,sigcK,sigcM,sigw,
              logitp0,
-             Ss0
+             Ss,Ss0,Sp,constant.consum,logsw,logs,osdlogsw1,osdlogsw2
       )
-    }
+    } else
+      if(input_datachoice == "FFQ"){
+        table1FFQ(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice3,input_modelchoice4,input_modelchoice5,
+                  theresults, foodnamesused, nfused, foodindex, hazardnames, 
+                  hazardnamesusedK,hazardnamesusedM, nhusedK, nhusedM, hazardindexK, hazardindexM,
+                  Rall, Pall,nhK,nhM,nf,nexactK,nexactM,
+                  mucK,mucM,mus0,muw,pK,pM,sigcK,sigcM,sigw,
+                  logitp0,
+                  Ss0
+        )
+      }
     
   })
-  
   
   output$values <- DT::renderDT({
     withProgress(message = 'Generating posterior predictive summaries...',
                  value = 0.1, {
-                   
                    
                    resultValues()%>%
                      DT::datatable(rownames = FALSE,
@@ -3213,9 +3517,12 @@ server <- function(input, output, session) {
     paste(tags$b("Table 1."), "Posterior predictive distributions present predictions where all uncertainties and 
           variabilities are integrated into one single probability distribution. This can be a useful summary for 
           assessing what is now probable, given all the data with all its variability and parameter uncertainties. 
-          The distribution is obtained by averaging (weighing) the possible variability distributions over the uncertainty 
-          distribution of their parameters.")
+          The predictive distribution is obtained by generating predicted values from possible variability distributions
+          according to their parameters drawn from the uncertainty distribution of parameters. Variability and uncertainty 
+          cannot be separated in this result. Only if parameter uncertainty is very small, the output would correspond to the true 
+          variability distribution.")
   })
+  
   
   ## Table 2, exposure limit ----
   
@@ -3262,12 +3569,15 @@ server <- function(input, output, session) {
     limitexpoK <- as.numeric(limitexpo[hazardtypes=="K"])
     limitexpoM <- as.numeric(limitexpo[hazardtypes=="M"])
     
-    
-    
     n_sim <- results$n.sims
     muw <- results$muw
     sigw <- results$sigw
-    
+    constant.consum <- FALSE
+    if(input$datachoice=="Constant consumption"){
+      constant.consum <- TRUE
+    }
+    osdlogsw1 <- data1$osdlogsw1  # between consumer variability (simple point estimate from data)
+    osdlogsw2 <- data1$osdlogsw2  # between day (serving) variability (simple point estimate from data)
     
     # redefine dimensions if scalars were returned from BUGS:
     if(nf==1){
@@ -3283,11 +3593,11 @@ server <- function(input, output, session) {
       
       if(input_datachoice != "FFQ"){
         Ss<- solvedBugs$Ss_s  
-      if(input_modelchoice=="Independent days"){
-        if(input_modelchoice2=="Yes"){
-          Sp <- solvedBugs$Sp_s
+        if((input_modelchoice=="Independent days")|(input_modelchoice=="Fixed variance") ){
+          if(input_modelchoice2=="Yes"){
+            Sp <- solvedBugs$Sp_s
+          }
         }
-      }
       }  
       
     }
@@ -3304,7 +3614,7 @@ server <- function(input, output, session) {
       
       if(input_datachoice != "FFQ"){
         Ss<- solvedBugs$Ss_m  
-        if(input_modelchoice=="Independent days"){
+        if((input_modelchoice=="Independent days")|(input_modelchoice=="Fixed variance") ){
           if(input_modelchoice2=="Yes"){
             Sp <- solvedBugs$Sp_m
           }
@@ -3315,27 +3625,29 @@ server <- function(input, output, session) {
     
     # call table function: 
     if(input_datachoice != "FFQ"){
-    table2(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,nfused,foodindex,hazardnames,
-           hazardnamesused,hazardtypesused,hazardnamesK,hazardnamesM,
-           hazardnamesusedK,hazardnamesusedM,nhusedK,nhusedM,hazardindexK,hazardindexM,
-           Rall,Pall,nhK,nhM,nf,nexactK,nexactM,limitexpoK,limitexpoM,
-           mus0,mucK,mucM,sigcK,sigcM,pK,pM,logitp0,muw,sigw,
-           Ss,Ss0,Sp 
-    )} else
-    if(input_datachoice == "FFQ"){
-      table2FFQ(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,nfused,foodindex,hazardnames,
+      table2(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,nfused,foodindex,hazardnames,
              hazardnamesused,hazardtypesused,hazardnamesK,hazardnamesM,
              hazardnamesusedK,hazardnamesusedM,nhusedK,nhusedM,hazardindexK,hazardindexM,
              Rall,Pall,nhK,nhM,nf,nexactK,nexactM,limitexpoK,limitexpoM,
              mus0,mucK,mucM,sigcK,sigcM,pK,pM,logitp0,muw,sigw,
-             Ss0 
-      )}
+             Ss,Ss0,Sp,constant.consum,osdlogsw1,osdlogsw2 
+      )} else
+        if(input_datachoice == "FFQ"){
+          table2FFQ(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,nfused,foodindex,hazardnames,
+                    hazardnamesused,hazardtypesused,hazardnamesK,hazardnamesM,
+                    hazardnamesusedK,hazardnamesusedM,nhusedK,nhusedM,hazardindexK,hazardindexM,
+                    Rall,Pall,nhK,nhM,nf,nexactK,nexactM,limitexpoK,limitexpoM,
+                    mus0,mucK,mucM,sigcK,sigcM,pK,pM,logitp0,muw,sigw,
+                    Ss0 
+          )}
     
     
   })
   
   
   output$pvalues <- DT::renderDT({
+    
+    
     withProgress(message = 'Generating exposure limit analysis table...',
                  value = 0.1, {
                    
@@ -3435,16 +3747,22 @@ server <- function(input, output, session) {
       # case we don't have write permissions to the current working dir (which
       # can happen when deployed).
       
-      if(input$datachoice!="FFQ"){
-      tempReport <- file.path(tempdir(), "report.Rmd") # for desktop app
-      reportfile <- "report_view_food_diary.Rmd"
-      file.copy(reportfile, tempReport, overwrite = TRUE)
+      if(input$datachoice == 'Food diary'){
+        tempReport <- file.path(tempdir(), "report_view_food_diary.Rmd") # for desktop app
+        reportfile <- "report_view_food_diary.Rmd"
+        file.copy(reportfile, tempReport, overwrite = TRUE)
       } else
-      if(input$datachoice=="FFQ"){  
-      tempReport <- file.path(tempdir(), "report.Rmd") # for desktop app
-      reportfile <- "report_view_FFQ.Rmd"
-      file.copy(reportfile, tempReport, overwrite = TRUE)    
-      }    
+        if(input$datachoice == "Constant consumption"){
+          tempReport <- file.path(tempdir(), "report_view_constant_consumption.Rmd") # for desktop app
+          reportfile <- "report_view_constant_consumption.Rmd"
+          file.copy(reportfile, tempReport, overwrite = TRUE)
+          
+        }else
+          if(input$datachoice=="FFQ"){  
+            tempReport <- file.path(tempdir(), "report_view_FFQ.Rmd") # for desktop app
+            reportfile <- "report_view_FFQ.Rmd"
+            file.copy(reportfile, tempReport, overwrite = TRUE)    
+          }    
       
       # Knit the document, passing in the `params` list, and eval it in a
       # child of the global environment (this isolates the code in the document
@@ -3452,71 +3770,126 @@ server <- function(input, output, session) {
       withProgress(message = 'Preparing the report in progress...',
                    value = 0.1, {
                      
-                     bugsresults = bugsresults()
-                     bugsresultsls = bugsresultsls()
-                     plot1 = distPlot1_1_1()
-                     plot2 = distPlot2_1_1()
-                     plot3 = distPlot3_1_1()
-                     plot4 = distPlot4_1_1()
-                     plot51 = distPlot5_1_1()
-                     plot52 = distPlot5_2_1()
-                     plot6 = distPlot6_1_1()
-                     plot7 = distPlot7_1_1()
-                     resultProbs = resultProbs()
-                     resultValues = resultValues()
-                     
-                     
-                     params <- list(
-                       data1 = data1(),
-                       bugsresults = bugsresults,
-                       bugsresultsls = bugsresultsls,
-                       plot1 = plot1, 
-                       plot2 = plot2,
-                       plot3 = plot3,
-                       plot4 = plot4,
-                       plot51 = plot51,
-                       plot52 = plot52,
-                       plot6 = plot6,
-                       plot7 = plot7,
-                       resultValues = resultValues,
-                       resultProbs = resultProbs,
-                       modelchoice = model_parameters(),
-                       factor = input$factor,
-                       pfactor = input$pfactor,
-                       thefoodnames1 = input$thefoodnames1,
-                       thehazardnames1 = input$thehazardnames1,
-                       thefoodnames2 = input$thefoodnames2,
-                       thefoodnames21=input$thefoodnames21,
-                       thefoodnames22=input$thefoodnames22,
-                       thefoodnames3 = input$thefoodnames3,
-                       thehazardnames3 = input$thehazardnames3,
-                       thefoodnames4 = input$thefoodnames4,
-                       thehazardnames4 = input$thehazardnames4,
-                       thefoodnames5 = input$thefoodnames5,
-                       thefoodnames52 = input$thefoodnames52,
-                       thehazardnames5 = input$thehazardnames5,
-                       conf_interval1 = input$conf_interval1,
-                       conf_interval2 = input$conf_interval2,
-                       conf_interval3 = input$conf_interval3,
-                       selectscale1 = input$selectscale1,
-                       selectscale2 = input$selectscale2,
-                       selectscale3 = input$selectscale3,
-                       selectscale4 = input$selectscale4,
-                       selectdist1 = input$selectdist1,
-                       selectdist2 = input$selectdist2,
-                       selectdist3 = input$selectdist3,
-                       concen = concen(),
-                       consum = consum(),
-                       ocdata = ocdata(),
-                       prevdata = prevdata(), 
-                       nf = nf_dl(),
-                       food = food_dl(),
-                       hazard = hazard_dl(),
-                       nU = input$nU,
-                       nV = input$nV,
-                       input_selectQ = input$selectQ
-                     )
-                     
+                     if(input$datachoice != "Constant consumption"){    
+                       bugsresults = bugsresults()
+                       bugsresultsls = bugsresultsls()
+                       plot1 = distPlot1_1_1()
+                       plot2 = distPlot2_1_1()
+                       plot3 = distPlot3_1_1()
+                       plot4 = distPlot4_1_1()
+                       plot51 = distPlot5_1_1()
+                       plot52 = distPlot5_2_1()
+                       plot6 = distPlot6_1_1()
+                       plot7 = distPlot7_1_1()
+                       resultProbs = resultProbs()
+                       resultValues = resultValues()
+                       
+                       params <- list(
+                         data1 = data1(),
+                         bugsresults = bugsresults,
+                         bugsresultsls = bugsresultsls,
+                         plot1 = plot1, 
+                         plot2 = plot2,
+                         plot3 = plot3,
+                         plot4 = plot4,
+                         plot51 = plot51,
+                         plot52 = plot52,
+                         plot6 = plot6,
+                         plot7 = plot7,
+                         resultValues = resultValues,
+                         resultProbs = resultProbs,
+                         modelchoice = model_parameters(),
+                         factor = input$factor,
+                         pfactor = input$pfactor,
+                         thefoodnames1 = input$thefoodnames1,
+                         thehazardnames1 = input$thehazardnames1,
+                         thefoodnames2 = input$thefoodnames2,
+                         thefoodnames21=input$thefoodnames21,
+                         thefoodnames22=input$thefoodnames22,
+                         thefoodnames3 = input$thefoodnames3,
+                         thehazardnames3 = input$thehazardnames3,
+                         thefoodnames4 = input$thefoodnames4,
+                         thehazardnames4 = input$thehazardnames4,
+                         thefoodnames5 = input$thefoodnames5,
+                         thefoodnames52 = input$thefoodnames52,
+                         thehazardnames5 = input$thehazardnames5,
+                         conf_interval1 = input$conf_interval1,
+                         conf_interval2 = input$conf_interval2,
+                         conf_interval3 = input$conf_interval3,
+                         selectscale1 = input$selectscale1,
+                         selectscale2 = input$selectscale2,
+                         selectscale3 = input$selectscale3,
+                         selectscale4 = input$selectscale4,
+                         selectdist1 = input$selectdist1,
+                         selectdist2 = input$selectdist2,
+                         selectdist3 = input$selectdist3,
+                         concen = concen(),
+                         consum = consum(),
+                         ocdata = ocdata(),
+                         prevdata = prevdata(), 
+                         nf = nf_dl(),
+                         food = food_dl(),
+                         hazard = hazard_dl(),
+                         nU = input$nU,
+                         nV = input$nV,
+                         input_selectQ = input$selectQ
+                       )
+                     } else 
+                       if(input$datachoice == "Constant consumption"){
+                         bugsresults = bugsresults()
+                         bugsresultsls = bugsresultsls()
+                         plot1 = distPlot1_1_1()
+                         plot2 = distPlot2_1_1()
+                         plot3 = distPlot3_1_1()
+                         plot51 = distPlot5_1_1()
+                         resultValues = resultValues()
+                         
+                         params <- list(
+                           data1 = data1(),
+                           bugsresults = bugsresults,
+                           bugsresultsls = bugsresultsls,
+                           plot1 = plot1, 
+                           plot2 = plot2,
+                           plot3 = plot3,
+                           plot51 = plot51,
+                           resultValues = resultValues,
+                           modelchoice = model_parameters(),
+                           factor = input$factor,
+                           pfactor = input$pfactor,
+                           thefoodnames1 = input$thefoodnames1,
+                           thehazardnames1 = input$thehazardnames1,
+                           thefoodnames2 = input$thefoodnames2,
+                           thefoodnames21=input$thefoodnames21,
+                           thefoodnames22=input$thefoodnames22,
+                           thefoodnames3 = input$thefoodnames3,
+                           thehazardnames3 = input$thehazardnames3,
+                           thefoodnames4 = input$thefoodnames4,
+                           thehazardnames4 = input$thehazardnames4,
+                           thefoodnames5 = input$thefoodnames5,
+                           thefoodnames52 = input$thefoodnames52,
+                           thehazardnames5 = input$thehazardnames5,
+                           conf_interval1 = input$conf_interval1,
+                           conf_interval2 = input$conf_interval2,
+                           conf_interval3 = input$conf_interval3,
+                           selectscale1 = input$selectscale1,
+                           selectscale2 = input$selectscale2,
+                           selectscale3 = input$selectscale3,
+                           selectscale4 = input$selectscale4,
+                           selectdist1 = input$selectdist1,
+                           selectdist2 = input$selectdist2,
+                           selectdist3 = input$selectdist3,
+                           concen = concen(),
+                           consum = consum(),
+                           ocdata = ocdata(),
+                           prevdata = prevdata(), 
+                           nf = nf_dl(),
+                           food = food_dl(),
+                           hazard = hazard_dl(),
+                           nU = input$nU,
+                           nV = input$nV,
+                           input_selectQ = input$selectQ
+                         )
+                       }
                      
                      # Set up parameters to pass to Rmd document
                      
@@ -3539,28 +3912,53 @@ server <- function(input, output, session) {
       # Copy the report file to a temporary directory before processing it, in
       # case we don't have write permissions to the current working dir (which
       # can happen when deployed).
-    
       
-      if(input$datachoice!="FFQ"){
-      tempReport <- file.path(tempdir(), "report_food_diary.Rmd")
-      reportfile <- "report_food_diary.Rmd"
-      file.copy(reportfile, tempReport, overwrite = TRUE)  
-      tempR <- file.path(tempdir(), "plotsfunctions.R")
-      rfile <- "plotsfunctions.R"
-      tempRtable <- file.path(tempdir(), "tablefunctions.R")
-      rfiletable <- "tablefunctions.R"
+      
+      if(input$datachoice == 'Food diary'){
+        tempReport <- file.path(tempdir(), "report_food_diary.Rmd")
+        reportfile <- "report_food_diary.Rmd"
+        file.copy(reportfile, tempReport, overwrite = TRUE)  
+        tempR <- file.path(tempdir(), "plotsfunctions.R")
+        rfile <- "plotsfunctions.R"
+        tempRtable <- file.path(tempdir(), "tablefunctions.R")
+        rfiletable <- "tablefunctions.R"
+        
+        
       } else
-      if(input$datachoice=="FFQ"){
-      tempReport <- file.path(tempdir(), "report_FFQ.Rmd")
-      reportfile <- "report_FFQ.Rmd"
-      file.copy(reportfile, tempReport, overwrite = TRUE)   
-      tempR <- file.path(tempdir(), "plotsfunctionsFFQ.R")
-      rfile <- "plotsfunctionsFFQ.R"
-      tempRtable <- file.path(tempdir(), "tablefunctionsFFQ.R")
-      rfiletable <- "tablefunctionsFFQ.R"
-      }
+        if (input$datachoice == "Constant consumption"){
+          tempReport <- file.path(tempdir(), "report_constant_consumption.Rmd")
+          reportfile <- "report_constant_consumption.Rmd"
+          file.copy(reportfile, tempReport, overwrite = TRUE)  
+          tempR <- file.path(tempdir(), "plotsfunctions.R")
+          rfile <- "plotsfunctions.R"
+          tempRtable <- file.path(tempdir(), "tablefunctions.R")
+          rfiletable <- "tablefunctions.R"
+          
+          # File only for "Constant consumption"
+          tempRconstM <- file.path(tempdir(), "constantconsumM.R")
+          rfileconstM <- "constantconsumM.R"
+          tempRconstK <- file.path(tempdir(), "constantconsumK.R")
+          rfileconstK <- "constantconsumK.R"
+          tempRtblconst <- file.path(tempdir(), "posterior_predictives_constant_consumption.R")
+          rfiletblconst <- "posterior_predictives_constant_consumption.R"
+          
+          file.copy(rfileconstM, tempRconstM, overwrite = TRUE)
+          file.copy(rfileconstK, tempRconstK, overwrite = TRUE)
+          file.copy(rfiletblconst, tempRtblconst, overwrite = TRUE)
+          
+        } else
+          if(input$datachoice=="FFQ"){
+            tempReport <- file.path(tempdir(), "report_FFQ.Rmd")
+            reportfile <- "report_FFQ.Rmd"
+            file.copy(reportfile, tempReport, overwrite = TRUE)   
+            tempR <- file.path(tempdir(), "plotsfunctionsFFQ.R")
+            rfile <- "plotsfunctionsFFQ.R"
+            tempRtable <- file.path(tempdir(), "tablefunctionsFFQ.R")
+            rfiletable <- "tablefunctionsFFQ.R"
+          }
       file.copy(rfile, tempR, overwrite = TRUE)
       file.copy(rfiletable, tempRtable, overwrite = TRUE)
+      
       
       
       # Knit the document, passing in the `params` list, and eval it in a
@@ -3570,36 +3968,7 @@ server <- function(input, output, session) {
       withProgress(message = 'Preparing the hazard report in progress...',
                    value = 0.1,
                    {
-                     if(input$datachoice != "FFQ"){
-                     params <- list(solvedBugs = solvedBugs(),
-                                    data1 = data1(),
-                                    bugsresults = bugsresults(),
-                                    modelchoice = model_parameters(),
-                                    factor = input$factor,
-                                    pfactor = input$pfactor,
-                                    conf_interval1 = input$conf_interval_dl,
-                                    selectscale1 = input$selectscale_dl,
-                                    selectdist1 = input$selectdist_dl,
-                                    concen = concen(),
-                                    consum = consum(),
-                                    ocdata = ocdata(),
-                                    prevdata = prevdata(),
-                                    nf = nf_dl(),
-                                    food = food_dl(),
-                                    hazard = hazard_dl(),
-                                    food_used = food_used_dl(),
-                                    input_modelchoice = input$modelchoice,
-                                    input_modelchoice2 = input$modelchoice2,
-                                    input_modelchoice3 = input$modelchoice3,
-                                    units_hazard = units_hazard(),
-                                    units_food = units_food(),
-                                    nU = input$nU_dl,
-                                    nV = input$nV_dl,
-                                    selectQ_dl = input$selectQ_dl,
-                                    thehazardnames_dl = input$thehazardnames_dl
-                     )
-                     } else
-                     if(input$datachoice == "FFQ"){
+                     if(input$datachoice == 'Food diary' | input$datachoice == "Constant consumption"){
                        params <- list(solvedBugs = solvedBugs(),
                                       data1 = data1(),
                                       bugsresults = bugsresults(),
@@ -3625,10 +3994,45 @@ server <- function(input, output, session) {
                                       nU = input$nU_dl,
                                       nV = input$nV_dl,
                                       selectQ_dl = input$selectQ_dl,
-                                      thehazardnames_dl = input$thehazardnames_dl
+                                      thehazardnames_dl = input$thehazardnames_dl,
+                                      datachoice = input$datachoice,
+                                      constant.consum = solvedBugs()$constant.consum
                                       
                        )
-                     }
+                     } else
+                       if(input$datachoice == "FFQ"){
+                         params <- list(solvedBugs = solvedBugs(),
+                                        data1 = data1(),
+                                        bugsresults = bugsresults(),
+                                        modelchoice = model_parameters(),
+                                        factor = input$factor,
+                                        pfactor = input$pfactor,
+                                        conf_interval1 = input$conf_interval_dl,
+                                        selectscale1 = input$selectscale_dl,
+                                        selectdist1 = input$selectdist_dl,
+                                        concen = concen(),
+                                        consum = consum(),
+                                        ocdata = ocdata(),
+                                        prevdata = prevdata(),
+                                        nf = nf_dl(),
+                                        food = food_dl(),
+                                        hazard = hazard_dl(),
+                                        food_used = food_used_dl(),
+                                        input_modelchoice = input$modelchoice,
+                                        input_modelchoice2 = input$modelchoice2,
+                                        input_modelchoice3 = input$modelchoice3,
+                                        units_hazard = units_hazard(),
+                                        units_food = units_food(),
+                                        nU = input$nU_dl,
+                                        nV = input$nV_dl,
+                                        selectQ_dl = input$selectQ_dl,
+                                        thehazardnames_dl = input$thehazardnames_dl,
+                                        datachoice = input$datachoice,
+                                        constant.consum = solvedBugs()$constant.consum
+                                        
+                         )
+                         
+                       }
                      rmarkdown::render(tempReport, output_file = file,
                                        params = params,
                                        envir = new.env(parent = globalenv())
@@ -3641,39 +4045,82 @@ server <- function(input, output, session) {
   ## Model settings for download---- 
   model_parameters <- reactive({
     
-    param_table <- matrix(data=NA,nrow = 7, ncol = 2)
-    if(input$datachoice!="FFQ"){
-    param_table[1,1] = paste("Consumption model")
-    param_table[1,2] = input$modelchoice
-    param_table[2,1] = paste("Between-user variability in consumption frequencies")
-    param_table[2,2] = input$modelchoice2
-    param_table[3,1] = paste("Correlation model of consumption frequencies")
-    param_table[3,2] = input$modelchoice5
-    param_table[4,1] = paste("Correlation model of serving sizes")
-    param_table[4,2] = input$modelchoice3
-    param_table[5,1] = paste("Correlation model of mean serving sizes")
-    param_table[5,2] = input$modelchoice4
-    param_table[6,1] = paste("Priors for variances")
-    param_table[6,2] = input$priorchoice
-    param_table[7,1] = paste("Number of MCMC iterations")
-    param_table[7,2] = input$Iterations
+    #param_table <- matrix(data=NA,nrow = 7, ncol = 2)
+    if(input$datachoice == 'Food diary'){
+      
+      if (input$modelchoice == "Dependent days"){
+        param_table <- matrix(data=NA,nrow = 6, ncol = 2)
+        param_table[1,1] = paste("Consumption data")
+        param_table[1,2] = paste("Food diary")
+        param_table[2,1] = paste("Consumption model")
+        param_table[2,2] = paste(input$modelchoice)
+        param_table[3,1] = paste("Correlation model of serving sizes")
+        param_table[3,2] = input$modelchoice3
+        param_table[4,1] = paste("Correlation model of mean serving sizes")
+        param_table[4,2] = input$modelchoice4
+        param_table[5,1] = paste("Priors for variances")
+        param_table[5,2] = input$priorchoice
+        param_table[6,1] = paste("Number of MCMC iterations")
+        param_table[6,2] = input$Iterations
+      }
+      
+      if (input$modelchoice == "Independent days"){
+        param_table <- matrix(data=NA,nrow = 8, ncol = 2)
+        param_table[1,1] = paste("Consumption data")
+        param_table[1,2] = paste("Food diary")
+        param_table[2,1] = paste("Consumption model")
+        param_table[2,2] = paste(input$modelchoice)
+        param_table[3,1] = paste("Between-user variability in consumption frequencies")
+        param_table[3,2] = input$modelchoice2
+        param_table[4,1] = paste("Correlation model of consumption frequencies")
+        param_table[4,2] = input$modelchoice5
+        param_table[5,1] = paste("Correlation model of serving sizes")
+        param_table[5,2] = input$modelchoice3
+        param_table[6,1] = paste("Correlation model of mean serving sizes")
+        param_table[6,2] = input$modelchoice4
+        param_table[7,1] = paste("Priors for variances")
+        param_table[7,2] = input$priorchoice
+        param_table[8,1] = paste("Number of MCMC iterations")
+        param_table[8,2] = input$Iterations
+      }
+      
+      if (input$modelchoice == "Fixed variance"){ # -> "Independent days, fixed variance"
+        param_table <- matrix(data=NA,nrow = 6, ncol = 2)
+        param_table[1,1] = paste("Consumption data")
+        param_table[1,2] = paste("Food diary")
+        param_table[2,1] = paste("Consumption model")
+        param_table[2,2] = paste("Independent days, ", tolower(input$modelchoice))
+        param_table[3,1] = paste("Between-user variability in consumption frequencies")
+        param_table[3,2] = input$modelchoice2
+        param_table[4,1] = paste("Correlation model of consumption frequencies")
+        param_table[4,2] = input$modelchoice5
+        param_table[5,1] = paste("Priors for variances")
+        param_table[5,2] = input$priorchoice
+        param_table[6,1] = paste("Number of MCMC iterations")
+        param_table[6,2] = input$Iterations
+      }
+      
     } else
-    if(input$datachoice=="FFQ"){
-      param_table[1,1] = paste("Consumption model")
-      param_table[1,2] = "FFQ model"
-      param_table[2,1] = paste("Between-user variability in consumption frequencies")
-      param_table[2,2] = "Does not apply to FFQ data"
-      param_table[3,1] = paste("Correlation model of consumption frequencies")
-      param_table[3,2] = "Does not apply to FFQ data"
-      param_table[4,1] = paste("Correlation model of serving sizes")
-      param_table[4,2] = "Does not apply to FFQ data"
-      param_table[5,1] = paste("Correlation model of mean serving sizes")
-      param_table[5,2] = input$modelchoice4FFQ
-      param_table[6,1] = paste("Priors for variances")
-      param_table[6,2] = input$priorchoice
-      param_table[7,1] = paste("Number of MCMC iterations")
-      param_table[7,2] = input$Iterations
-    }
+      if(input$datachoice == "Constant consumption"){
+        param_table <- matrix(data=NA,nrow = 3, ncol = 2)
+        param_table[1,1] = paste("Consumption data")
+        param_table[1,2] = paste("Constant consumption")
+        param_table[2,1] = paste("Priors for variances")
+        param_table[2,2] = input$priorchoice
+        param_table[3,1] = paste("Number of MCMC iterations")
+        param_table[3,2] = input$Iterations
+      } else
+        if(input$datachoice=="FFQ"){
+          param_table <- matrix(data=NA,nrow = 4, ncol = 2)
+          param_table[1,1] = paste("Consumption data")
+          param_table[1,2] = "FFQ"
+          param_table[2,1] = paste("Correlation model of mean serving sizes")
+          param_table[2,2] = input$modelchoice4FFQ
+          param_table[3,1] = paste("Priors for variances")
+          param_table[3,2] = input$priorchoice
+          param_table[4,1] = paste("Number of MCMC iterations")
+          param_table[4,2] = input$Iterations
+        }
     
     param_table
     

@@ -235,6 +235,7 @@ if(nhM>0){
 cat("#-----------------",file="bikemodel.txt",sep="\n",append=TRUE)
 cat("# Consumption code",file="bikemodel.txt",sep="\n",append=TRUE)
 
+
 cat("# Body weight model:",file="bikemodel.txt",sep="\n",append=TRUE)
 cat("for(r in 1:nr){ logWeight[r] ~ dnorm(muw,tauw); logWeight[r] <- log(Weight[r]) }",file="bikemodel.txt",sep="\n",append=TRUE)
 cat("muw ~ dunif(-10,10)",file="bikemodel.txt",sep="\n",append=TRUE)
@@ -245,7 +246,8 @@ if(input$priorchoice=="sigma_uniform"){
 if(input$priorchoice=="tau_gamma"){
   cat("tauw ~ dgamma(0.1,0.1)",file="bikemodel.txt",sep="\n",append=TRUE)
   cat("sigw <- sqrt(1/tauw)",file="bikemodel.txt",sep="\n",append=TRUE)
-} 
+}
+
 cat("  ",file="bikemodel.txt",sep="\n",append=TRUE)
 cat("  ",file="bikemodel.txt",sep="\n",append=TRUE)
 
@@ -273,14 +275,15 @@ if(nf==1){
   cat("mus[r,1] ~ dnorm(mus0[1],Ts0[1,1])",file="bikemodel.txt",sep="\n",append=TRUE)  
 }
 cat("}",file="bikemodel.txt",sep="\n",append=TRUE)
+
 cat("# Priors for food consumption mean amounts:",file="bikemodel.txt",sep="\n",append=TRUE)
 cat("for(j in 1:nf){ ",file="bikemodel.txt",sep="\n",append=TRUE)
 cat("mus0[j] ~ dunif(-10,10)",file="bikemodel.txt",sep="\n",append=TRUE)
 cat("}",file="bikemodel.txt",sep="\n",append=TRUE)
 
+
 mchoice4 <- input$modelchoice4  
-#if(input$datachoice!="FFQ"){ mchoice4 <- input$modelchoice4    }
-#if(input$datachoice=="FFQ"){ mchoice4 <- input$modelchoice4FFQ }
+
 if(nf>1){
 if(mchoice4=="Yes"){  
 cat("# Correlations between food type means:",file="bikemodel.txt",sep="\n",append=TRUE)
@@ -315,6 +318,7 @@ if(nf==1){
 ###  cat("Ss0[1,1] <- 1/Ts0[1,1]",file="bikemodel.txt",sep="\n",append=TRUE)
 ###  cat("Ss[1,1] <- 1/Ts[1,1]",file="bikemodel.txt",sep="\n",append=TRUE)
 }
+
 
 ##################################
 cat("# Consumption frequencies data (daily yes/no)",file="bikemodel.txt",sep="\n",append=TRUE)
@@ -389,4 +393,3 @@ cat("}",file="bikemodel.txt",sep="\n",append=TRUE)
 
 
 close(fileConn)
-

@@ -1,9 +1,7 @@
 
 # Table 1:----
 
-# generate results based on inputs from ui.R: 
-# create data frame containing posterior predictive summaries
-
+# posterior predictive summaries
 
 ## ---- resultValues -------- 
 table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice3,input_modelchoice4,input_modelchoice5,
@@ -12,12 +10,13 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
                    Rall, Pall,nhK,nhM,nf,nexactK,nexactM,
                    mucK,mucM,mus0,muw,pK,pM,sigcK,sigcM,sigw,
                    logitp0,
-                   Ss,Ss0,Sp
-){
+                   Ss,Ss0,Sp,constant.consum,logsw,logs,osdlogsw1,osdlogsw2){
+  
   # generate results based on inputs from ui.R: 
   # create data frame containing posterior predictive summaries----
   
-  
+  if(constant.consum==FALSE){
+    
   if(is.element("Concentrations",theresults)){
     
     DF <- data.frame(Results="No food-hazard selected")
@@ -57,7 +56,6 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
         }
       } 
       DFKconcentrations <- data.frame(
-        
         Quantity_ = paste(hazardnamesusedKinfoodnamesused),
         Quantity = paste("concentr+"),
         Q01 = as.character(round(hlo98cK[1:counterK],2)),
@@ -71,8 +69,6 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
     } # end of if nhusedK nfused  
     
     if((nhusedM>0)&(nfused>0)){  # if some microbial hazard in some food selected
-      # redefine dimensions if scalars were returned from BUGS:
-      
       
       cMmc <- array(NA,dim=c(n_sim,nhusedM,nfused))
       for(mc in 1:(n_sim)){  # simulate posterior predictive concentrations
@@ -117,12 +113,11 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
         Q95 = as.character(round(hup90cM[1:counterM],2)),
         Q99 = as.character(round(hup98cM[1:counterM],2)),
         stringsAsFactors=FALSE)
-    } # end of if nhusedK nfused  
+    } # end of if nhusedM nfused  
     
   } # end of concentrations
   
   if(is.element("Consumptions",theresults)|is.element("Exposures",theresults)){
-    
     
     
     DF <- data.frame(Results="No food-hazard selected")
@@ -175,15 +170,9 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
       
       if(nhusedK>0){ # simulate posterior predictive distributions for chemical hazards
         
-        
-        if(input_modelchoice == "Independent days"){
+        if((input_modelchoice == "Independent days")|(input_modelchoice=="Fixed variance") ) {
           
-          #invTs <- array(NA,dim=c(n_sim,nf,nf)) 
           for(mc in 1:(n_sim)){
-            
-            # variances for consumptions:
-            #invTs[mc,1:nf,1:nf] <- Ss[mc,1:nf,1:nf]
-            
             
             if(nf>1){ # many foods
               if(input_modelchoice2=="Yes"){ # variability between users frequencies 
@@ -194,7 +183,10 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
                 logitpmc[mc,1:nf] <- logitp0[mc,1:nf]       
               }   
               pmc[mc,1:nf] <- exp(logitpmc[mc,1:nf])/(1+exp(logitpmc[mc,1:nf])) # individual use probability
-              musmc[mc,1:nf] <- rmvnorm(1,mus0[mc,1:nf],Ss0[mc,1:nf,1:nf]) # individual mean log amount
+              if(input_modelchoice=="Fixed variance"){ 
+                musmc[mc,1:nf] <- rmvnorm(1,mus0[mc,1:nf],diag(osdlogsw1^2) ) # individual mean log amount  
+                }else
+                 musmc[mc,1:nf] <- rmvnorm(1,mus0[mc,1:nf],Ss0[mc,1:nf,1:nf]) # individual mean log amount
               
             }
             if(nf==1){ # only one food
@@ -205,6 +197,9 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
                 logitpmc[mc,1] <- logitp0[mc,1]    
               }   
               pmc[mc,1] <- exp(logitpmc[mc,1])/(1+exp(logitpmc[mc,1])) # individual use probability
+              if(input_modelchoice=="Fixed variance"){
+                musmc[mc,1] <- rnorm(1,mus0[mc,1], osdlogsw1[1] ) # individual mean log amount
+              }else
               musmc[mc,1] <- rnorm(1,mus0[mc,1],sqrt(Ss0[mc,1,1])) # individual mean log amount
             }
             
@@ -213,14 +208,19 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
                 if(nexactK[hazardindexK[h],foodindex[i]]>0){ # hazard-food is modeled
                   # chronic (mean) exposure for a random consumer, hazard h, food i:
                   
+                  if(input_modelchoice=="Fixed variance"){
+                    Ssoption <- osdlogsw2[foodindex[i]]^2   
+                  }else
+                    Ssoption <- Ss[mc,foodindex[i],foodindex[i]]
+                  
                   EemcK[mc,h,i] <- pK[mc,hazardindexK[h],foodindex[i]]*
                     PK[foodindex[i],hazardindexK[h]]*
                     pmc[mc,foodindex[i]]*
                     exp(logRK[foodindex[i],hazardindexK[h]]
                         +musmc[mc,foodindex[i]]
-                        +0.5*Ss[mc,foodindex[i],foodindex[i]]
+                        +0.5*Ssoption  # Ss[mc,foodindex[i],foodindex[i]]
                         +mucK[mc,hazardindexK[h],foodindex[i]]
-                        +0.5*sigcK[mc,hazardindexK[h],foodindex[i]]^2)    # invTs[] replaced with Ss
+                        +0.5*sigcK[mc,hazardindexK[h],foodindex[i]]^2)  
                 }
               }
               chronictotbwK[mc,h] <- sum(EemcK[mc,h,1:nfused]) # sum over foods
@@ -231,20 +231,22 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
         
         if(input_modelchoice == "Dependent days"){
           
-          #invTs <- array(NA,dim=c(n_sim,nf,nf))
           p0 <- exp(logitp0)/(1+exp(logitp0))
           
           for(mc in 1:(n_sim)){
             
-            # variances for consumptions:
-            #invTs[mc,1:nf,1:nf] <- Ss[mc,1:nf,1:nf]
-            
             if(nf>1){ # many foods
+              #if(input_modelchoice=="Fixed variance"){
+              #musmc[mc,1:nf] <- rmvnorm(1,mus0[mc,1:nf],diag(osdlogsw1^2)) # individual mean log amount  
+              #}else
               musmc[mc,1:nf] <- rmvnorm(1,mus0[mc,1:nf],Ss0[mc,1:nf,1:nf]) # individual mean log amount 
               
             }
             if(nf==1){ # only one food
-              musmc[mc,1] <- rnorm(1,mus0[mc,1],sqrt(Ss0[mc,1,1])) # individual mean log amount   
+              #if(input_modelchoice=="Fixed variance"){
+              #musmc[mc,1] <- rnorm(1,mus0[mc,1],osdlogsw1[1] ) # individual mean log amount
+              #}else  
+              musmc[mc,1] <- rnorm(1,mus0[mc,1],sqrt(Ss0[mc,1,1])) # individual mean log amount
               
             }
             for(h in 1:nhusedK){
@@ -252,6 +254,10 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
                 if(nexactK[hazardindexK[h],foodindex[i]]>0){ # hazard-food is modeled
                   # chronic (mean) exposure for a random consumer, hazard h, food i:
                   
+                  #if(input_modelchoice=="Fixed variance"){
+                  #  Ssoption <- osdlogsw2[foodindex[i]]^2
+                  #}else
+                  #  Ssoption <- Ss[mc,foodindex[i],foodindex[i]]
                   EemcK[mc,h,i] <- pK[mc,hazardindexK[h],foodindex[i]]*
                     PK[foodindex[i],hazardindexK[h]]*
                     p0[mc,foodindex[i]]*
@@ -259,7 +265,7 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
                         +musmc[mc,foodindex[i]]
                         +0.5*Ss[mc,foodindex[i],foodindex[i]]
                         +mucK[mc,hazardindexK[h],foodindex[i]]
-                        +0.5*sigcK[mc,hazardindexK[h],foodindex[i]]^2)  # invTs replaced with Ss  
+                        +0.5*sigcK[mc,hazardindexK[h],foodindex[i]]^2)    
                 }
               }
               chronictotbwK[mc,h] <- sum(EemcK[mc,h,1:nfused]) # sum over foods
@@ -272,15 +278,9 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
       
       if(nhusedM>0){  # simulate posterior predictive distributions for microbial hazards
         
-        
-        if(input_modelchoice == "Independent days"){  
-          
-          #invTs <- array(NA,dim=c(n_sim,nf,nf))
+        if((input_modelchoice == "Independent days")|(input_modelchoice=="Fixed variance") ){  
           
           for(mc in 1:(n_sim)){
-            
-            # variances for consumptions:
-            #invTs[mc,1:nf,1:nf] <- Ss[mc,1:nf,1:nf] 
             
             if(nf>1){  # many foods
               if(input_modelchoice2=="Yes"){ # variability between users frequencies
@@ -290,15 +290,21 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
                 logitpmc[mc,1:nf] <- logitp0[mc,1:nf]   
               }   
               pmc[mc,1:nf] <- exp(logitpmc[mc,1:nf])/(1+exp(logitpmc[mc,1:nf])) # individual use probability
+              if(input_modelchoice=="Fixed variance"){
+              musmc[mc,1:nf] <- rmvnorm(1,mus0[mc,1:nf], diag(osdlogsw1^2) )    
+              }else
               musmc[mc,1:nf] <- rmvnorm(1,mus0[mc,1:nf],Ss0[mc,1:nf,1:nf])  
               
+              if(input_modelchoice!="Fixed variance"){ 
               if(input_modelchoice3=="No"){ # no correlation of serving sizes
                 smc[mc,1:nf] <- exp(rmvnorm(1,musmc[mc,1:nf],diag(diag(Ss[mc,1:nf,1:nf])))) # actual random amount  
               }
-              if(input_modelchoice3=="Yes"){
+              if(input_modelchoice3=="Yes"){   
                 smc[mc,1:nf] <- exp(rmvnorm(1,musmc[mc,1:nf],Ss[mc,1:nf,1:nf] )) # actual random amount  
               }
-              
+              }else{ 
+                smc[mc,1:nf] <- exp(rmvnorm(1,musmc[mc,1:nf],diag(osdlogsw2^2) )) # actual random amount  
+              }
             } 
             
             if(nf==1){ # only one food
@@ -309,19 +315,22 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
                 logitpmc[mc,1] <- logitp0[mc,1]     
               }   
               pmc[mc,1] <- exp(logitpmc[mc,1])/(1+exp(logitpmc[mc,1])) # individual use probability
+              if(input_modelchoice=="Fixed variance"){
+              musmc[mc,1] <- rnorm(1,mus0[mc,1],osdlogsw1[1]) # individual mean amount  
+              }else
               musmc[mc,1] <- rnorm(1,mus0[mc,1],sqrt(Ss0[mc,1,1])) # individual mean amount 
-              
+              if(input_modelchoice=="Fixed variance"){
+              smc[mc,1] <- rlnorm(1,musmc[mc,1],osdlogsw2[1] ) # actual random amount  
+              }else
               smc[mc,1] <- rlnorm(1,musmc[mc,1],sqrt(Ss[mc,1,1])) # actual random amount   
             }
             
             wmc[mc] <- rlnorm(1,muw[mc],sigw[mc]) # bodyweight for random individual
             Umc[mc,1:nf] <- rbinom(nf,rep(1,nf),pmc[mc,1:nf]) # actual random use
             
-            
-            
-            for(h in 1:nhM){
-              Imc[mc,h,1:nf] <- rbinom(nf,rep(1,nf),pM[mc,h,1:nf]*PM[1:nf,h]) # actual contamination yes/no
-              cmc[mc,h,1:nf] <- rlnorm(nf,mucM[mc,h,1:nf],sigcM[mc,h,1:nf]) # actual contamination level
+            for(h in 1:nhusedM){
+              Imc[mc,hazardindexM[h],1:nf] <- rbinom(nf,rep(1,nf),pM[mc,hazardindexM[h],1:nf]*PM[1:nf,hazardindexM[h]]) # actual contamination yes/no
+              cmc[mc,hazardindexM[h],1:nf] <- rlnorm(nf,mucM[mc,hazardindexM[h],1:nf],sigcM[mc,hazardindexM[h],1:nf]) # actual contamination level
             } 
             
             for(h in 1:nhusedM){ #Predict final count with poisson distribution:
@@ -346,13 +355,10 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
         } # end of independent days
         
         if(input_modelchoice == "Dependent days"){ 
-          #invTs <- array(NA,dim=c(n_sim,nf,nf))
+          
           p0 <- exp(logitp0)/(1+exp(logitp0)) 
           
           for(mc in 1:(n_sim)){
-            
-            # variances for consumptions:
-            #invTs[mc,1:nf,1:nf] <- Ss[mc,1:nf,1:nf]
             
             if(nf>1){ # many foods
               musmc[mc,1:nf] <- rmvnorm(1,mus0[mc,1:nf],Ss0[mc,1:nf,1:nf])
@@ -373,9 +379,9 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
             Umc[mc,1:nf] <- rbinom(nf,rep(1,nf),p0[mc,1:nf]) # actual random use
             
             
-            for(h in 1:nhM){
-              Imc[mc,h,1:nf] <- rbinom(nf,rep(1,nf),pM[mc,h,1:nf]*PM[1:nf,h]) # actual contamination yes/no
-              cmc[mc,h,1:nf] <- rlnorm(nf,mucM[mc,h,1:nf],sigcM[mc,h,1:nf]) # actual contamination level
+            for(h in 1:nhusedM){
+              Imc[mc,hazardindexM[h],1:nf] <- rbinom(nf,rep(1,nf),pM[mc,hazardindexM[h],1:nf]*PM[1:nf,hazardindexM[h]]) # actual contamination yes/no
+              cmc[mc,hazardindexM[h],1:nf] <- rlnorm(nf,mucM[mc,hazardindexM[h],1:nf],sigcM[mc,hazardindexM[h],1:nf]) # actual contamination level
             } 
             
             for(h in 1:nhusedM){ #Predict final count with poisson distribution:
@@ -444,15 +450,24 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
         fconsup98 <- numeric(nfused)
         for(mc in 1:(n_sim)){
           if(nf>1){ # many foods
+            if(input_modelchoice=="Fixed variance"){
+            musmc[mc,1:nf] <- rmvnorm(1,mus0[mc,1:nf],diag(osdlogsw1^2)  )  
+            }else  
             musmc[mc,1:nf] <- rmvnorm(1,mus0[mc,1:nf],Ss0[mc,1:nf,1:nf])
           }
           if(nf==1){ # only one food
+            if(input_modelchoice=="Fixed variance"){
+            musmc[mc,1] <- rnorm(1,mus0[mc,1],osdlogsw1[1])
+            }else  
             musmc[mc,1] <- rnorm(1,mus0[mc,1],sqrt(Ss0[mc,1,1]))
           }
         }
         for(i in 1:nfused){ # posterior predictive summaries (quantiles) of individual chronic consumptions (/bw and absolute)
           Vs <- numeric() # variances
           for(mc in 1:(n_sim)){ # variances for consumptions
+            if(input_modelchoice=="Fixed variance"){
+            Vs[mc] <- osdlogsw2[foodindex[i]]^2 
+            }else
             Vs[mc] <-Ss[mc,foodindex[i],foodindex[i]]
           }
           
@@ -476,7 +491,6 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
       # Compose data frame for chemical exposure
       if(nhusedK>0){
         DF1K <- data.frame(
-          
           Quantity_ = paste(hazardnamesusedK),
           Quantity = paste("total chronic exposure/bw"),
           Q01 = as.character(round(hlo98totbwK[1:nhusedK],2)),
@@ -491,10 +505,8 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
       # Compose data frame for microbial exposure   
       if(nhusedM>0){
         DF1M <- data.frame(
-          
           Quantity_ = paste(hazardnamesusedM),
           Quantity = paste("total acute exposure"),
-          
           Q01 = as.character(round(hlo98totacuteM[1:nhusedM],2)),
           Q05 = as.character(round(hlo90totacuteM[1:nhusedM],2)),
           Q10 = as.character(round(hlo80totacuteM[1:nhusedM],2)),
@@ -508,7 +520,6 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
       # Compose data frame for consumptions   
       if(is.element("Consumptions",theresults)){   
         DF4 <- data.frame(
-          
           Quantity_ = paste(foodnamesused),
           Quantity = paste("mean daily use/bw+"),
           Q01 = as.character(round(fconslo98bw[1:nfused],2)),
@@ -520,7 +531,6 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
           Q99 = as.character(round(fconsup98bw[1:nfused],2)),
           stringsAsFactors=FALSE)
         DF5 <- data.frame(
-          
           Quantity_ = paste(foodnamesused),
           Quantity = paste("mean daily use+"),
           Q01 = as.character(round(fconslo98[1:nfused],2)),
@@ -571,31 +581,32 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
     }
   } # end of if Concentrations
   
-  
   DF # results collected as data frame
   
+} else{ # constant.consum TRUE  ######################################################
+ source("posterior_predictives_constant_consumption.R",local=TRUE)
+  DF # results collected as data frame
+ } # consumption constant
 }
 
 
 
 # Table 2: ----
 
-## ---- resultProbs -------- # mus0,ppred
+## ---- resultProbs -------- 
 table2 <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,nfused,foodindex,hazardnames,
                    hazardnamesused,hazardtypesused,hazardnamesK,hazardnamesM,
                    hazardnamesusedK,hazardnamesusedM,nhusedK,nhusedM,hazardindexK,hazardindexM,
                    Rall,Pall,nhK,nhM,nf,nexactK,nexactM,limitexpoK,limitexpoM,
                    mus0,mucK,mucM,sigcK,sigcM,pK,pM,logitp0,muw,sigw,
-                   Ss,Ss0,Sp 
+                   Ss,Ss0,Sp,constant.consum,osdlogsw1,osdlogsw2 
 ){
   # generate results based on inputs from ui.R: 
   # create data frame containing exposure limit analysis table----
   
+  if(constant.consum==FALSE){
   DFplim <- data.frame()
   DF95 <- data.frame()
-  
-  
-  
   
   # Chemical exposures
   if((nhusedK>0)&(nfused>0)){
@@ -629,10 +640,15 @@ table2 <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,nfu
           for(u in 1:(n_sim)){ 
             # simulate variability for V individuals, 
             # per each uncertain parameter:
-            Vs[u] <- Ss[u,foodindex[i],foodindex[i]] 
-            Vs0[u] <- Ss0[u,foodindex[i],foodindex[i]] 
+            if(input_modelchoice=="Fixed variance"){
+            Vs[u] <- osdlogsw2[foodindex[i]]^2
+            Vs0[u] <- osdlogsw1[foodindex[i]]^2
+            }else{  
+            Vs[u] <- Ss[u,foodindex[i],foodindex[i]] # day-to-day (serving) variability 
+            Vs0[u] <- Ss0[u,foodindex[i],foodindex[i]]  # between consumer variability 
+            }
             
-            if(input_modelchoice=="Independent days"){
+            if((input_modelchoice=="Independent days")|(input_modelchoice=="Fixed variance") ){
               if(input_modelchoice2 =="Yes"){
                 logitpconsume[foodindex[i],1:V] <- rnorm(V,logitp0[u,foodindex[i]],sqrt(Sp[u,foodindex[i],foodindex[i]]))
               }
@@ -659,7 +675,7 @@ table2 <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,nfu
                 PK[foodindex[i],hazardindexK[h]]*
                 cmeanpos[1:V],0.95,names=FALSE)
             
-            plnormK <- plnorm(limitexpoK[h],fornormK,
+            plnormK <- plnorm(limitexpoK[hazardindexK[h]],fornormK,
                               sqrt(Vs0[u]) )
             
             meanK <- mean(pconsume[foodindex[i],1:V])
@@ -681,7 +697,7 @@ table2 <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,nfu
           
           
           # get the probability (of not exceeding limit) into data frame:
-          DFplimposK <- data.frame(Quantity = paste0("P(chronic<",limitexpoK[h], ")"),
+          DFplimposK <- data.frame(Quantity = paste0("P(chronic<",limitexpoK[hazardindexK[h]], ")"),
                                    From = paste0("pos days"),
                                    Hazard = paste0(hazardnamesusedK[h]),
                                    Food = paste0(foodnamesused[i]),
@@ -691,7 +707,7 @@ table2 <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,nfu
                                    Q50 = as.character(round(quantile(punderlimitposK,c(0.5),names=FALSE,na.rm=TRUE),2)),
                                    Q95 = as.character(round(quantile(punderlimitposK,c(0.95),names=FALSE,na.rm=TRUE),2)),
                                    stringsAsFactors=FALSE)
-          DFplimallK <- data.frame(Quantity = paste0("P(chronic<",limitexpoK[h], ")"),
+          DFplimallK <- data.frame(Quantity = paste0("P(chronic<",limitexpoK[hazardindexK[h]], ")"),
                                    From = paste0("all days"),
                                    Hazard = paste0(hazardnamesusedK[h]),
                                    Food = paste0(foodnamesused[i]),
@@ -716,6 +732,7 @@ table2 <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,nfu
           
           # positive chronic exposures, 
           # posterior quantiles of variability 95% quantile (contaminated consumptions only):
+          
           qu95_50 <- round(quantile(qlnorm(0.95,logRK[foodindex[i],hazardindexK[h]]
                                            +mus0[,foodindex[i]]
                                            +0.5*Vs
@@ -755,7 +772,6 @@ table2 <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,nfu
   # Microbial exposures:  
   
   if((nhusedM>0)&(nfused>0)){
-    # redefine dimensions if scalars were returned from BUGS:
     
     RM = matrix(NA,nf,nhM) # factors for concentration
     RM[1:nf,1:nhM] = Rall[1:nf,is.element(hazardnames,hazardnamesusedM)]
@@ -785,10 +801,15 @@ table2 <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,nfu
           for(u in 1:(n_sim)){ 
             # simulate variability for V individuals, 
             # per each uncertain parameter:
-            Vs[u] <- Ss[u,foodindex[i],foodindex[i]]
-            Vs0[u] <- Ss0[u,foodindex[i],foodindex[i]]
+            if(input_modelchoice=="Fixed variance"){
+            Vs[u] <- osdlogsw2[foodindex[i]]^2
+            Vs0[u] <- osdlogsw1[foodindex[i]]^2
+            }else{
+            Vs[u] <- Ss[u,foodindex[i],foodindex[i]] # day-to-day (serving) variability
+            Vs0[u] <- Ss0[u,foodindex[i],foodindex[i]] # between consumer variability
+            }
             
-            if(input_modelchoice=="Independent days"){
+            if((input_modelchoice=="Independent days")|(input_modelchoice=="Fixed variance") ){
               if(input_modelchoice2 =="Yes"){
                 logitpconsume[foodindex[i],1:V] <- rnorm(V,logitp0[u,foodindex[i]],sqrt(Sp[u,foodindex[i],foodindex[i]]))
               }
@@ -820,7 +841,7 @@ table2 <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,nfu
                                          +sigw[u]^2))
             }
             
-            plnormM <- plnorm(limitexpoM[h],logRM[foodindex[i],hazardindexM[h]]
+            plnormM <- plnorm(limitexpoM[hazardindexM[h]],logRM[foodindex[i],hazardindexM[h]]
                               +mus0[u,foodindex[i]]
                               +mucM[u,hazardindexM[h],foodindex[i]]
                               +muw[u],
@@ -870,7 +891,7 @@ table2 <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,nfu
                                                 +sigw^2)),0.95,names=FALSE,na.rm=TRUE),3)
           
           # get the probability (of not exceeding limit) into data frame:
-          DFplimposM <- data.frame(Quantity = paste0("P(acute<",limitexpoM[h], ")"),
+          DFplimposM <- data.frame(Quantity = paste0("P(acute<",limitexpoM[hazardindexM[h]], ")"),
                                    From = paste0("pos days"),
                                    Hazard = paste0(hazardnamesusedM[h]),
                                    Food = paste0(foodnamesused[i]),
@@ -880,7 +901,7 @@ table2 <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,nfu
                                    Q50 = as.character(round(quantile(punderlimitposM,c(0.5),names=FALSE,na.rm=TRUE),2)),
                                    Q95 = as.character(round(quantile(punderlimitposM,c(0.95),names=FALSE,na.rm=TRUE),2)),
                                    stringsAsFactors=FALSE)
-          DFplimallM <- data.frame(Quantity = paste0("P(acute<",limitexpoM[h], ")"),
+          DFplimallM <- data.frame(Quantity = paste0("P(acute<",limitexpoM[hazardindexM[h]], ")"),
                                    From = paste0("all days"),
                                    Hazard = paste0(hazardnamesusedM[h]),
                                    Food = paste0(foodnamesused[i]),
@@ -923,7 +944,11 @@ table2 <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,nfu
   } # (nhusedM>0)&(nfused>0) microbial exposures
   
   rbind(DFplim,DF95) # results collected as data frame
-  
+  } else{  # constant.consum TRUE
+    #  in this case: give a message that the feature is not available
+    DF <- data.frame(Results="Consumption is constant, hence this feature not available!")
+    DF
+  } 
   
 } # end of reactive
 

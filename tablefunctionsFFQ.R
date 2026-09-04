@@ -469,7 +469,7 @@ table2FFQ <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,
                                     sqrt(Vs0[u]))
             }
             
-            plnormK <- plnorm(limitexpoK[h],logRK[foodindex[i],hazardindexK[h]]+
+            plnormK <- plnorm(limitexpoK[hazardindexK[h]],logRK[foodindex[i],hazardindexK[h]]+
                                 mus0[u,foodindex[i]]+
                                 mucK[u,hazardindexK[h],foodindex[i]]+
                                 0.5*sigcK[u,hazardindexK[h],foodindex[i]]^2 ,
@@ -492,7 +492,7 @@ table2FFQ <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,
           
           
           # get the probability (of not exceeding limit) into data frame:
-          DFplimposK <- data.frame(Quantity = paste0("P(chronic<",limitexpoK[h], ")"),
+          DFplimposK <- data.frame(Quantity = paste0("P(chronic<",limitexpoK[hazardindexK[h]], ")"),
                                    From = paste0("pos days"),
                                    Hazard = paste0(hazardnamesusedK[h]),
                                    Food = paste0(foodnamesused[i]),
@@ -502,7 +502,7 @@ table2FFQ <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,
                                    Q50 = as.character(round(quantile(punderlimitposK,c(0.5),names=FALSE,na.rm=TRUE),2)),
                                    Q95 = as.character(round(quantile(punderlimitposK,c(0.95),names=FALSE,na.rm=TRUE),2)),
                                    stringsAsFactors=FALSE)
-          DFplimallK <- data.frame(Quantity = paste0("P(chronic<",limitexpoK[h], ")"),
+          DFplimallK <- data.frame(Quantity = paste0("P(chronic<",limitexpoK[hazardindexK[h]], ")"),
                                    From = paste0("all days"),
                                    Hazard = paste0(hazardnamesusedK[h]),
                                    Food = paste0(foodnamesused[i]),
@@ -610,7 +610,7 @@ table2FFQ <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,
                                          +sigw[u]^2))
             }
             
-            plnormM <- plnorm(limitexpoM[h],logRM[foodindex[i],hazardindexM[h]]
+            plnormM <- plnorm(limitexpoM[hazardindexM[h]],logRM[foodindex[i],hazardindexM[h]]
                               +mus0[u,foodindex[i]]
                               +mucM[u,hazardindexM[h],foodindex[i]]
                               +muw[u]
@@ -657,7 +657,7 @@ table2FFQ <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,
                                                 +sigw^2)),0.95,names=FALSE,na.rm=TRUE),3)
           
           # get the probability (of not exceeding limit) into data frame:
-          DFplimposM <- data.frame(Quantity = paste0("P(chronic <",limitexpoM[h], ")"),
+          DFplimposM <- data.frame(Quantity = paste0("P(chronic <",limitexpoM[hazardindexM[h]], ")"),
                                    From = paste0("pos days"),
                                    Hazard = paste0(hazardnamesusedM[h]),
                                    Food = paste0(foodnamesused[i]),
@@ -667,7 +667,7 @@ table2FFQ <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,
                                    Q50 = as.character(round(quantile(punderlimitposM,c(0.5),names=FALSE,na.rm=TRUE),2)),
                                    Q95 = as.character(round(quantile(punderlimitposM,c(0.95),names=FALSE,na.rm=TRUE),2)),
                                    stringsAsFactors=FALSE)
-          DFplimallM <- data.frame(Quantity = paste0("P(chronic<",limitexpoM[h], ")"),
+          DFplimallM <- data.frame(Quantity = paste0("P(chronic<",limitexpoM[hazardindexM[h]], ")"),
                                    From = paste0("all days"),
                                    Hazard = paste0(hazardnamesusedM[h]),
                                    Food = paste0(foodnamesused[i]),

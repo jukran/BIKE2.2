@@ -13,7 +13,7 @@ help_file <- function(){
              "",
              "After the correct data file is uploaded a table with its content will be generated on the right side of the screen.",
              "",
-             "NOTE: Consumption data can take two different forms: Food diary or Food frequency questionnaire. This should be indicated by selecting the correct option!",
+             "NOTE: Consumption data can take three different forms: Food diary, Food frequency questionnaire or Constant consumption. This should be indicated by selecting the correct option!",
              "",
              "<b>Example of an appropriate csv file:</b>",
              "",
@@ -21,6 +21,33 @@ help_file <- function(){
              "<i>1,poultry,broiler,EU,2020,campylobacter,NA,NA,0.500,cfu.p.gram</i>",
              "<i>2,poultry,broiler,EU,2020,campylobacter,0.572,0.500,0.500,cfu.p.gram</i>",
              "<i>3,poultry,broiler,EU,2020,campylobacter,2.141,0.500,0.500,cfu.p.gram</i></ul>",
+             "",
+             "More details about how to prepare the files are given 
+             in <b>About</b> -> The model -> Requirements for the input data."
+             
+           ),
+           buttonLabel = "OK", 
+           easyClose = TRUE,
+           icon = "info-circle",
+           colour = "#343841",
+           
+           fade = FALSE)
+}
+
+help_consum_data <- function(){
+  tags$i()%>%
+    helper(type="inline",
+           size = "m",
+           title = "Upload consumption data",
+           content = c(
+             "Select what type of consumption data to upload. For 'Food diary' and 'FFQ' types, upload the data as csv file. For 'Constant consumption' use the pop-up table to fill in the consumers weight and the amount of each food.",
+             
+             "",
+             "After the correct data file is uploaded a table with its content will be generated on the right side of the screen.",
+             "",
+             "NOTE: For the pop-up table to be generated, Occurrence data file should be uploaded first.",
+             "",
+             
              "",
              "More details about how to prepare the files are given 
              in <b>About</b> -> The model -> Requirements for the input data."
@@ -49,9 +76,12 @@ help_parameters <- function(){
              Markov model as its stationary distribution.</li> 
              <li><b>Independent days</b> assumes the 
              occurrence of consumption (yes/no) on any day is independent of the occurrence of consumption 
-             (yes/no) on any other day. The consumption frequency is estimated from a binomial model. </li></ul>",
+             (yes/no) on any other day. The consumption frequency is estimated from a binomial model. </li>
+             <li><b>Independent days, fixed variance</b> Same as above, except variances between days (servings) and 
+             variances between individual mean consumptions are fixed values determined directly from data sample, and 
+             there are no correlation models for consumption amounts of foods. </li></ul>",
              "<b>Priors for variances</b>",
-             "There are two options for prior distributions for variance parameters.",
+             "There are two options for prior distributions for (unknown) variance parameters.",
              "<ul>
              <li><b>Tau Gamma</b>, a conventional choice for the prior of inverse variance.</li> 
              <li>The restricted <b>Sigma Uniform</b> prior for standard deviation, determined from 
@@ -193,7 +223,7 @@ help_quantiles <- function(){
         the MCMC-simulated parameter values (describing parameter uncertainty), and then for each parameter 
         value taking 'the variability-simulations' for the quantities that are considered as variables from the 
         conditional distributions <b><i>P(variable | parameter)</i></b>. 
-        So this just partly utilizes the existing MCMC sample for getting the parameter uncertainty from it.",
+        So this just partly utilizes the existing MCMC sample ('Uncertainty sample' must be at most equal to the total MCMC sample) for getting the parameter uncertainty from it.",
         "",
         "The quantile for two exposure distributions will be estimated.",
         "<ul><b>a.</b> The worst case exposure that results if all the (selected) foods are always contaminated 
@@ -203,10 +233,11 @@ help_quantiles <- function(){
         
         "Since the distribution of summed positive exposure can only be simulated approximately, 
         the sample size to be used for producing a <b>variability distribution</b>, and <b>uncertainty distribution</b> 
-        for the underlying n-tuple of parameters of each variability distribution, can be defined using the numeric input boxes.",
+        for the underlying n-tuple of parameters of each variability distribution, needs to be defined using the numeric input boxes.",
         "",
         "<b>Note</b>: The quantiles will be estimated only for those food-hazard pairs for which data is available. The text in the 
-        figure does not specify the names of the selected foods used for the calculations."
+        figure does not specify the names of the selected foods used for the calculations.",
+        "<b>Note</b>: The microbiological exposures are simulated including the final randomness of cell counts in servings, using Poisson distribution."
       ),
       buttonLabel = "OK",
       easyClose = TRUE,
@@ -364,6 +395,25 @@ help_report_mcmc  <- function(){
            easyClose = TRUE,
            icon = "info-circle",
            colour = "#5C442C",
+           
+           fade = FALSE)
+}
+
+
+help_log_results <- function(){
+  tags$i()%>%
+    helper(type="inline",
+           size = "m",
+           title = "Means of acute and chronic positive exposures E(log e^+) and E(log E(e^+)) ",
+           content = c(
+             "<b>Uncertainty distributions for the mean</b> of single 'acute' log exposures E(log e^+) and for the mean of 'chronic' log-average exposures E(log E(e^+)) 
+             are different. The former describes the mean over individual random log-exposures, and the latter the mean of log-average exposures over consumers. 
+             When one of these is plotted as the cumulative uncertainty distribution (solid line), the other cumulative uncertainty distribution is plotted with dashed line for comparison."
+           ),
+           buttonLabel = "OK", 
+           easyClose = TRUE,
+           icon = "info-circle",
+           colour = "#004F71",
            
            fade = FALSE)
 }

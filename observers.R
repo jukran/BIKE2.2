@@ -103,7 +103,12 @@ output$plot4text <- renderText({
   paste0(tags$b("Select model settings and run the simulation"))
 })
 output$plot4gen <- renderText({
+  if (input$datachoice != "Constant consumption"){
   paste0(tags$b("Select total exposure quantile and generate plot!"))
+    } else
+      if (input$datachoice == "Constant consumption"){
+        paste0(tags$b("This feature not available for constant consumption."))
+      }
 })
 output$plot5text <- renderText({
   paste0(tags$b("Select model settings and run the simulation"))
@@ -128,7 +133,13 @@ output$table1text_generate <- renderText({
   paste0(tags$b("Generate new table!"))
 })
 output$table2text_generate <- renderText({
-  paste0(tags$b("Generate new table!"))
+  
+  if (input$datachoice != "Constant consumption"){
+    paste0(tags$b("Generate new table!"))
+  } else
+    if (input$datachoice == "Constant consumption"){
+      paste0(tags$b("This feature not available for constant consumption."))
+    }
 })
 
 output$reportDLtext <- renderText({

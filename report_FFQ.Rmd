@@ -39,8 +39,28 @@ params:
   nV: NA
   selectQ_dl: NA
   thehazardnames_dl: NA
-  
+  datachoice: NA
+  constant.consum: FALSE
 ---
+
+
+<style>
+.nav-pills > li > a.active,
+.nav-pills > li.active > a,
+.nav-pills .nav-link.active {
+  background-color: #E6F0FF !important;
+  color: #003366 !important;
+}
+
+
+.nav-tabs > li > a.active,
+.nav-tabs > li.active > a {
+  background-color: #E6F0FF !important;
+  color: #003366 !important;
+}
+
+</style>
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, results='asis', fig.retina = 2)
@@ -246,19 +266,22 @@ cat('\n\n', "Food types: `", params$food,'`\n\n')
 ::: {.col data-latex="{0.4\\textwidth}" style="background-color: #F4F3F2;"}
 
 > <br>
-> <b style="color:#D0006F">Consumption model for FFQ data.</b>
+> <b style="color:#D0006F">Consumption model for FFQ data</b>
 > <br>
-> <b>FFQ model</b> assumes every individual has reported mean consumption per day for each food type 
+> <ul><li><b>FFQ model</b> assumes every individual has reported mean consumption per day for each food type 
  (zero represents a true non-consumer of the food). Hence, the distribution of mean amounts is estimated for the population of true consumers, along with the proportion of true consumers in the population. Variation between days (or servings) cannot be modeled. Only the assessment of long term ('chronic') consumption is possible.  
+> </li>
+</ul>
+> <b style="color:#D0006F">Correlation models for consumption amounts</b>
 > <ul><li><b>Mean serving sizes</b>
 > With several food types, correlations may be allowed between **daily mean** (log) consumption amounts of different foods, but the correlation parameters are not individual specific (this would require much more reporting days per each individual).
 </li>
 </ul>
-> <b style="color:#D0006F">Priors for variances.</b>
+> <b style="color:#D0006F">Priors for variances</b>
 > <ul><li><b>Tau Gamma</b>, is a conventional choice for the prior of inverse variance.</li>
 > <li>The restricted <b>Sigma Uniform</b> prior for standard deviation, is determined from an exaggerated upper bound based on data. (This might be more robust with very small data sample).</li>
 </ul>
-> <b style="color:#D0006F">Number of MCMC iterations.</b>
+> <b style="color:#D0006F">Number of MCMC iterations</b>
 > <br>
 > The number of MCMC simulations affects the Monte Carlo accuracy of the results. It is recommended that several iterations of different lengths are tried to gauge how Monte Carlo error could still affect the results.
 
@@ -364,11 +387,11 @@ knitr::read_chunk('plotsfunctionsFFQ.R')
 
 
 
-```{r concen-plot, distPlot1_1, fig.show ='hold', out.width="600px", out.height="400px"}
+```{r concen-plot, distPlot1_1FFQ, fig.show ='hold', out.width="600px", out.height="400px"}
 
 
 
-distPlot1_1(input_lim, unit_concen, hazard_concen, input_upper, input_lower, n_sim, input_selectdist, input_selectscale, foodnamesused,
+distPlot1_1FFQ(input_lim, unit_concen, hazard_concen, input_upper, input_lower, n_sim, input_selectdist, input_selectscale, foodnamesused,
                nfused, foodindex, hazardnamesused, hazardtypesused, nhused,
                hazardnamesK, hazardnamesM, hazardnamesusedK, hazardnamesusedM,
                nhusedK, nhusedM, hazardindex, hazardindexK, hazardindexM,
@@ -415,9 +438,10 @@ $Figure$$2a$ Variability distributions for both mean consumptions per bodyweight
 
 ```{r consum-plot, distPlot2_1FFQ, fig.show ='hold', out.width="600px", out.height="400px"}
 
-distPlot2_1FFQ(input_lim, food_consum, unit_consum, input_upper, input_lower, n_sim, input_selectdist, input_selectscale, foodnamesused, nfused, foodindex,
-               nf, nr,logs, logsw,
-               mus0,muw,logitp0,sigw,Ss0
+
+distPlot2_1FFQ(input_lim, food_consum, unit_consum, input_upper, input_lower, n_sim, input_selectdist, 
+                           input_selectscale, foodnamesused, nfused, foodindex, nf, nr,logs, logsw, 
+                           mus0,muw,logitp0,sigw,Ss0
 )
 
 

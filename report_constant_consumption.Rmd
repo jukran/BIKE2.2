@@ -1,5 +1,5 @@
 ---
-title: <div><b style="color:#004F71">BIKE report food diary,</b> <i style="color:#004F71">`r params$thehazardnames_dl`</i></div>
+title: <div><b style="color:#004F71">BIKE report constant consumption,</b> <i style="color:#004F71">`r params$thehazardnames_dl`</i></div>
 
 output:
   html_document:
@@ -76,10 +76,9 @@ library(DT)
 #library(rmarkdown)
 
 constant.consum <- params$constant.consum
-if (params$datachoice == 'Food diary' )
-{constant.consum <- FALSE} 
-# else if (params$datachoice == "Constant consumption") 
-#   {constant.consum <- TRUE}
+if (params$datachoice == 'Food diary' | params$datachoice == 'FFQ')
+{constant.consum <- FALSE} else if (params$datachoice == "Constant consumption") 
+  {constant.consum <- TRUE}
 
 
 osdlogsw1 <- params$data1$osdlogsw1
@@ -180,10 +179,9 @@ if(nf==1){
   mucM <- params$solvedBugs$mucM_s
   sigcM <- params$solvedBugs$sigcM_s
   pM <- params$solvedBugs$pM_s
-  logitp0 <- params$solvedBugs$logitp0_s
   
   if(input_modelchoice=="Independent days"){
-    #logitp0 <- params$solvedBugs$logitp0_s
+    logitp0 <- params$solvedBugs$logitp0_s
     
     if(input_modelchoice2=="Yes"){
       Sp <- params$solvedBugs$Sp_s
@@ -290,34 +288,17 @@ cat('\n\n', "Food types: `", params$food,'`\n\n')
 
 > <br>
 > <b style="color:#D0006F">Consumption model</b>
-> <ul><li><b>Dependent days</b> assumes the reported days are consecutive days so that the occurrence of consumption (yes/no) on any day may depend on the occurrence of consumption (yes/no) on the previous day. The long-term consumption frequency is estimated from a Markov model as its stationary distribution.  This model assumes a common day-to-day transition probability for all consumers (no variability between consumers). Distribution of consumption amounts is estimated from the actual (positive) consumption days, and the amounts are independent variables.</li>
+> <ul><li>No distribution model for consumption, everyone consumes the set amount every day. </li>
 > 
-> <li><b>Independent days</b> assumes the occurrence of consumption (yes/no) on any day is independent of the occurrence of consumption (yes/no) on any other day. The consumption frequency is estimated from a binomial model. Distribution of consumption amounts is estimated from the actual (positive) consumption days, and the amounts are independent variables. 
-> </li>
-> <li><b>Independent days, fixed variance</b> Same as above, except variances between days (servings) and variances between individual mean consumptions are fixed values determined directly from data sample, and there are no correlation models for consumption amounts of foods.
-> </li>
-> <ul><li><b>Between-user variability in consumption frequencies</b></li> Independent days consumption model assumes two levels of variability: (1) variability of consumption days (yes/no) per consumer, and (2) variability of (logit) frequencies between consumers. However, some consumption data sets may contain food types that are reported as consumed on all days, for all consumers. In that case, estimation of between consumer variability of the frequencies would not be possible. Even if there were a few occurrences which manifest such variation, they may be too few for reliable estimation. For example, if all respondents (except one) in the data consume a food type on all reporting days (100% frequency), and the one respondent does not consume it at all (0% frequency). Therefore, it is recommended to check the MCMC output for the variance parameter from the corresponding plots and to be aware of the quality of data used. ‘Between-user variability’ should be considered as part of the model only if there is enough data for estimating between consumer variance.
-> <li><b>Correlation model of consumption frequencies</b></li>
-> With several food types, correlations may be allowed between consumption (logit) frequencies of different foods, but the correlation parameters are not individual specific (this would require much more reporting days per each individual).
-</ul>
-</ul>
-> <b style="color:#D0006F">Correlation models for consumption amounts</b>
-<ul>
-<li>
-> <b>Serving sizes</b>
-> With several food types, correlations may be allowed between **daily** (log) consumption amounts of different foods, but the correlation parameters are not individual specific (this would require much more reporting days per each individual).
-</li>
-<li>
-> <b>Mean serving sizes</b>
-> With several food types, correlations may be allowed between **daily mean** (log) consumption amounts of different foods, but the correlation parameters are not individual specific (this would require much more reporting days per each individual).
-</li>
-</ul>
+
 > <b style="color:#D0006F">Priors for variances</b>
 > <ul><li><b>Tau Gamma</b>, is a conventional choice for the prior of inverse variance.</li>
 > <li>The restricted <b>Sigma Uniform</b> prior for standard deviation, is determined from an exaggerated upper bound based on data. (This might be more robust with very small data sample).</li>
 </ul>
 > <b style="color:#D0006F">Number of MCMC iterations</b>
+> <br>
 > The number of MCMC simulations affects the Monte Carlo accuracy of the results. It is recommended that several iterations of different lengths are tried to gauge how Monte Carlo error could still affect the results.
+
 
 :::
 :::
@@ -417,8 +398,11 @@ $Figure$ $1.$ Variability distribution for positive hazard concentrations in foo
 
 knitr::read_chunk('plotsfunctions.R')
 
+#, 'constantconsumK.R', 'constantconsumM.R'
 
 ```
+
+
 
 
 ```{r concen-plot, distPlot1_1, fig.show ='hold', out.width="600px", out.height="400px"}
@@ -451,22 +435,22 @@ distPlot1_1(input_lim, unit_concen, hazard_concen, input_upper, input_lower, n_s
 
 <hr />
 
-### [**Consumptions**]{style="color: #004F71"}{.tabset .tabset-pills}
+### [**Consumptions**]{style="color: #004F71"}
 
-#### [**Consumptions**]{style="color: #004F71"}
+
 
 ::: {.cols style="display: grid; grid-template-columns:  2fr 1fr; grid-column-gap: 25px;"}
 ::: col
 
 ```{r}
 #cat('\n\n', "Food: `", params$thefoodnames2, '`\n\n')
-cat('\n', "Confidence interval: `", params$conf_interval1, '`\n')
-cat('\n',"Scale: `", params$selectscale1, '`\n')
-cat('\n',"Distribution: `", params$selectdist1, '`\n')
+#cat('\n', "Confidence interval: `", params$conf_interval1, '`\n')
+#cat('\n',"Scale: `", params$selectscale1, '`\n')
+#cat('\n',"Distribution: `", params$selectdist1, '`\n')
 
 ```
 
-$Figure$$2a$ Variability distributions for both mean consumptions per bodyweight ('chronic') and single consumptions ('acute'). The uncertainty of the true variability distribution of positive consumptions is expressed by plotting a range (e.g. pointwise 95%CI) of probable variability distributions ([**straw color**]{style="color: #CEB888;"}). The uncertainty distributions for mean ([**yellow color**]{style="color: #F7CE3C;"}) and median ([**black color**]{style="color: #343841;"}) are plotted in bold lines. Observed data for positive consumptions are shown as [**raspberry color**]{style="color: #D0006F;"} ticks and the empirical cumulative distribution in [**raspberry color**]{style="color: #D0006F;"} line. Note that the distributions in the figures represent truly positive consumptions, excluding zeros.
+$Figure$ $2.$  Constant consumption amounts shown as pie charts (per bodyweight and absolute).
 
 
 
@@ -486,63 +470,7 @@ distPlot2_1(input_lim, food_consum, unit_consum, input_upper, input_lower, n_sim
 ::: {.col data-latex="{0.4\\textwidth}" style="background-color: #F4F3F2;"}
 
 > <br>
-> **Graphical distributions for consumptions** of single food types represent the variability distribution of servings (acute) and the variability distribution of mean servings (chronic), concerning actual consumption days. A ‘serving’ here means one day consumption. A mean serving (chronic) denotes a long term average serving for each consumer. Eventually, the consumptions over all days will result from the distribution of positive consumption amounts applied on consumption days, and the frequency of such consumption days. The plot will always show distributions for positive consumptions (acute or chronic) and the estimated consumption frequency with 95%CI in a legend.
-
-:::
-:::
-
-
-
-#### [**Serving correlations**]{style="color: #004F71"}
-::: {.cols style="display: grid; grid-template-columns:  2fr 1fr; grid-column-gap: 25px;"}
-::: col
-
-
-$Figure$ $2b$ Pairwise scatter plots of logarithms of actual positive consumptions per bodyweights. Data points ([**blueberry color**]{style="color: #004F71;"}) and model based simulations ([**raspberry color**]{style="color: #D0006F;"}).
-
-```{r correl-plot1, distPlot6_1, fig.show ='hold', out.width="600px", out.height="400px"}
-
-if (nfused<2){
-  cat("**Requires at least two food types.**")
-} else
-  distPlot6_1(food_consum, unit_consum, n_sim, foodnamesused,
-                        nfused, foodindex,nr,nd,nf,logsw,
-                        mus0,
-                        Ss,Ss0,constant.consum,input_modelchoice,
-                        osdlogsw1,osdlogsw2
-)
-
-
-```
-
-<br />
-<br />
-
-$Figure$ $2c$ Pairwise scatter plots of logarithms of mean positive consumptions per bodyweights. Data points ([**blueberry color**]{style="color: #004F71;"}) and model based simulations ([**raspberry color**]{style="color: #D0006F;"}).
-
-
-```{r correl-plot2, distPlot7_1, fig.show ='hold', out.width="600px", out.height="400px"}
-
-if (nfused<2){
-  cat("**Requires at least two food types.**")
-} else
-  distPlot7_1(food_consum, unit_consum, n_sim, foodnamesused, nfused, foodindex,
-                        nf,nr,nd,logsw,
-                        mus0,
-                        Ss,Ss0,constant.consum,input_modelchoice,
-                        osdlogsw1,osdlogsw2
-)
-
-
-```
-
-
-:::
-
-::: {.col data-latex="{0.4\\textwidth}" style="background-color: #F4F3F2;"}
-
-> <br>
-> The food consumption model contains **two correlation structures** for consumption amounts for food types: **(i)** all pairwise correlations for the actual consumption amounts in log-scale, and **(ii)** all pairwise correlations for the mean log-amounts. These are not specific correlations per each individual consumer, but generally for the whole group of consumers. These models aim to capture all such pairwise correlations in the consumer population if there are any. The correlation models (if used) are always running for the full set of foods in the data even if only some food types were selected for results. The correlations can be visualised for the actual amounts or for the expected amounts in two figure plots.
+> Constant consumption amounts are shown as pie charts (per bodyweight and absolute). Graphical distributions not available.
 
 :::
 :::
@@ -566,7 +494,7 @@ cat('\n',"Distribution: `", params$selectdist1, '`\n')
 
 
 
-$Figure$ $3$ Variability distribution for mean positive exposures per bodyweight (chemical) or acute positive exposures (microbial). The uncertainty of the true variability distribution of positive exposures is expressed by plotting a range (e.g. pointwise 95%CI) of probable variability distributions ([**straw color**]{style="color: #CEB888;"}). The uncertainty distributions for mean ([**yellow color**]{style="color: #F7CE3C;"}) and median ([**black color**]{style="color: #343841;"}) are plotted in bold lines. The (pseudo)empirical cumulative distribution simulated from bootstrapped data are shown using LB substitution ([**blueberry color**]{style="color: #004F71;"}) and UB substitution ([**raspberry color**]{style="color: #D0006F;"}) method. Note that the distributions in the figures represent truly positive exposures, excluding zeros.
+$Figure$ $3.$ Variability distribution for mean positive exposures per bodyweight (chemical) or acute positive exposures (microbial). The uncertainty of the true variability distribution of positive exposures is expressed by plotting a range (e.g. pointwise 95%CI) of probable variability distributions ([**straw color**]{style="color: #CEB888;"}). The uncertainty distributions for mean ([**yellow color**]{style="color: #F7CE3C;"}) and median ([**black color**]{style="color: #343841;"}) are plotted in bold lines. The (pseudo)empirical cumulative distribution simulated from bootstrapped data are shown using LB substitution ([**blueberry color**]{style="color: #004F71;"}) and UB substitution ([**raspberry color**]{style="color: #D0006F;"}) method. Note that the distributions in the figures represent truly positive exposures, excluding zeros.
 
 <br />
 
@@ -605,68 +533,15 @@ distPlot3_1(input_lim, unit_concen, hazard_concen, input_upper, input_lower, n_s
 
 <hr />
 
-### [**Quantiles**]{style="color: #004F71"}
-
-::: {.cols style="display: grid; grid-template-columns:  2fr 1fr; grid-column-gap: 25px;"}
-::: col
-
-```{r }
-
-#cat('\n\n', "Food-hazard combination: `",params$thehazardnames4, '` from `', params$thefoodnames4, '`\n\n')
-cat('\n',"Scale: `", input_selectscale, '`\n')
-cat('\n',"Total exposure quantile (Q%): `", input_selectQ, '`\n')
-cat('\n',"Variability sample size for Q%: `", nV, '`\n')
-cat('\n',"Uncertainty sample size for Q%: `", nU, '`\n')
-
-
-```
-
-
-$Figure$ $4$ Cumulative distributions for separation of uncertainty and variability for mean exposures per bodyweight (chemical) or acute exposures (microbial). The uncertainty of true variability distribution of positive exposures summed from all selected foods is expressed by plotting a sample of probable variability distributions ([**raspberry color**]{style="color: #D0006F;"}). The uncertainty distribution for the selected variability quantile is shown between vertical bars (and is subject to Monte Carlo error of 2D simulations).
-
-
-```{r quantiles-plot, distPlot4_1, fig.show ='hold', out.width="600px", out.height="400px"}
-
-if (is.element("None", input_selectQ)){
-  cat("**Total exposure quantile not selected.**")
-} else
-  
-  distPlot4_1(unit_concen, hazard_concen, n_sim, input_selectscale, input_selectQ, nV,
-                        nU, Rall, Pall, input_modelchoice, input_modelchoice2,
-                        nfused, foodindex, 
-                        nexactK, nexactM, 
-                        nhused, hazardnames, hazardnamesusedK, hazardnamesusedM,
-                        nhusedK, nhusedM, hazardindexK, hazardindexM, nhK,nhM,nf,
-                        mucK,mucM,mus0,muw,pK,pM,sigcK,sigcM,sigw,
-                        Ss,Ss0,Sp,
-                        logitp0,constant.consum,osdlogsw1,osdlogsw2)
-
-
-```
-
-
-
-:::
-
-::: {.col data-latex="{0.4\\textwidth}" style="background-color: #F4F3F2;"}
-
-> <br>
-> The total exposure will be computed as the summed exposure from the selected foods. Depending on hazard type, the exposure will be either *acute* (microbiological) or *chronic* (chemical). From the distribution of total exposure, a selected quantile point is estimated. The calculations employ 2D simulations (often computationally heavy). BIKE estimates **the quantile for two exposure distributions**: **(a)****^[**Positive exposure days only (worst case)** Positive acute exposure from a hazard-food combination occurs when both the hazard concentration and the food consumption are positive in a single serving day. Positive chronic exposure is likewise defined as the individual mean exposure from such positive exposures only. In other words: positive exposure does not include possible zero concentrations or zero consumption days. To evaluate total positive exposure from several foods, such positive exposures are summed over the selected foods. Note that this corresponds to a worst case scenario where all the selected foods are contaminated and they are all consumed on all days. The variation of such hypothetical total exposures is simulated to obtain a distribution for which the selected quantile point is estimated with 95% uncertainty bounds.]** the worst case exposure that results if all the (selected) foods are always contaminated and consumed daily, and **(b)****^[**Exposures for all days (including zeros)** Perhaps eventually of interest is the total exposure that accounts for both zero and positive daily exposures of the foods to be summed up. These occur according to the frequency of consumption days of each of the foods, and the prevalence of hazard contamination in each of the foods occurring on those consumption days. Typically, the proportion of zero exposure days can be large and some large exposure incidences may occur for some days only. This usually makes plotting of the total exposure distribution graphically infeasible. Therefore, the figure that appears in quantile plots shows a plot representing the variability distribution of total positive exposures only (as explained above). This may serve as a worst case risk assessment tool. However, the quantiles for the overall total exposure distribution, including random zero exposures are nevertheless evaluated and numerically given in the other legend in the same figure. The estimated 95% uncertainty interval of the required quantile may become nearly entirely zeros if the positive exposures are rare occasions leading mostly to zero exposures. For proving a low risk, this would be a good result!]** accounting the prevalence of contamination for each food as well as the actual consumption frequency of each food. The worst case total exposure distribution is shown graphically (and numerically in a legend), while the actual total exposure quantile is given only numerically in a legend.
-
-:::
-:::
-
-<br>
-<hr />
 
 ### [**MCMC samples of parameters**]{style="color: #004F71"}{.tabset .tabset-pills}
 
-#### [**Concentration parameters**]{style="color: #004F71"}
+[**Concentration parameters**]{style="color: #004F71"}
 
 ::: {.cols style="display: grid; grid-template-columns:  2fr 1fr; grid-column-gap: 25px;"}
 ::: col
 
-$Figure$ $5a$ Permuted MCMC samples of model parameters $mu$ and $sigma$ of the log-normal ($mu$, $sigma$)-distribution, and prevalence $q$ of the **hazard**. For each parameter, also the approximated marginal probability density is shown.
+$Figure$ $4.$ Permuted MCMC samples of model parameters $mu$ and $sigma$ of the log-normal ($mu$, $sigma$)-distribution, and prevalence $q$ of the **hazard**. For each parameter, also the approximated marginal probability density is shown.
 
 <br />
 
@@ -691,7 +566,7 @@ distPlot5_1(n_sim, foodnamesused, nfused, foodindex,
 ::: {.col data-latex="{0.4\\textwidth}" style="background-color: #F4F3F2;"}
 
 > <br>
-> The posterior distribution is computed using **Markov Chain Monte Carlo (MCMC)** sampling. In MCMC, each iteration step depends on the values generated at the previous step. This sampling converges to the correct target distribution which is the posterior distribution of all unknown parameters. In difficulties, the posterior may be nearly flat or with multiple peaks. This, and/or insufficient iterations may then result into poor convergence, and the obtained parameter estimates would not be valid. Poor convergence and poor mixing of the algorithm could be detected as instability in the parameter distributions. The MCMC sample of the parameters, and the marginal posterior distribution are provided for critical inspection. Although a visual inspection is informal and indicative, it can reveal problems in MCMC sampling. The sample should look smoothly scattered without clustering at some values only. The marginal probability density (plotted on top) should look smooth without ‘extra bumps’. New or increased MCMC runs should lead to same results. If a possible problem is detected, increase MCMC iterations and/or investigate whether there are simply insufficient data for the parameter to be well estimated. Note also that the full joint distribution is a multidimensional distribution which cannot be pictured and these plots only show marginal one-dimensional distributions for each parameter, like shadows of the multidimensional distribution. The parameter samples can be viewed for both the concentration distributions and consumption distributions. The values at the peaks of those distributions could also be compared with the corresponding parameter estimates directly evaluated from raw (log-)data, e.g., mean and standard deviation, although censored data can make direct comparison less straightforward.
+> The posterior distribution is computed using **Markov Chain Monte Carlo (MCMC)** sampling. In MCMC, each iteration step depends on the values generated at the previous step. This sampling converges to the correct target distribution which is the posterior distribution of all unknown parameters. In difficulties, the posterior may be nearly flat or with multiple peaks. This, and/or insufficient iterations may then result into poor convergence, and the obtained parameter estimates would not be valid. Poor convergence and poor mixing of the algorithm could be detected as instability in the parameter distributions. The MCMC sample of the parameters, and the marginal posterior distribution are provided for critical inspection. Although a visual inspection is informal and indicative, it can reveal problems in MCMC sampling. The sample should look smoothly scattered without clustering at some values only. The marginal probability density (plotted on top) should look smooth without ‘extra bumps’. New or increased MCMC runs should lead to same results. If a possible problem is detected, increase MCMC iterations and/or investigate whether there are simply insufficient data for the parameter to be well estimated. Note also that the full joint distribution is a multidimensional distribution which cannot be pictured and these plots only show marginal one-dimensional distributions for each parameter, like shadows of the multidimensional distribution. The parameter samples can be viewed for the concentration distributions. The values at the peaks of those distributions could also be compared with the corresponding parameter estimates directly evaluated from raw (log-)data, e.g., mean and standard deviation, although censored data can make direct comparison less straightforward.
 
 :::
 :::
@@ -699,47 +574,12 @@ distPlot5_1(n_sim, foodnamesused, nfused, foodindex,
 <br>
 <hr />
 
-#### [**Consumption parameters**]{style="color: #004F71"}
-
-::: {.cols style="display: grid; grid-template-columns:  2fr 1fr; grid-column-gap: 25px;"}
-::: col
-
-$Figure$ $5b$ Permuted MCMC samples of model parameters $mu$ and $sigma$ of the log-normal ($mu$, $sigma$)-distribution, and consumption frequency $p$ of the **food**. For each parameter, also the approximated marginal probability density is shown.
-
-<br />
-
-```{r consum-params-plot, distPlot5_2, fig.show ='hold', out.width="600px", out.height="400px"}
-
-#cat('**Consumption parameters**')
-
-distPlot5_2(n_sim,foodnamesused, nfused, foodindex,
-                        nf,
-                        mus0,logitp0,
-                        Ss,constant.consum,input_modelchoice
-)
-
-```
-
-
-
-:::
-
-::: {.col data-latex="{0.4\\textwidth}" style="background-color: #F4F3F2;"}
-
-> <br>
-> The posterior distribution is computed using **Markov Chain Monte Carlo (MCMC)** sampling. In MCMC, each iteration step depends on the values generated at the previous step. This sampling converges to the correct target distribution which is the posterior distribution of all unknown parameters. In difficulties, the posterior may be nearly flat or with multiple peaks. This, and/or insufficient iterations may then result into poor convergence, and the obtained parameter estimates would not be valid. Poor convergence and poor mixing of the algorithm could be detected as instability in the parameter distributions. The MCMC sample of the parameters, and the marginal posterior distribution are provided for critical inspection. Although a visual inspection is informal and indicative, it can reveal problems in MCMC sampling. The sample should look smoothly scattered without clustering at some values only. The marginal probability density (plotted on top) should look smooth without ‘extra bumps’. New or increased MCMC runs should lead to same results. If a possible problem is detected, increase MCMC iterations and/or investigate whether there are simply insufficient data for the parameter to be well estimated. Note also that the full joint distribution is a multidimensional distribution which cannot be pictured and these plots only show marginal one-dimensional distributions for each parameter, like shadows of the multidimensional distribution. The parameter samples can be viewed for both the concentration distributions and consumption distributions. The values at the peaks of those distributions could also be compared with the corresponding parameter estimates directly evaluated from raw (log-)data, e.g., mean and standard deviation, although censored data can make direct comparison less straightforward.
-
-:::
-:::
-
-<br>
-<hr />
 
 
 ## [**Tables**]{style="color: #004F71"}{.tabset}
 
 
-### [**Posterior predictive distributions**]{style="color: #004F71"}
+[**Posterior predictive distributions**]{style="color: #004F71"}
 
 Posterior predictive distributions present predictions where all uncertainties and variabilities are integrated into one single probability distribution. This can be a useful summary for assessing what is now probable, given all the data with all its variability and uncertainties. The distribution is obtained by averaging (weighing) the possible variability distributions over the uncertainty distribution of their parameters.
 
@@ -789,47 +629,6 @@ datatable(resultValues, rownames = FALSE,
 
 <hr />
 
-### [**Exposure limit analysis**]{style="color: #004F71"}
-
-Exposure limit analysis presents the part of the population (1 = 100%) with exposure below the limit given in the Occurrence dataset. The estimate is given for all days and for days with only positive consumption of contaminated food. The exposure limit can be set as a health based guidance value, for example tolerable daily intake TDI. Note that the exposure calculated by BIKE is in units per day (per bodyweight or as absolute), and thus a health based guidance value given in units per a longer time period  should be adjusted  to units per day before uploading data.
-
-The columns Q05, Q50, Q95 refer to uncertainty quantiles for the 'Quantity' in first column. The 'Quantity' Q95(exposure) refer to the unknown quantiles of variability distribution. This becomes estimated with the indicated uncertainty quantiles Q05, Q50, Q95.
-
-```{r limits-table, echo = F}
-
-# create data frame containing exposure limit analysis table----
-
-resultProbs <- table2(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,nfused,foodindex,hazardnames,
-                   hazardnamesused,hazardtypesused,hazardnamesK,hazardnamesM,
-                   hazardnamesusedK,hazardnamesusedM,nhusedK,nhusedM,hazardindexK,hazardindexM,
-                   Rall,Pall,nhK,nhM,nf,nexactK,nexactM,limitexpoK,limitexpoM,
-                   mus0,mucK,mucM,sigcK,sigcM,pK,pM,logitp0,muw,sigw,
-                   Ss,Ss0,Sp,constant.consum,osdlogsw1,osdlogsw2 
-)
-
-datatable(resultProbs, rownames = FALSE,
-          caption = "Exposure limit analysis",
-          class = 'row-border stripe',
-          extensions = c("Buttons", "RowGroup"),
-          options = list(
-            rowGroup = list(dataSrc = 0), # row grouping feature -> grouped by second column value
-
-            dom = "Bfrtip",
-            buttons = list(list(extend = "excel", text = '<span class="glyphicon glyphicon-download-alt"></span> Excel', title = NULL,
-                                exportOptions = list(columns = ":visible"),
-                                filename =  paste("Exposure_limit_analysis"))
-            ),
-
-            paging=FALSE, scrollY = "480px"
-          )
-)
-
-
-```
-
-<br /> 
-
-<hr />
 
 
 # [**Input data**]{style="color:  #004F71"}{.tabset}
