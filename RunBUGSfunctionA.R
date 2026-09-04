@@ -59,7 +59,7 @@ for(i in 1:nhM){
 # if only chemical hazards:  
 if((nhK>0)&(nhM==0)){
 data <- list("Weight","logcK","nexactK",
-               "nf","nr","nd","logsw","usedays")  
+               "nf","nr","nd","logsw","usedays")
 if(input$priorchoice == "sigma_uniform"){
 data <- append(data,"sdpriorlimK")  # assign limits for prior range 
 }
