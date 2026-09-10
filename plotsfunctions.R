@@ -112,11 +112,11 @@ distPlot1_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
                 uppervalues[xv] <- quantile(plnorm(xvalues[xv],
                                                    mucK[,hazardindexK[h],foodindex[i]],
                                                    sigcK[,hazardindexK[h],foodindex[i]]),
-                                            input_upper,names=FALSE) #0.975,names=FALSE)
+                                            input_upper,names=FALSE) 
                 lowervalues[xv] <- quantile(plnorm(xvalues[xv],
                                                    mucK[,hazardindexK[h],foodindex[i]],
                                                    sigcK[,hazardindexK[h],foodindex[i]]),
-                                            input_lower,names=FALSE) #0.025,names=FALSE)
+                                            input_lower,names=FALSE) 
               }
               polygon(c(xvalues,xvalues[100:1]),c(uppervalues,lowervalues[100:1]),col="#CEB888")
               cmeanK <- sort(exp(mucK[,hazardindexK[h],foodindex[i]]+0.5*sigcK[,hazardindexK[h],foodindex[i]]^2))
@@ -456,7 +456,6 @@ distPlot2_1 <- function(input_lim, food_consum, unit_consum, input_upper, input_
   if(constant.consum=="FALSE"){ 
     
   OIM <- numeric() # observed individual mean consumptions
-  
   p0 <- exp(logitp0)/(1+exp(logitp0)) # consumption frequencies in population  
   for(i in 1:nfused){
     Unit <- unit_consum[food_consum == foodnamesused[i]] # the measurement unit used for food consumptions
@@ -503,7 +502,7 @@ distPlot2_1 <- function(input_lim, food_consum, unit_consum, input_upper, input_
         lines(density(meansmedian,from=0,to=maxx,n=2048),lwd=3,main=paste(foodnamesused[i],"consumption"),xlab="C.consumption/bw+",ylab="",xlim=c(0,maxx),type="l")
         lines(density(meansmean,from=0,to=maxx,n=2048),col="#F7CE3C",lwd=3)
         
-        for(r in 1:nr){
+        for(r in 1:nr){ # observed individual means
           OIM[r]<- mean(exp(logsw[r,1:nd,foodindex[i]]),na.rm=TRUE) 
         } 
         OIM<-OIM[!is.na(OIM)]
@@ -575,7 +574,7 @@ distPlot2_1 <- function(input_lim, food_consum, unit_consum, input_upper, input_
         lines(density(musmean/log(10),from=minn/log(10),to=maxx/log(10),n=2048),col="#F7CE3C",lwd=3,main=paste(foodnamesused[i],"consumption"),xlab="log C.consumption/bw+",ylab="",xlim=c(minn/log(10),maxx/log(10)),type="l")
         
         
-        for(r in 1:nr){
+        for(r in 1:nr){ # log of observed individual means
           OIM[r]<- log(mean(exp(logsw[r,1:nd,foodindex[i]]),na.rm=TRUE)) 
         } 
         OIM<-OIM[!is.na(OIM)]
@@ -651,7 +650,7 @@ distPlot2_1 <- function(input_lim, food_consum, unit_consum, input_upper, input_
         lines(meansmean,cump,col="#F7CE3C",lwd=3,main=paste(foodnamesused[i],"consumption"),xlab="C.consumption/bw+",ylab="",xlim=c(0,maxx),type="l")
         lines(meansmedian,cump,lwd=3)
         
-        for(r in 1:nr){
+        for(r in 1:nr){ # observed individual means
           OIM[r]<- mean(exp(logsw[r,1:nd,foodindex[i]]),na.rm=TRUE) 
         } 
         OIM<-OIM[!is.na(OIM)]
@@ -725,7 +724,7 @@ distPlot2_1 <- function(input_lim, food_consum, unit_consum, input_upper, input_
         lines(musmean/log(10),cump,lwd=3,main=paste(foodnamesused[i],"consumption"),xlab="log C.consumption/bw+",ylab="",xlim=c(minn/log(10),maxx/log(10)),type="l")
         
         
-        for(r in 1:nr){
+        for(r in 1:nr){ # log of observed individual means
           OIM[r]<- log(mean(exp(logsw[r,1:nd,foodindex[i]]),na.rm=TRUE)) 
         } 
         OIM<-OIM[!is.na(OIM)]
@@ -842,7 +841,7 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
         if(nexactK[hazardindexK[h],foodindex[i]]>0){ # this hazard-food is modeled
           ##############################################################################
           if(constant.consum==FALSE){
-          p0 <- exp(logitp0)/(1+exp(logitp0))
+          p0 <- exp(logitp0)/(1+exp(logitp0)) # consumption frequency
           Vs <- numeric() # variances between days (servings), over actual positives
           Vs0 <- numeric() # variances between individual means, over actual positives 
           for(u in 1:n_sim){
@@ -2392,7 +2391,7 @@ distPlot4_1 <- function(unit_concen, hazard_concen, n_sim, input_selectscale, in
     nU <- min(nU,n_sim) # number of uncertainty samples nU cannot be larger than total n_sim from MCMC.
     mc <- round(seq(1,n_sim,length=nU),0) 
     
-    p0 <- exp(logitp0)/(1+exp(logitp0))
+    p0 <- exp(logitp0)/(1+exp(logitp0)) # consumption frequencies
     # Chemical exposure quantiles----
     
     if((nhusedK>0)&(nfused>0)){ 
@@ -3348,7 +3347,7 @@ distPlot5_2 <- function(n_sim,foodnamesused, nfused, foodindex,
          heights = c(2, 4),    # Heights of the two rows
          widths = c(1, 1, 1))     # Widths of the two columns
 
-  p0 <- exp(logitp0)/(1+exp(logitp0)) 
+  p0 <- exp(logitp0)/(1+exp(logitp0)) # consumption frequencies 
   for(i in 1:nfused){
     if(input_modelchoice!="Fixed variance"){
     Vs <- numeric() # variances, day-to-day (serving) variation
