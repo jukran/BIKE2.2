@@ -633,9 +633,9 @@ table2 <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,nfu
           punderlimitposK <- numeric()
           punderlimitallK <- numeric()
           
-          Vs <- numeric() # variances
-          Vs0 <- numeric() # variances
-          p0 <- exp(logitp0)/(1+exp(logitp0))
+          Vs <- numeric() # variances between days
+          Vs0 <- numeric() # variances between individuals
+          p0 <- exp(logitp0)/(1+exp(logitp0)) # consumption frequencies
           
           for(u in 1:(n_sim)){ 
             # simulate variability for V individuals, 
@@ -794,9 +794,9 @@ table2 <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,nfu
           punderlimitposM <- numeric()
           punderlimitallM <- numeric()
           
-          Vs <- numeric() # variances
-          Vs0 <- numeric() # variances
-          p0 <- exp(logitp0)/(1+exp(logitp0)) 
+          Vs <- numeric() # variances between days
+          Vs0 <- numeric() # variances between individuals
+          p0 <- exp(logitp0)/(1+exp(logitp0)) # consumption frequencies 
           
           for(u in 1:(n_sim)){ 
             # simulate variability for V individuals, 
@@ -822,7 +822,7 @@ table2 <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,nfu
               pconsume[foodindex[i],1:V] <- rep(p0[u,foodindex[i]],V)
             }
             
-            meanM <- mean(pconsume[foodindex[i],1:V])
+            meanM <- mean(pconsume[foodindex[i],1:V]) # probability of consumption in a population
             
             # evaluate the 95% quantile of the exposure distribution including all days 
             # (not only positively contaminated consumptions), i.e. zero inflated distribution
