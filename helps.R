@@ -404,7 +404,7 @@ help_log_results <- function(){
   tags$i()%>%
     helper(type="inline",
            size = "m",
-           title = "Means of acute and chronic positive exposures E(log e^+) and E(log E(e^+)) ",
+           title = "Means of log-acute and log-chronic positive exposures E(log e^+) and E(log E(e^+)) ",
            content = c(
              "<b>Uncertainty distributions for the mean</b> of single 'acute' log exposures E(log e^+) and for the mean of 'chronic' log-average exposures E(log E(e^+)) 
              are different. The former describes the mean over individual random log-exposures, and the latter the mean of log-average exposures over consumers. 
