@@ -2206,12 +2206,8 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
                                             input_lower,names=FALSE)
               }
               # uncertainty bounds for logarithmic acute exposure distribution
-              polygon(c(acutexvalues,acutexvalues[100:1]),c(acuteuppervalues,acutelowervalues[100:1]),col="#CEB888")
-              # uncertainty for mean log-acute exposure  E(log e^+)
-              lines(meanlogexposureacute/log(10),cump,lwd=3)
-              # uncertainty for mean log-chronic exposure  E(log E(e^+)) 
-              lines(meanlogexposurechronic/log(10),cump,lwd=3,lty="dashed")  
-              
+              polygon(c(acutexvalues,acutexvalues[100:1]),c(acuteuppervalues,acutelowervalues[100:1]),col="#CEB888") 
+
               
               # plot empirically generated cumulative acute exposure distributions
               W <- matrix(sample(Weight),nr,nd) # randomize bodyweights of individuals 
@@ -2246,8 +2242,10 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
                 lines(ecdf(log10(sampleser*sampleconUB*RM[foodindex[i],hazardindexM[h]])),verticals=TRUE,do.points=FALSE,xlim=c(minnacute/log(10),maxxacute/log(10)),lwd=1,lty=3,col="#D0006F")
                 lines(ecdf(log10(sampleser*sampleconLB*RM[foodindex[i],hazardindexM[h]])),verticals=TRUE,do.points=FALSE,xlim=c(minnacute/log(10),maxxacute/log(10)),lwd=1,lty=3,col="#004F71")
               }  
-              # uncertainty for log mean exposure
-              lines(meanlogexposureacute/log(10),cump,lwd=3) 
+              # uncertainty for mean log-acute exposure  E(log e^+)
+              lines(meanlogexposureacute/log(10),cump,lwd=3)
+              # uncertainty for mean log-chronic exposure  E(log E(e^+)) 
+              lines(meanlogexposurechronic/log(10),cump,lwd=3,lty="dashed") 
               
               ################################################
               # plot a new frame for chronic exposures:
