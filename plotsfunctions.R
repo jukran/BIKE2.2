@@ -1256,6 +1256,9 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
               # uncertainty for mean and median-chronic exposure:
               lines(meanexposurechronic[meanexposurechronic<maxxchronic],cump[meanexposurechronic<maxxchronic],col="#F7CE3C",main=paste(hazardnamesusedK[h],"from",foodnamesused[i],"(chronic)"),xlab="C.exposure/bw+",ylab="",xlim=c(0,maxxchronic),lwd=3) 
               lines(medianexposurechronic[medianexposurechronic<maxxchronic],cump[medianexposurechronic<maxxchronic],xlim=c(0,maxxchronic),lwd=3)
+              lines(c(limitexpoK[hazardindexK[h]],limitexpoK[hazardindexK[h]]),c(0,1),lwd=2,col="blue")
+              
+              
               
               ##################
               # plot a new frame for acute exposures:
@@ -1435,7 +1438,7 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
               lines(meanlogexposurechronic/log(10),cump,lwd=3)
               # uncertainty for mean log-acute exposure  E(log e^+)
               lines(meanlogexposureacute/log(10),cump,lwd=3,lty="dashed")
-              
+              lines(log10(c(limitexpoK[hazardindexK[h]],limitexpoK[hazardindexK[h]])),c(0,1),lwd=2,col="blue")
               
               
               ##################
@@ -2019,6 +2022,7 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
               # uncertainty for mean and median acute exposure:
               lines(meanexposureacute[meanexposureacute<maxxacute],cump[meanexposureacute<maxxacute],col="#F7CE3C",main=paste(hazardnamesusedM[h],"from",foodnamesused[i],"(acute)"),xlab="A.exposure+",ylab="",xlim=c(0,maxxacute),lwd=3) 
               lines(medianexposureacute[medianexposureacute<maxxacute],cump[medianexposureacute<maxxacute],xlim=c(0,maxxacute),lwd=3)
+              lines(c(limitexpoM[hazardindexM[h]],limitexpoM[hazardindexM[h]]),c(0,1),lwd=2,col="blue")
               
               ######################################
               # plot a new frame for chronic exposures:
@@ -2206,8 +2210,8 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
                                             input_lower,names=FALSE)
               }
               # uncertainty bounds for logarithmic acute exposure distribution
-              polygon(c(acutexvalues,acutexvalues[100:1]),c(acuteuppervalues,acutelowervalues[100:1]),col="#CEB888") 
-
+              polygon(c(acutexvalues,acutexvalues[100:1]),c(acuteuppervalues,acutelowervalues[100:1]),col="#CEB888")
+              
               
               # plot empirically generated cumulative acute exposure distributions
               W <- matrix(sample(Weight),nr,nd) # randomize bodyweights of individuals 
@@ -2246,6 +2250,7 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
               lines(meanlogexposureacute/log(10),cump,lwd=3)
               # uncertainty for mean log-chronic exposure  E(log E(e^+)) 
               lines(meanlogexposurechronic/log(10),cump,lwd=3,lty="dashed") 
+              lines(log10(c(limitexpoM[hazardindexM[h]],limitexpoM[hazardindexM[h]])),c(0,1),lwd=2,col="blue")
               
               ################################################
               # plot a new frame for chronic exposures:
