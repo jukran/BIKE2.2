@@ -178,9 +178,29 @@ distPlot1_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
                   logLODLimK[hazardindexK[h],foodindex[i],]/log(10)-20)
               ),verticals=TRUE,do.points=FALSE,lwd=2,col="#004F71")
               
-            }  
+            } # end of if logarithmic  
           } # end of if cumulative
           
+
+          qutotal95 <- numeric()
+          qutotal50 <- numeric()
+          # evaluate the 95% and 50% quantile of the concentration distribution including all servings 
+          # (not only positively contaminated servings), i.e. zero inflated distribution
+          for(u in 1:n_sim){
+          PPOSK <- pK[u,hazardindexK[h],foodindex[i]]
+          if(0.95<=(1-PPOSK)){qutotal95[u]<-0}
+          if(0.95>(1-PPOSK)){
+            qutotal95[u]<- qlnorm((0.95-1+PPOSK)/PPOSK,
+                                  +mucK[u,hazardindexK[h],foodindex[i]],
+                                  sigcK[u,hazardindexK[h],foodindex[i]])
+          }
+          if(0.5<=(1-PPOSK)){qutotal50[u]<-0}
+          if(0.5>(1-PPOSK)){
+            qutotal50[u]<- qlnorm((0.5-1+PPOSK)/PPOSK,
+                                  +mucK[u,hazardindexK[h],foodindex[i]],
+                                  sigcK[u,hazardindexK[h],foodindex[i]])
+          }
+          }
           
           # legend----
           mtext(paste("Prevalence of", hazardnamesusedK[h],"in",foodnamesused[i], ": ",round(quantile(100*pK[,hazardindexK[h],foodindex[i]],0.5,names=FALSE),1),
@@ -192,13 +212,25 @@ distPlot1_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
                       round(quantile(qlnorm(0.5,mucK[,hazardindexK[h],foodindex[i]],sigcK[,hazardindexK[h],foodindex[i]]),0.025,names=FALSE),2),"-", round(quantile(qlnorm(0.5,mucK[,hazardindexK[h],foodindex[i]],sigcK[,hazardindexK[h],foodindex[i]]),0.975,names=FALSE),2),", and for Q95%:",
                       round(quantile(qlnorm(0.95,mucK[,hazardindexK[h],foodindex[i]],sigcK[,hazardindexK[h],foodindex[i]]),0.025,names=FALSE),2),"-", round(quantile(qlnorm(0.95,mucK[,hazardindexK[h],foodindex[i]],sigcK[,hazardindexK[h],foodindex[i]]),0.975,names=FALSE),2)),
                 side = 1, adj = 0,line=2, cex = 1,
-                outer = TRUE)}
+                outer = TRUE)
+          mtext(paste("95% uncertainty interval for the Q50% concentration:",
+                      round(quantile(qutotal50,0.025,names=FALSE),2),"-",round(quantile(qutotal50,0.975,names=FALSE),2),", and for Q95%:",
+                      round(quantile(qutotal95,0.025,names=FALSE),2),"-",round(quantile(qutotal95,0.975,names=FALSE),2)),
+                  side = 1, adj = 0,line=3, cex = 1,
+                  outer = TRUE)  
+            }
           if(input_selectscale=="Logarithmic"){
             mtext(paste("95% uncertainty interval for the Q50% log(concentration+):", 
                         round(quantile(qnorm(0.5,mucK[,hazardindexK[h],foodindex[i]],sigcK[,hazardindexK[h],foodindex[i]])/log(10),0.025,names=FALSE),2),"-", round(quantile(qnorm(0.5,mucK[,hazardindexK[h],foodindex[i]],sigcK[,hazardindexK[h],foodindex[i]])/log(10),0.975,names=FALSE),2),", and for Q95%:",
                         round(quantile(qnorm(0.95,mucK[,hazardindexK[h],foodindex[i]],sigcK[,hazardindexK[h],foodindex[i]])/log(10),0.025,names=FALSE),2),"-", round(quantile(qnorm(0.95,mucK[,hazardindexK[h],foodindex[i]],sigcK[,hazardindexK[h],foodindex[i]])/log(10),0.975,names=FALSE),2)),
                   side = 1, adj = 0,line=2, cex = 1,
-                  outer = TRUE)}
+                  outer = TRUE)
+            mtext(paste("95% uncertainty interval for the Q50% log(concentration):",
+                        round(quantile(log10(qutotal50),0.025,names=FALSE),2),"-",round(quantile(log10(qutotal50),0.975,names=FALSE),2),", and for Q95%:",
+                        round(quantile(log10(qutotal95),0.025,names=FALSE),2),"-",round(quantile(log10(qutotal95),0.975,names=FALSE),2)),
+                  side = 1, adj = 0,line=3, cex = 1,
+                  outer = TRUE) 
+            }
           
           
         } else # end of if this hazard-food was modeled  
@@ -382,6 +414,25 @@ distPlot1_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
             } # end of if logarithmic
           } # end of if cumulative
           
+          qutotal95 <- numeric()
+          qutotal50 <- numeric()
+          # evaluate the 95% and 50% quantile of the concentration distribution including all servings 
+          # (not only positively contaminated servings), i.e. zero inflated distribution
+          for(u in 1:n_sim){
+            PPOSM <- pM[u,hazardindexM[h],foodindex[i]]
+            if(0.95<=(1-PPOSM)){qutotal95[u]<-0}
+            if(0.95>(1-PPOSM)){
+              qutotal95[u]<- qlnorm((0.95-1+PPOSM)/PPOSM,
+                                    +mucM[u,hazardindexM[h],foodindex[i]],
+                                    sigcM[u,hazardindexM[h],foodindex[i]])
+            }
+            if(0.5<=(1-PPOSM)){qutotal50[u]<-0}
+            if(0.5>(1-PPOSM)){
+              qutotal50[u]<- qlnorm((0.5-1+PPOSM)/PPOSM,
+                                    +mucM[u,hazardindexM[h],foodindex[i]],
+                                    sigcM[u,hazardindexM[h],foodindex[i]])
+            }
+          }
           
           # legend ----
           # outside the figure, but onto the current plot, so it is part of the png file:
@@ -394,13 +445,25 @@ distPlot1_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
                         round(quantile(qlnorm(0.5,mucM[,hazardindexM[h],foodindex[i]],sigcM[,hazardindexM[h],foodindex[i]]),0.025,names=FALSE),2),"-", round(quantile(qlnorm(0.5,mucM[,hazardindexM[h],foodindex[i]],sigcM[,hazardindexM[h],foodindex[i]]),0.975,names=FALSE),2),", and for Q95%:",
                         round(quantile(qlnorm(0.95,mucM[,hazardindexM[h],foodindex[i]],sigcM[,hazardindexM[h],foodindex[i]]),0.025,names=FALSE),2),"-", round(quantile(qlnorm(0.95,mucM[,hazardindexM[h],foodindex[i]],sigcM[,hazardindexM[h],foodindex[i]]),0.975,names=FALSE),2)),
                   side = 1, adj = 0,line=2, cex = 1,
-                  outer = TRUE)}
+                  outer = TRUE)
+            mtext(paste("95% uncertainty interval for the Q50% concentration:",
+                        round(quantile(qutotal50,0.025,names=FALSE),2),"-",round(quantile(qutotal50,0.975,names=FALSE),2),", and for Q95%:",
+                        round(quantile(qutotal95,0.025,names=FALSE),2),"-",round(quantile(qutotal95,0.975,names=FALSE),2)),
+                  side = 1, adj = 0,line=3, cex = 1,
+                  outer = TRUE)  
+            }
           if(input_selectscale=="Logarithmic"){
             mtext(paste("95% uncertainty interval for the Q50% log(concentration+):", 
                         round(quantile(qnorm(0.5,mucM[,hazardindexM[h],foodindex[i]],sigcM[,hazardindexM[h],foodindex[i]])/log(10),0.025,names=FALSE),2),"-", round(quantile(qnorm(0.5,mucM[,hazardindexM[h],foodindex[i]],sigcM[,hazardindexM[h],foodindex[i]])/log(10),0.975,names=FALSE),2),", and for Q95%:",
                         round(quantile(qnorm(0.95,mucM[,hazardindexM[h],foodindex[i]],sigcM[,hazardindexM[h],foodindex[i]])/log(10),0.025,names=FALSE),2),"-", round(quantile(qnorm(0.95,mucM[,hazardindexM[h],foodindex[i]],sigcM[,hazardindexM[h],foodindex[i]])/log(10),0.975,names=FALSE),2)),
                   side = 1, adj = 0,line=2, cex = 1,
-                  outer = TRUE)}
+                  outer = TRUE)
+            mtext(paste("95% uncertainty interval for the Q50% log(concentration):",
+                        round(quantile(log10(qutotal50),0.025,names=FALSE),2),"-",round(quantile(log10(qutotal50),0.975,names=FALSE),2),", and for Q95%:",
+                        round(quantile(log10(qutotal95),0.025,names=FALSE),2),"-",round(quantile(log10(qutotal95),0.975,names=FALSE),2)),
+                  side = 1, adj = 0,line=3, cex = 1,
+                  outer = TRUE)  
+            }
           
           
         } else # end of if hazard-food modeled  
@@ -1439,6 +1502,7 @@ distPlot3_1 <- function(input_lim, unit_concen, hazard_concen, input_upper, inpu
               # uncertainty for mean log-acute exposure  E(log e^+)
               lines(meanlogexposureacute/log(10),cump,lwd=3,lty="dashed")
               lines(log10(c(limitexpoK[hazardindexK[h]],limitexpoK[hazardindexK[h]])),c(0,1),lwd=2,col="blue")
+            
               
               
               ##################
@@ -3518,7 +3582,6 @@ distPlot7_1 <- function(food_consum, unit_consum, n_sim, foodnamesused, nfused, 
     par(xpd=TRUE)
     pairs(rbind(DF1,DF2),
           main=paste("Pairwise scatterplots of log (E(consumption/bw+(", Unit3,"per kg))"),
-          # main="Pairwise scatterplots of log (E(consumption/bw+))",
           upper.panel=NULL,omd=c(1,1,15,1),
           cex=c(1,0.4)[group],pch=c(16,16)[group],col=c("#004F71","#D0006F")[group])
   }
