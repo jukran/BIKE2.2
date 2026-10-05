@@ -3388,7 +3388,6 @@ server <- function(input, output, session) {
     nexactK <- data1$nexactK
     nexactM <- data1$nexactM
     
-    
     n_sim <- results$n.sims
     muw <- results$muw
     sigw <- results$sigw
@@ -3569,6 +3568,11 @@ server <- function(input, output, session) {
     limitexpoK <- as.numeric(limitexpo[hazardtypes=="K"])
     limitexpoM <- as.numeric(limitexpo[hazardtypes=="M"])
     
+    # units for the plot
+    units_hazard <- units_hazard()
+    unit_concen <- units_hazard$unit_concen
+    hazard_concen <- units_hazard$hazard_concen
+    
     n_sim <- results$n.sims
     muw <- results$muw
     sigw <- results$sigw
@@ -3630,7 +3634,7 @@ server <- function(input, output, session) {
              hazardnamesusedK,hazardnamesusedM,nhusedK,nhusedM,hazardindexK,hazardindexM,
              Rall,Pall,nhK,nhM,nf,nexactK,nexactM,limitexpoK,limitexpoM,
              mus0,mucK,mucM,sigcK,sigcM,pK,pM,logitp0,muw,sigw,
-             Ss,Ss0,Sp,constant.consum,osdlogsw1,osdlogsw2 
+             Ss,Ss0,Sp,constant.consum,osdlogsw1,osdlogsw2,unit_concen,hazard_concen 
       )} else
         if(input_datachoice == "FFQ"){
           table2FFQ(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,nfused,foodindex,hazardnames,
