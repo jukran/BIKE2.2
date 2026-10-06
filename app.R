@@ -3642,7 +3642,7 @@ server <- function(input, output, session) {
                     hazardnamesusedK,hazardnamesusedM,nhusedK,nhusedM,hazardindexK,hazardindexM,
                     Rall,Pall,nhK,nhM,nf,nexactK,nexactM,limitexpoK,limitexpoM,
                     mus0,mucK,mucM,sigcK,sigcM,pK,pM,logitp0,muw,sigw,
-                    Ss0 
+                    Ss0,unit_concen,hazard_concen 
           )}
     
     
