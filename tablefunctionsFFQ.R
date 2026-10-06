@@ -417,7 +417,7 @@ table2FFQ <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,
                    hazardnamesusedK,hazardnamesusedM,nhusedK,nhusedM,hazardindexK,hazardindexM,
                    Rall,Pall,nhK,nhM,nf,nexactK,nexactM,limitexpoK,limitexpoM,
                    mus0,mucK,mucM,sigcK,sigcM,pK,pM,logitp0,muw,sigw,
-                   Ss0 
+                   Ss0,unit_concen,hazard_concen 
 ){
   # generate results based on inputs from ui.R: 
   # create data frame containing exposure limit analysis table----
@@ -436,6 +436,9 @@ table2FFQ <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,
     PK[1:nf,1:nhK] = Pall[1:nf,is.element(hazardnames,hazardnamesusedK)]
     
     for(h in 1:nhusedK){
+      UnitK <- unit_concen[hazard_concen == hazardnamesusedK[h]] # the measurement unit used for hazard concentration
+      UnitK1 <- sub(".p.*", "", UnitK) # Extract characters before pattern
+      
       for(i in 1:nfused){
         if(nexactK[hazardindexK[h],foodindex[i]]>0){ # this hazard-food is modeled
           
@@ -498,9 +501,10 @@ table2FFQ <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,
                                    Food = paste0(foodnamesused[i]),
                                    # Limit = paste0("<",limitexpoK[h]),
                                    #Quantity = paste0("P(chronic ",hazardnamesusedK[h]," from pos days, ",foodnamesused[i],", <",limitexpoK[h],")"),
-                                   Q05 = as.character(round(quantile(punderlimitposK,c(0.05),names=FALSE,na.rm=TRUE),2)),
-                                   Q50 = as.character(round(quantile(punderlimitposK,c(0.5),names=FALSE,na.rm=TRUE),2)),
-                                   Q95 = as.character(round(quantile(punderlimitposK,c(0.95),names=FALSE,na.rm=TRUE),2)),
+                                   Q05 = as.character(round(100*quantile(punderlimitposK,c(0.05),names=FALSE,na.rm=TRUE),2)),
+                                   Q50 = as.character(round(100*quantile(punderlimitposK,c(0.5),names=FALSE,na.rm=TRUE),2)),
+                                   Q95 = as.character(round(100*quantile(punderlimitposK,c(0.95),names=FALSE,na.rm=TRUE),2)),
+                                   Unit = paste0("%"),
                                    stringsAsFactors=FALSE)
           DFplimallK <- data.frame(Quantity = paste0("P(chronic<",limitexpoK[hazardindexK[h]], ")"),
                                    From = paste0("all days"),
@@ -508,9 +512,10 @@ table2FFQ <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,
                                    Food = paste0(foodnamesused[i]),
                                    #  Limit = paste0("<",limitexpoK[h]),
                                    #Quantity = paste0("P(chronic ",hazardnamesusedK[h]," from all days, ",foodnamesused[i],", <",limitexpoK[h],")"),
-                                   Q05 = as.character(round(quantile(punderlimitallK,c(0.05),names=FALSE,na.rm=TRUE),2)),
-                                   Q50 = as.character(round(quantile(punderlimitallK,c(0.5),names=FALSE,na.rm=TRUE),2)),
-                                   Q95 = as.character(round(quantile(punderlimitallK,c(0.95),names=FALSE,na.rm=TRUE),2)),
+                                   Q05 = as.character(round(100*quantile(punderlimitallK,c(0.05),names=FALSE,na.rm=TRUE),2)),
+                                   Q50 = as.character(round(100*quantile(punderlimitallK,c(0.5),names=FALSE,na.rm=TRUE),2)),
+                                   Q95 = as.character(round(100*quantile(punderlimitallK,c(0.95),names=FALSE,na.rm=TRUE),2)),
+                                   Unit = paste0("%"),
                                    stringsAsFactors=FALSE)
           DFplim <- rbind.data.frame(DFplim,DFplimallK,DFplimposK)
           
@@ -523,6 +528,7 @@ table2FFQ <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,
                                  Q05 = as.character(round(quantile(qutotal95,0.05,names=FALSE,na.rm=TRUE),2)),
                                  Q50 = as.character(round(quantile(qutotal95,0.5,names=FALSE,na.rm=TRUE),2)),
                                  Q95 = as.character(round(quantile(qutotal95,0.95,names=FALSE,na.rm=TRUE),2)), 
+                                 Unit = paste0(UnitK1),
                                  stringsAsFactors=FALSE)   
           
           # positive chronic exposures, 
@@ -554,6 +560,7 @@ table2FFQ <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,
                                  Q05 = as.character(round(qu95_05,2)),
                                  Q50 = as.character(round(qu95_50,2)),
                                  Q95 = as.character(round(qu95_95,2)),
+                                 Unit = paste0(UnitK1),
                                  stringsAsFactors=FALSE)
           
           DF95 <- rbind.data.frame(DF95,DF95allK,DF95posK)
@@ -574,6 +581,9 @@ table2FFQ <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,
     PM[1:nf,1:nhM] = Pall[1:nf,is.element(hazardnames,hazardnamesusedM)]
     
     for(h in 1:nhusedM){
+      UnitM <- unit_concen[hazard_concen == hazardnamesusedM[h]] # the measurement unit used for hazard concentration
+      UnitM1 <- sub(".p.*", "", UnitM) # Extract characters before pattern
+      
       for(i in 1:nfused){
         if(nexactM[hazardindexM[h],foodindex[i]]>0){ # this hazard-food is modeled
           
@@ -663,9 +673,10 @@ table2FFQ <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,
                                    Food = paste0(foodnamesused[i]),
                                    # Limit = paste0("<",limitexpoM[h]),
                                    #Quantity = paste0("P(chronic ",hazardnamesusedM[h]," from pos days, ",foodnamesused[i],", <",limitexpoM[h],")"),
-                                   Q05 = as.character(round(quantile(punderlimitposM,c(0.05),names=FALSE,na.rm=TRUE),2)),
-                                   Q50 = as.character(round(quantile(punderlimitposM,c(0.5),names=FALSE,na.rm=TRUE),2)),
-                                   Q95 = as.character(round(quantile(punderlimitposM,c(0.95),names=FALSE,na.rm=TRUE),2)),
+                                   Q05 = as.character(round(100*quantile(punderlimitposM,c(0.05),names=FALSE,na.rm=TRUE),2)),
+                                   Q50 = as.character(round(100*quantile(punderlimitposM,c(0.5),names=FALSE,na.rm=TRUE),2)),
+                                   Q95 = as.character(round(100*quantile(punderlimitposM,c(0.95),names=FALSE,na.rm=TRUE),2)),
+                                   Unit = paste0("%"),
                                    stringsAsFactors=FALSE)
           DFplimallM <- data.frame(Quantity = paste0("P(chronic<",limitexpoM[hazardindexM[h]], ")"),
                                    From = paste0("all days"),
@@ -673,9 +684,10 @@ table2FFQ <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,
                                    Food = paste0(foodnamesused[i]),
                                    # Limit = paste0("<",limitexpoM[h]),
                                    #Quantity = paste0("P(chronic ",hazardnamesusedM[h]," from all days, ",foodnamesused[i],", <",limitexpoM[h],")"),
-                                   Q05 = as.character(round(quantile(punderlimitallM,c(0.05),names=FALSE,na.rm=TRUE),2)),
-                                   Q50 = as.character(round(quantile(punderlimitallM,c(0.5),names=FALSE,na.rm=TRUE),2)),
-                                   Q95 = as.character(round(quantile(punderlimitallM,c(0.95),names=FALSE,na.rm=TRUE),2)),
+                                   Q05 = as.character(round(100*quantile(punderlimitallM,c(0.05),names=FALSE,na.rm=TRUE),2)),
+                                   Q50 = as.character(round(100*quantile(punderlimitallM,c(0.5),names=FALSE,na.rm=TRUE),2)),
+                                   Q95 = as.character(round(100*quantile(punderlimitallM,c(0.95),names=FALSE,na.rm=TRUE),2)),
+                                   Unit = paste0("%"),
                                    stringsAsFactors=FALSE)
           DFplim <- rbind.data.frame(DFplim,DFplimallM,DFplimposM)
           
@@ -688,6 +700,7 @@ table2FFQ <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,
                                  Q05 = as.character(round(quantile(qutotal95,0.05,names=FALSE,na.rm=TRUE),2)),
                                  Q50 = as.character(round(quantile(qutotal95,0.5,names=FALSE,na.rm=TRUE),2)),
                                  Q95 = as.character(round(quantile(qutotal95,0.95,names=FALSE,na.rm=TRUE),2)), 
+                                 Unit = paste0(UnitM1),
                                  stringsAsFactors=FALSE)
           
           # positive mean exposures, 
@@ -700,7 +713,8 @@ table2FFQ <- function(n_sim, input_modelchoice,input_modelchoice2,foodnamesused,
                                  #Quantity = paste0("Q95 chronic ",hazardnamesusedM[h]," from pos days, ",foodnamesused[i]), 
                                  Q05 = as.character(round(qu95_05,2)),
                                  Q50 = as.character(round(qu95_50,2)),
-                                 Q95 = as.character(round(qu95_95,2)), 
+                                 Q95 = as.character(round(qu95_95,2)),
+                                 Unit = paste0(UnitM1),
                                  stringsAsFactors=FALSE)
           
           DF95 <- rbind.data.frame(DF95,DF95allM,DF95posM)
