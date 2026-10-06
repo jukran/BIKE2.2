@@ -3388,6 +3388,11 @@ server <- function(input, output, session) {
     nexactK <- data1$nexactK
     nexactM <- data1$nexactM
     
+    # units for the plot
+    units_hazard <- units_hazard()
+    unit_concen <- units_hazard$unit_concen
+    hazard_concen <- units_hazard$hazard_concen
+    
     n_sim <- results$n.sims
     muw <- results$muw
     sigw <- results$sigw
@@ -3470,7 +3475,7 @@ server <- function(input, output, session) {
              Rall, Pall,nhK,nhM,nf,nexactK,nexactM,
              mucK,mucM,mus0,muw,pK,pM,sigcK,sigcM,sigw,
              logitp0,
-             Ss,Ss0,Sp,constant.consum,logsw,logs,osdlogsw1,osdlogsw2
+             Ss,Ss0,Sp,constant.consum,logsw,logs,osdlogsw1,osdlogsw2,unit_concen,hazard_concen
       )
     } else
       if(input_datachoice == "FFQ"){
@@ -3480,7 +3485,7 @@ server <- function(input, output, session) {
                   Rall, Pall,nhK,nhM,nf,nexactK,nexactM,
                   mucK,mucM,mus0,muw,pK,pM,sigcK,sigcM,sigw,
                   logitp0,
-                  Ss0
+                  Ss0,unit_concen,hazard_concen
         )
       }
     
