@@ -10,11 +10,13 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
                    Rall, Pall,nhK,nhM,nf,nexactK,nexactM,
                    mucK,mucM,mus0,muw,pK,pM,sigcK,sigcM,sigw,
                    logitp0,
-                   Ss,Ss0,Sp,constant.consum,logsw,logs,osdlogsw1,osdlogsw2){
+                   Ss,Ss0,Sp,constant.consum,logsw,logs,osdlogsw1,osdlogsw2,unit_concen,hazard_concen){
   
   # generate results based on inputs from ui.R: 
   # create data frame containing posterior predictive summaries----
   
+  UnitK1 <- character()
+  UnitM1 <- character()
   if(constant.consum==FALSE){
     
   if(is.element("Concentrations",theresults)){
@@ -24,8 +26,12 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
     if((nhusedK>0)&(nfused>0)){  # if some chemical hazard in some food selected
       
       cKmc <- array(NA,dim=c(n_sim,nhusedK,nfused))   
-      for(mc in 1:(n_sim)){  # simulate posterior predictive concentrations
-        for(h in 1:nhusedK){ # actual contamination level:
+      
+        for(h in 1:nhusedK){ # actual hazard contamination level:
+          UnitK <- unit_concen[hazard_concen == hazardnamesusedK[h]] # the measurement unit used for hazard concentration
+          UnitK1[h] <- sub(".p.*", "", UnitK) # Extract characters before pattern
+          
+          for(mc in 1:(n_sim)){  # simulate posterior predictive concentrations
           cKmc[mc,h,1:nfused] <- rlnorm(nfused,
                                         mucK[mc,hazardindexK[h],foodindex[1:nfused]],
                                         sigcK[mc,hazardindexK[h],foodindex[1:nfused]])
@@ -34,6 +40,7 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
         } # end of h
       } # end of mc
       hazardnamesusedKinfoodnamesused <- array(NA,nhusedK*nfused) # collect the names of used hazard-food combinations
+      UnitKinfood <- array(NA,nhusedK*nfused) # collect the measurement units for hazards in foods
       hlo98cK <- numeric()
       hup98cK <- numeric()
       hlo90cK <- numeric()
@@ -42,21 +49,22 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
       hup80cK <- numeric()
       hmediancK <- numeric()
       counterK <- 0
-      for(i in 1:nhusedK){
+      for(h in 1:nhusedK){
         for(j in 1:nfused){
           counterK <- counterK +1
-          hazardnamesusedKinfoodnamesused[counterK] <- paste0(hazardnamesusedK[i]," in ",foodnamesused[j],":") 
-          hlo98cK[counterK] <- quantile(cKmc[,i,j],c(0.01),names=FALSE) # calculate quantile
-          hup98cK[counterK] <- quantile(cKmc[,i,j],c(0.99),names=FALSE) # calculate quantile
-          hlo90cK[counterK] <- quantile(cKmc[,i,j],c(0.05),names=FALSE) # calculate quantile
-          hup90cK[counterK] <- quantile(cKmc[,i,j],c(0.95),names=FALSE) # calculate quantile
-          hlo80cK[counterK] <- quantile(cKmc[,i,j],c(0.10),names=FALSE) # calculate quantile
-          hup80cK[counterK] <- quantile(cKmc[,i,j],c(0.90),names=FALSE) # calculate quantile
-          hmediancK[counterK] <- quantile(cKmc[,i,j],c(0.5),names=FALSE) # calculate quantile
+          hazardnamesusedKinfoodnamesused[counterK] <- paste0(hazardnamesusedK[h]," in ",foodnamesused[j],":") 
+          UnitKinfood[counterK] <- paste0(UnitK1[h],"/g")
+          hlo98cK[counterK] <- quantile(cKmc[,h,j],c(0.01),names=FALSE) # calculate quantile
+          hup98cK[counterK] <- quantile(cKmc[,h,j],c(0.99),names=FALSE) # calculate quantile
+          hlo90cK[counterK] <- quantile(cKmc[,h,j],c(0.05),names=FALSE) # calculate quantile
+          hup90cK[counterK] <- quantile(cKmc[,h,j],c(0.95),names=FALSE) # calculate quantile
+          hlo80cK[counterK] <- quantile(cKmc[,h,j],c(0.10),names=FALSE) # calculate quantile
+          hup80cK[counterK] <- quantile(cKmc[,h,j],c(0.90),names=FALSE) # calculate quantile
+          hmediancK[counterK] <- quantile(cKmc[,h,j],c(0.5),names=FALSE) # calculate quantile
         }
       } 
       DFKconcentrations <- data.frame(
-        Quantity_ = paste(hazardnamesusedKinfoodnamesused),
+        Subject = paste(hazardnamesusedKinfoodnamesused),
         Quantity = paste("concentr+"),
         Q01 = as.character(round(hlo98cK[1:counterK],2)),
         Q05 = as.character(round(hlo90cK[1:counterK],2)),
@@ -65,14 +73,19 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
         Q90 = as.character(round(hup80cK[1:counterK],2)),
         Q95 = as.character(round(hup90cK[1:counterK],2)),
         Q99 = as.character(round(hup98cK[1:counterK],2)),
+        Unit = paste(UnitKinfood[1:counterK]),
         stringsAsFactors=FALSE)
     } # end of if nhusedK nfused  
     
     if((nhusedM>0)&(nfused>0)){  # if some microbial hazard in some food selected
       
       cMmc <- array(NA,dim=c(n_sim,nhusedM,nfused))
-      for(mc in 1:(n_sim)){  # simulate posterior predictive concentrations
-        for(h in 1:nhusedM){  # actual contamination level:
+     
+        for(h in 1:nhusedM){  # actual hazard contamination level:
+          UnitM <- unit_concen[hazard_concen == hazardnamesusedM[h]] # the measurement unit used for hazard concentration
+          UnitM1[h] <- sub(".p.*", "", UnitM) # Extract characters before pattern
+          
+          for(mc in 1:(n_sim)){  # simulate posterior predictive concentrations
           cMmc[mc,h,1:nfused] <- rlnorm(nfused,
                                         mucM[mc,hazardindexM[h],foodindex[1:nfused]],
                                         sigcM[mc,hazardindexM[h],foodindex[1:nfused]]) 
@@ -81,6 +94,7 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
         } # end of h
       } # end of mc
       hazardnamesusedMinfoodnamesused <- array(NA,nhusedM*nfused) # collect the names of used hazard-food combinations
+      UnitMinfood <- array(NA,nhusedM*nfused) # collect the measurement units for hazards in foods
       hlo98cM <- numeric()
       hup98cM <- numeric()
       hlo90cM <- numeric()
@@ -89,21 +103,22 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
       hup80cM <- numeric()
       hmediancM <- numeric()
       counterM <- 0
-      for(i in 1:nhusedM){
+      for(h in 1:nhusedM){
         for(j in 1:nfused){
           counterM <- counterM +1
-          hazardnamesusedMinfoodnamesused[counterM] <- paste0(hazardnamesusedM[i]," in ",foodnamesused[j],":") 
-          hlo98cM[counterM] <- quantile(cMmc[,i,j],c(0.01),names=FALSE) # calculate quantile
-          hup98cM[counterM] <- quantile(cMmc[,i,j],c(0.99),names=FALSE) # calculate quantile
-          hlo90cM[counterM] <- quantile(cMmc[,i,j],c(0.05),names=FALSE) # calculate quantile
-          hup90cM[counterM] <- quantile(cMmc[,i,j],c(0.95),names=FALSE) # calculate quantile
-          hlo80cM[counterM] <- quantile(cMmc[,i,j],c(0.10),names=FALSE) # calculate quantile
-          hup80cM[counterM] <- quantile(cMmc[,i,j],c(0.90),names=FALSE) # calculate quantile
-          hmediancM[counterM] <- quantile(cMmc[,i,j],c(0.5),names=FALSE) # calculate quantile
+          hazardnamesusedMinfoodnamesused[counterM] <- paste0(hazardnamesusedM[h]," in ",foodnamesused[j],":")
+          UnitMinfood[counterM] <- paste0(UnitM1[h],"/g")
+          hlo98cM[counterM] <- quantile(cMmc[,h,j],c(0.01),names=FALSE) # calculate quantile
+          hup98cM[counterM] <- quantile(cMmc[,h,j],c(0.99),names=FALSE) # calculate quantile
+          hlo90cM[counterM] <- quantile(cMmc[,h,j],c(0.05),names=FALSE) # calculate quantile
+          hup90cM[counterM] <- quantile(cMmc[,h,j],c(0.95),names=FALSE) # calculate quantile
+          hlo80cM[counterM] <- quantile(cMmc[,h,j],c(0.10),names=FALSE) # calculate quantile
+          hup80cM[counterM] <- quantile(cMmc[,h,j],c(0.90),names=FALSE) # calculate quantile
+          hmediancM[counterM] <- quantile(cMmc[,h,j],c(0.5),names=FALSE) # calculate quantile
         }
       } 
       DFMconcentrations <- data.frame(
-        Quantity_ = paste(hazardnamesusedMinfoodnamesused),
+        Subject = paste(hazardnamesusedMinfoodnamesused),
         Quantity = paste("concentr+"),
         Q01 = as.character(round(hlo98cM[1:counterM],2)),
         Q05 = as.character(round(hlo90cM[1:counterM],2)),
@@ -112,6 +127,7 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
         Q90 = as.character(round(hup80cM[1:counterM],2)),
         Q95 = as.character(round(hup90cM[1:counterM],2)),
         Q99 = as.character(round(hup98cM[1:counterM],2)),
+        Unit = paste(UnitMinfood[1:counterM]),
         stringsAsFactors=FALSE)
     } # end of if nhusedM nfused  
     
@@ -491,7 +507,7 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
       # Compose data frame for chemical exposure
       if(nhusedK>0){
         DF1K <- data.frame(
-          Quantity_ = paste(hazardnamesusedK),
+          Subject = paste(hazardnamesusedK),
           Quantity = paste("total chronic exposure/bw"),
           Q01 = as.character(round(hlo98totbwK[1:nhusedK],2)),
           Q05 = as.character(round(hlo90totbwK[1:nhusedK],2)),
@@ -500,12 +516,13 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
           Q90 = as.character(round(hup80totbwK[1:nhusedK],2)),
           Q95 = as.character(round(hup90totbwK[1:nhusedK],2)),
           Q99 = as.character(round(hup98totbwK[1:nhusedK],2)),
+          Unit = paste0(UnitK1[1:nhusedK],"/kg/day"),
           stringsAsFactors=FALSE)
       }
       # Compose data frame for microbial exposure   
       if(nhusedM>0){
         DF1M <- data.frame(
-          Quantity_ = paste(hazardnamesusedM),
+          Subject = paste(hazardnamesusedM),
           Quantity = paste("total acute exposure"),
           Q01 = as.character(round(hlo98totacuteM[1:nhusedM],2)),
           Q05 = as.character(round(hlo90totacuteM[1:nhusedM],2)),
@@ -514,13 +531,14 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
           Q90 = as.character(round(hup80totacuteM[1:nhusedM],2)),
           Q95 = as.character(round(hup90totacuteM[1:nhusedM],2)),
           Q99 = as.character(round(hup98totacuteM[1:nhusedM],2)),
+          Unit = paste0(UnitM1[1:nhusedM],"/day"),
           stringsAsFactors=FALSE)
       }
       
       # Compose data frame for consumptions   
       if(is.element("Consumptions",theresults)){   
         DF4 <- data.frame(
-          Quantity_ = paste(foodnamesused),
+          Subject = paste(foodnamesused),
           Quantity = paste("mean daily use/bw+"),
           Q01 = as.character(round(fconslo98bw[1:nfused],2)),
           Q05 = as.character(round(fconslo90bw[1:nfused],2)),
@@ -529,9 +547,10 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
           Q90 = as.character(round(fconsup80bw[1:nfused],2)),
           Q95 = as.character(round(fconsup90bw[1:nfused],2)),
           Q99 = as.character(round(fconsup98bw[1:nfused],2)),
+          Unit = paste0(rep("g/kg/day",nfused)),
           stringsAsFactors=FALSE)
         DF5 <- data.frame(
-          Quantity_ = paste(foodnamesused),
+          Subject = paste(foodnamesused),
           Quantity = paste("mean daily use+"),
           Q01 = as.character(round(fconslo98[1:nfused],2)),
           Q05 = as.character(round(fconslo90[1:nfused],2)),
@@ -540,6 +559,7 @@ table1 <- function(n_sim, input_modelchoice,input_modelchoice2,input_modelchoice
           Q90 = as.character(round(fconsup80[1:nfused],2)),
           Q95 = as.character(round(fconsup90[1:nfused],2)),
           Q99 = as.character(round(fconsup98[1:nfused],2)),
+          Unit = paste0(rep("g/day",nfused)),
           stringsAsFactors=FALSE)
       }
       
@@ -733,7 +753,7 @@ table2 <- function(n_sim,input_modelchoice,input_modelchoice2,foodnamesused,nfus
                                  Q05 = as.character(round(quantile(qutotal95,0.05,names=FALSE,na.rm=TRUE),2)),
                                  Q50 = as.character(round(quantile(qutotal95,0.5,names=FALSE,na.rm=TRUE),2)),
                                  Q95 = as.character(round(quantile(qutotal95,0.95,names=FALSE,na.rm=TRUE),2)),
-                                 Unit = paste0(UnitK1),
+                                 Unit = paste0(UnitK1,"/kg/day"),
                                  stringsAsFactors=FALSE)   
           
           # positive chronic exposures, 
@@ -767,7 +787,7 @@ table2 <- function(n_sim,input_modelchoice,input_modelchoice2,foodnamesused,nfus
                                  Q05 = as.character(round(qu95_05,2)),
                                  Q50 = as.character(round(qu95_50,2)),
                                  Q95 = as.character(round(qu95_95,2)),
-                                 Unit = paste0(UnitK1),
+                                 Unit = paste0(UnitK1,"/kg/day"),
                                  stringsAsFactors=FALSE)
           
           DF95 <- rbind.data.frame(DF95,DF95allK,DF95posK)
@@ -934,7 +954,7 @@ table2 <- function(n_sim,input_modelchoice,input_modelchoice2,foodnamesused,nfus
                                  Q05 = as.character(round(quantile(qutotal95,0.05,names=FALSE,na.rm=TRUE),2)),
                                  Q50 = as.character(round(quantile(qutotal95,0.5,names=FALSE,na.rm=TRUE),2)),
                                  Q95 = as.character(round(quantile(qutotal95,0.95,names=FALSE,na.rm=TRUE),2)),
-                                 Unit = paste0(UnitM1),
+                                 Unit = paste0(UnitM1,"/day"),
                                  stringsAsFactors=FALSE)
           
           # positive acute ('poisson mean') exposures, 
@@ -948,7 +968,7 @@ table2 <- function(n_sim,input_modelchoice,input_modelchoice2,foodnamesused,nfus
                                  Q05 = as.character(round(qu95_05,2)),
                                  Q50 = as.character(round(qu95_50,2)),
                                  Q95 = as.character(round(qu95_95,2)), 
-                                 Unit = paste0(UnitM1),
+                                 Unit = paste0(UnitM1,"/day"),
                                  stringsAsFactors=FALSE)
           
           DF95 <- rbind.data.frame(DF95,DF95allM,DF95posM)
