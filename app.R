@@ -1385,64 +1385,95 @@ specific values for prevalence sample data, and 'all' should go together with 'N
                                          tags$p(h4("Incomplete list...")),       
                                          tags$ul(
                                            tags$br(),
-                                           tags$li(tags$b("Concentration+"),"positive concentration (zeros excluded)."),
+                                           tags$li(tags$b(" Concentration+"),"positive concentration (zeros excluded)."),
+                                           tags$br(),
+                                           tags$li(tags$b(" Concentration"),"concentration (zeros included)."),
+                                           tags$br(),
+                                           tags$li(tags$b(" bw"),"bodyweight"),
                                            tags$br(),
                                            tags$li(tags$b(" C.consumption/bw+"),"
-positive chronic (i.e. mean) consumption per bodyweight per consumption day (zeros excluded)."),
+positive 'chronic' (i.e. mean) consumption per bodyweight per consumption day (zeros excluded)."),
+                                           tags$br(),
+                                           tags$li(tags$b(" C.consumption/bw"),"
+'chronic' (i.e. mean) consumption per bodyweight per consumption day (zeros included)."),
                                            tags$br(),
                                            tags$li(tags$b(" A.consumption+"),"
-positive acute consumption per consumption day (zeros excluded)."),
+positive 'acute' consumption per consumption day (zeros excluded)."),
+                                           tags$br(),
+                                           tags$li(tags$b(" A.consumption"),"
+'acute' consumption per consumption day (zeros included)."),
                                            tags$br(),
                                            tags$li(tags$b(" C.exposure/bw+"),"
 positive chronic (i.e. mean) exposure per bodyweight per exposure day (zeros excluded)."),
                                            tags$br(),
+                                           tags$li(tags$b(" C.exposure/bw"),"
+chronic (i.e. mean) exposure per bodyweight per exposure day (zeros included)."),
+                                           tags$br(),
                                            tags$li(tags$b(" A.exposure+"),"
 positive acute exposure per exposure day (zeros excluded)."),
+                                           tags$br(),
+                                           tags$li(tags$b(" A.exposure"),"
+acute exposure per exposure day (zeros included)."),
                                            tags$br(),
                                            tags$li(tags$b(" MCMC"),"
 Markov chain Monte Carlo sampling method."),
                                            tags$br(),
-                                           tags$li(tags$b(" uncertainty"),"
+                                           tags$li(tags$b(" Uncertainty"),"
 uncertainty of parameter values (represented by posterior distribution, realized as an MCMC
 sample)."),
                                            tags$br(),
-                                           tags$li(tags$b(" variability"),"
+                                           tags$li(tags$b(" Variability"),"
 variability of quantities in a population, modelled as a distribution that depends on its parameters."),
                                            tags$br(),
-                                           tags$li(tags$b(" quantile"),"
-quantile point of a variability distribution (i.e. unknown, hence uncertain quantity), or quantile point of an uncertainty distribution."),
+                                           tags$li(tags$b(" Quantile"),"
+quantile point of a variability distribution (i.e. unknown, hence uncertain quantity), or the quantile point of an uncertainty distribution."),
                                            tags$br(),
-                                           tags$li(tags$b(" empirical distribution"),"
+                                           tags$li(tags$b(" Empirical distribution"),"
 a distribution of data values as such."),
                                            tags$br(),
-                                           tags$li(tags$b(" pseudo empirical distribution (of exposure)"),"
+                                           tags$li(tags$b(" Pseudo empirical distribution (of exposure)"),"
 a distribution of exposure produced by sampling concentrations and consumptions directly from
-the separate data sets for each. Usually requires either LB or UB substitutions for values below
+the data sets for each. Usually requires either LB or UB substitutions for values below
 LOQ or LOD, leading to lower or upper estimate of pseudo empirical exposure distribution."),
                                            tags$br(),
-                                           tags$li(tags$b(" bootstrap"),"
+                                           tags$li(tags$b(" Bootstrap"),"
 resampling of data (with replacement) to create artificial random replicate of data, with
 original sample size."),
                                            tags$br(),
                                            tags$li(tags$b(" 2D simulation"),"
 simulation of parameter values from uncertainty distribution (here by MCMC) and simulation
-of variable quantities from variability distributions (which are defined by those parameters)."),
+of variable quantities from variability distributions (which are defined by those parameters). Variability and uncertainty separated."),
                                            tags$br(),
-                                           tags$li(tags$b(" consumption frequency"),"
+                                           tags$li(tags$b(" Consumption frequency"),"
 proportion of actual consumption days in the long run."),
                                            tags$br(),
-                                           tags$li(tags$b(" proportion of consumers"),"
+                                           tags$li(tags$b(" Proportion of consumers"),"
 proportion of true consumers of a food type in population."),
                                            tags$br(),
-                                           tags$li(tags$b(" prevalence"),"
+                                           tags$li(tags$b(" Prevalence"),"
 proportion of contaminated food items."
                                            ),
                                            tags$br(),
-                                           tags$li(tags$b("LB substitution"), "replacement of the <LOD or <LOQ measurement by zero."),
+                                           tags$li(tags$b(" Exposure frequency"),"
+proportion of actual exposure days (when the food was both consumed and contaminated) in the long run."),
                                            tags$br(),
-                                           tags$li(tags$b("UB substitution"), "replacement of the <LOD or <LOQ measurement by the limit"),
+                                           tags$li(tags$b(" LB substitution"), "replacement of the measurement <LOD by zero, or the measurement <LOQ by LOD."),
                                            tags$br(),
-                                           tags$li(tags$b("Posterior distribution"), "uncertainty distribution of all unknown parameters, conditionally on the observed data.")
+                                           tags$li(tags$b(" UB substitution"), "replacement of the <LOD or <LOQ measurement by the limit"),
+                                           tags$br(),
+                                           tags$li(tags$b(" Prior distribution"), "initial 'flat' uncertainty distribution of all unknown parameters, before having data."),
+                                           tags$br(),
+                                           tags$li(tags$b(" Posterior distribution"), "uncertainty distribution of all unknown parameters, conditionally on the observed data."),
+                                           tags$br(),
+                                           tags$li(tags$b(" Posterior predictive distribution"), "predictive distribution of variable quantities, conditionally on the observed data. Variability and uncertainty mixed."),
+                                           tags$br(),
+                                           tags$li(tags$b(" Tau Gamma"), " Gamma(0.01,0.01)-prior distribution for inverse variance."),
+                                           tags$br(),
+                                           tags$li(tags$b(" Sigma Uniform"), " Uniform(0,L)-prior distribution for standard deviation, upperbound based on inflated sample standard deviation."),
+                                           tags$br(),
+                                           tags$li(tags$b(" Concentration factor"), " any positive constant to increase or decrease hazard concentrations by multiplication."),
+                                           tags$br(),
+                                           tags$li(tags$b(" Prevalence factor"), " any positive constant (smaller than one) to decrease hazard prevalence by multiplication.")
                                          )
                                        )
                               ),
