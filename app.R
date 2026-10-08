@@ -1481,12 +1481,9 @@ proportion of actual exposure days (when the food was both consumed and contamin
                                        wellPanel(
                                          
                                          tags$p(
-                                           "The source code will be available at",
+                                           "The source code available at",
                                            tags$a("GitHub", href =
-                                                    "https://github.com/", target = "_blank"), 
-                                           " / ","The source code will be published at",
-                                           tags$a("Zenodo?", href =
-                                                    "https://zenodo.org/", target = "_blank")
+                                                    "https://github.com/", target = "_blank")
                                          )
                                        )),
                               tabPanel("How to cite?", 
@@ -1496,8 +1493,8 @@ proportion of actual exposure days (when the food was both consumed and contamin
                                  BIKE foodborne exposure model - A graphical user interface for 
                                  the Bayesian dietary exposure assessment model for microbiological and chemical hazards (BIKE). 
                                  Finnish Food Authority, Helsinki, Finland. Available at",
-                                                tags$a("https://bike-expo-shiny.rahtiapp.fi/", href =
-                                                         "https://bike-expo-shiny.rahtiapp.fi/", target = "_blank"))
+                                                tags$a("https://bike-version-2-2.2.rahtiapp.fi/    ", href =
+                                                         "https://bike-version-2-2.2.rahtiapp.fi/  ", target = "_blank"))
                                        ))
                               
                             ))
